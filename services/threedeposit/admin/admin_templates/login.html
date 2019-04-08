@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container" align="middle">
+	<div class="form-group">
+		<form method="POST" action="">
+		    {{ form.csrf_token }}
+		    {{ form.username.label }} {{ form.username(size=20) }}
+		    <br>
+		    {{ form.password.label }} {{ form.password(size=20) }}
+		    <br>
+			<input class="btn btn-outline-primary" type="submit" value="Login">	    
+		</form>
+	</div>
+</div>	
+
+
+{% endblock %}

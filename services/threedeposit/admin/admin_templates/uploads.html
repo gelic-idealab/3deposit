@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container">
+	{% if models  %}
+		<h5>Uploads</h5>
+		<table id="upload-table" class="table table-striped table-bordered table-responsive">
+			<thead>
+				<tr>
+					<th>Publish Date</th>
+					<th>Model Name</th>
+					<th>Viewer URL</th>
+					<th>Thumbnail</th>
+					<th>Details</th>
+				</tr>
+			</thead>
+			<tbody>		
+				{% for model in models %}
+					<tr><td>{{ model['publishedAt']}}</td>
+						<td>{{ model['name'] }}</td>
+						<td><a href="{{ model['viewerUrl']}}" target="_blank">{{ model['viewerUrl']}}</a></td>
+						<td><img src="{{ model['thumbnails']['images'][4]['url'] }}" alt="{{ model['name'] }}"></td>
+						<td><a class="btn btn-sm btn-info" href="{{ url_for('admin.model_details', uid = model['uid']) }}">Details</a></td>
+					</tr>
+				{% endfor %}
+			</tbody>	
+		</table>
+	<br>
+
+</div>	
+	{% if collections %}
+		<div class="container">
+			<h5>Collections</h5>
+			<table id="collections-table" class="table table-striped table-bordered">
+				<thead>
+					<tr>
+						<th>Collection ID</th>
+						<th>Unit Name</th>
+						<th>Model Count</th>
+						<th>Embed</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for collection in collections %}
+					<tr><td>{{ collection['uid'] }}</td>
+						<td>{{ collection['name'] }}</td>
+						<td>{{ collection['modelCount'] }}</td>
+						<td><a class="btn btn-sm btn-info" href="{{ url_for('admin.collection', collectionid=collection['uid']) }}">View</a></td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	{% endif %}		
+
+	{% else %}
+		No uploads. 
+	{% endif %}
+
+<br>
+<div class="container">
+	<form action="{{ url_for('admin.delete') }}" method="post">
+		<div class="col-6 input-group">
+			<div class="input-group-prepend">
+				<button type="submit" class="btn btn-sm btn-outline-danger">Delete model</button>
+			</div>
+			<input type="text" class="form-control" placeholder="sketchfab uid" name="scope" id="scope">
+		</div>
+	</form>	
+	<br>
+	<div class="container">
+		<form action="{{ url_for('admin.delete') }}" method="post">
+			<input type="hidden" value="DELETE_ALL" name="scope" id="scope">
+			<button type="submit" class="btn btn-danger btn-sm">Delete all models</button>
+		</form>
+	</div>
+</div>
+<br>	
+
+<script type="text/javascript">
+	$(document).ready(function() {
+	    $('#upload-table').DataTable();
+	} );
+</script>
+
+{% endblock %}

@@ -1,0 +1,6 @@
+*.pyc
+app.log
+threedeposit.sqlite
+threedeposit/tmp
+reset_deposits.py
+.vscode/*

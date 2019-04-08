@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container">
+	<h6>{{ model['name'] }}</h6>
+	<code>{{ model['uid'] }}</code>
+	<div class="embed-responsive embed-responsive-16by9">
+		<embed class="embed-responsive-item" src="{{ model['embedUrl'] }}">
+	</div>
+	<br>
+	<div class="btn-group mr-2">
+		<a class="btn btn-sm btn-outline-info" href="{{ model['editorUrl'] }}" target="_blank">Edit Model</a>
+	</div>
+	<div class="btn-group mr-2">
+		<form action="{{ url_for('admin.delete') }}" method="post">
+			<button type="submit" class="btn btn-sm btn-outline-danger">Delete model</button>
+			<input type="hidden" value="{{ model['uid'] }}" name="scope" id="scope">
+		</form>
+	</div>
+	<div class="btn-group mr-2">
+		<form action="{{ url_for('admin.update_collection') }}" method="post">
+		<div class="input-group mr-2">
+		  <div class="input-group-prepend">
+		    <button class="btn btn-sm btn-outline-secondary" type="submit">Add to collection</button>
+		    <input type="hidden" value="{{ model['uid'] }}" name="uid" id="uid">
+		  </div>
+		  <input type="text" class="form-control-sm" name="cid" id="cid">
+		</div>
+	</div>
+</div>
+<br>
+<div class="container">
+	<table class="table table-striped table-bordered table-responsive">
+		{% for key in model|sort %}
+			<tr><td><strong>{{ key }}</strong></td>
+			<td>{{ model[key] }}</td></tr>
+		{% endfor %}			
+	</table>
+</div>
+<br>
+
+{% endblock %}

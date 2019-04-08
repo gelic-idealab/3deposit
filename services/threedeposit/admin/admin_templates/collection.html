@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if collection %}
+	<div class="container">
+		<h5>Collection for {{ collection['name'] }}</h5>
+		<code>https://sketchfab.com/playlists/embed?collection={{ collection['uid'] }}</code>
+	</div>
+	<br>
+	<div class = "container">
+		<div class="embed-responsive embed-responsive-16by9">
+			<embed class="embed-responsive-item" src="https://sketchfab.com/playlists/embed?collection={{ collection['uid'] }}" frameborder="0" allow="autoplay; fullscreen; vr" mozallowfullscreen="true" webkitallowfullscreen="true"></embed>
+
+			<p style="font-size: 13px; font-weight: normal; margin: 5px; color: #4A4A4A;">
+			    <a href="https://sketchfab.com/uiuclibrary/collections/{{ collection['slug'] }}?utm_source=website&utm_medium=embed&utm_campaign=share-popup" target="_blank" style="font-weight: bold; color: #1CAAD9;">{{ collection['name'] }}</a>
+			    by <a href="https://sketchfab.com/uiuclibrary?utm_source=website&utm_medium=embed&utm_campaign=share-popup" target="_blank" style="font-weight: bold; color: #1CAAD9;">University of Illinois Library</a>
+			    on <a href="https://sketchfab.com?utm_source=website&utm_medium=embed&utm_campaign=share-popup" target="_blank" style="font-weight: bold; color: #1CAAD9;">Sketchfab</a>
+			</p>
+		</div>
+		<br>
+	</div>
+{% endif %}	
+
+{% endblock %}

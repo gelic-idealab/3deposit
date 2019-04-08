@@ -1,0 +1,33 @@
+{
+  "title": "Deposit Form",
+  "description": "",
+  "fields": [
+  { "id": 0,
+    "label": "Creator Name(s)",
+    "type": "text",
+    "repeatable": true,
+    "required": true,
+    "children": [],
+    "value": [""],
+    "placeholder": "Enter creator name."
+  },
+  { "id": 1,
+    "label": "Media Type",
+    "type": "select",
+    "repeatable": false,
+    "required": true,
+    "children": [2],
+    "value": [""],
+    "options": [{"value": "model", "label": "3D Model"}, {"value": "vr", "label": "Virtual Reality"}, {"value": "video", "label": "360 Video"}]
+  },
+  { "id": 2,
+    "label": "File Type",
+    "type": "select",
+    "repeatable": false,
+    "required": true,
+    "children": [],
+    "value": [""],        
+    "options": [{"value": "gltf", "label": ".glTF"}, {"value": "obj", "label": ".obj"}]
+  }
+  ]
+}

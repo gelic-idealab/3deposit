@@ -1,0 +1,28 @@
+version: "2"
+services:
+
+  db:
+    image: mysql:5.7
+    ports:
+      - "32000:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: threedeposit
+    volumes:  
+      - db_data:/var/lib/mysql
+
+  app:
+    depends_on:
+      - db
+    build: .
+    links:
+      - db
+    ports:
+      - "5000:5000"
+    environment:
+      FLASK_APP: threedeposit
+      FLASK_ENV: development
+      DATABASE: mysql
+
+volumes:
+    db_data: {}    

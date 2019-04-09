@@ -1,7 +1,6 @@
-import requests
-import urllib
 import os
 import json
+import requests
 from flask import Flask, request, jsonify
 
 
@@ -16,7 +15,7 @@ def publish():
     TOKEN = request.form.get('token')
 
     headers = {'Authorization': 'Token {}'.format(TOKEN)}
-    
+
     post_data = json.loads(request.form.get('data'))
     data = {'name': post_data.get('name')}
 

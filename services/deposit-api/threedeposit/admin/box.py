@@ -4,19 +4,9 @@ from threedeposit.database import db_session, Config
 import json
 import sys
 
-# with open('threedeposit/admin/box/box_cfg.json') as f:
-#     data = json.load(f)
-
-# CLIENT_ID = data['client_id']
-# CLIENT_SECRET = data['client_secret']
 
 # save token to a file
 def save_tokens(access_token, refresh_token):
-    # with open('threedeposit/admin/box/box_tokens.json', 'w') as f:
-    #     tokens = {}
-    #     tokens['access_token'] = access_token
-    #     tokens['refresh_token'] = refresh_token
-    #     json.dump(tokens, f)
     at = Config.query.filter_by(key='boxaccesstoken')
     rt = Config.query.filter_by(key='boxrefreshtoken')
     at = access_token
@@ -27,13 +17,6 @@ def save_tokens(access_token, refresh_token):
 
 # reads tokens
 def read_tokens():
-#     try:
-#         with open('threedeposit/admin/box/box_tokens.json', 'r') as f:
-#             data = json.load(f)
-#         return data
-#     except Exception as e:
-#         print("Read token error: {}".format(e) + sys.exc_info())
-#         return "null", "null"
     data = {}
     try:
         data['access_token'] = Config.query.filter_by(key='boxaccesstoken').value(Config.value)

@@ -3,6 +3,17 @@ import json
 import requests
 from flask import Flask, request, jsonify
 
+'''
+Flask app that takes in zipped 3d model file, JSON data, and Sketchfab API token
+and publishes to Sketchfab. 
+
+Returns JSON object with two fields, if successful, indicating Sketchfab UID and 
+permalink to hosted model location. 
+
+JSON data can be arbitrary: needs at least a 'name' field for the title of the 
+published model. Everything else can get dumped into a 'description' field. 
+
+'''
 
 app = Flask(__name__)
 

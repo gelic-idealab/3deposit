@@ -13,7 +13,7 @@ def box():
         response = {}
         post_data = json.loads(request.form.get('data'))
         metadata = post_data.get('metadata')
-        file_path = 'file.zip'
+        file_path = metadata['deposit_id']
         file = request.files['file']
         file.save(file_path)
 
@@ -27,9 +27,10 @@ def box():
             return tokens
 
 
-        def save_tokens(at, rt):
+        def store_tokens(at, rt):
             response['auth']['at'] = at
             response['auth']['rt'] = rt
+            print(rt)
 
     
         CLIENT_ID = post_data.get('auth').get('client_id')
@@ -38,7 +39,7 @@ def box():
         oauth = OAuth2(
                 client_id=CLIENT_ID,
                 client_secret=CLIENT_SECRET,
-                store_tokens=save_tokens
+                store_tokens=store_tokens
                 )
 
         tokens = read_tokens()

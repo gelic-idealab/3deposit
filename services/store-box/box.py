@@ -1,6 +1,7 @@
+import os
 import sys
 import json
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from boxsdk import Client, OAuth2
 
 
@@ -9,62 +10,55 @@ app = Flask(__name__)
 @app.route('/box', methods=['POST'])
 def box():
     if request.method == 'POST':
+        response = {}
         post_data = json.loads(request.form.get('data'))
-
+        metadata = post_data.get('metadata')
+        file_path = 'file.zip'
         file = request.files['file']
-        file.save('model.zip')
-        f = open('model.zip', 'rb')
-        files = {'modelFile': f}
+        file.save(file_path)
 
-    # save token to a file
-        def save_tokens(access_token, refresh_token):
-            at = Config.query.filter_by(key='boxaccesstoken')
-            rt = Config.query.filter_by(key='boxrefreshtoken')
-            at = access_token
-            rt = refresh_token
-            db_session.commit()
-
-
+        folder_id = post_data.get('services').get('box').get('folder_id')
 
         # reads tokens
         def read_tokens():
-            data = {}
-            try:
-                data['access_token'] = Config.query.filter_by(key='boxaccesstoken').value(Config.value)
-                data['refresh_token'] = Config.query.filter_by(key='boxrefreshtoken').value(Config.value)
-            except Exception as e:
-                print("Read token error: {}".format(e))
-            return data
+            tokens = {}
+            tokens['at'] = post_data.get('auth').get('at')
+            tokens['rt'] = post_data.get('auth').get('rt')
+            return tokens
 
 
-        def push_to_box(folderid, file_path):
-            CLIENT_ID = Config.query.filter_by(key='boxclientid').value(Config.value)
-            CLIENT_SECRET = Config.query.filter_by(key='boxclientsecret').value(Config.value)
+        def save_tokens(at, rt):
+            response['auth']['at'] = at
+            response['auth']['rt'] = rt
 
-            oauth = OAuth2(
+    
+        CLIENT_ID = post_data.get('auth').get('client_id')
+        CLIENT_SECRET = post_data.get('auth').get('client_secret')
+
+        oauth = OAuth2(
                 client_id=CLIENT_ID,
                 client_secret=CLIENT_SECRET,
                 store_tokens=save_tokens
-            )
-            tokens = read_tokens()
-            at = tokens['access_token']
-            rt = tokens['refresh_token']
-            oauth._access_token = at
-            oauth._refresh_token = rt
-            client = Client(oauth)
-            archive = client.folder(folder_id=folderid)
+                )
+
+        tokens = read_tokens()
+        oauth._access_token = tokens['at']
+        oauth._refresh_token = tokens['rt']
+
+        client = Client(oauth)
+        archive = client.folder(folder_id=folder_id)
+        try:
+            upload_file = archive.upload(file_path)
             try:
-                upload_file = archive.upload(file_path)
-                try:
-                    file_url = upload_file.get_shared_link_download_url(access='open')
-                    return file_url
-                except Exception as e:
-                    flash('Error getting shared link from Box: '.format(Exception),
-                        category='danger')
-                    return False
+                file_url = upload_file.get_shared_link_download_url(access='open')
+                response['file_url'] = file_url
             except Exception as e:
-                flash('Error uploading to Box: '.format(Exception), category='danger')
-                return False
+                response['link error'] = str(e)
+        except Exception as e:
+            response['upload error'] = str(e)
+
+    os.remove(file_path)
+    return jsonify(response)        
 
 
 if __name__ == '__main__':

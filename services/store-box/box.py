@@ -6,8 +6,8 @@ from boxsdk import Client, OAuth2
 
 app = Flask(__name__)
 
-@app.route('/store', methods=['POST'])
-def store():
+@app.route('/box', methods=['POST'])
+def box():
 
     # save token to a file
     def save_tokens(access_token, refresh_token):

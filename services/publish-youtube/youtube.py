@@ -20,10 +20,10 @@ def youtube():
         token = post_data.get('token')
         headers = {'Authorization': 'Token {}'.format(token)}
         
-        data = {'name': post_data.get('name')}
+        filename = post_data.get('metadata').get('filename')
 
         file = request.files['file']
-        file.save('model.zip')
+        file.save(filename)
         
 
         return jsonify({'message': 'post received'})

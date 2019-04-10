@@ -23,11 +23,11 @@ def sketchfab():
         SKETCHFAB_DOMAIN = 'sketchfab.com'
         SKETCHFAB_API_URL = 'https://api.{}/v3'.format(SKETCHFAB_DOMAIN)
         MODEL_ENDPOINT = SKETCHFAB_API_URL + '/models'
-        TOKEN = request.form.get('token')
-
-        headers = {'Authorization': 'Token {}'.format(TOKEN)}
-
+        
         post_data = json.loads(request.form.get('data'))
+        token = post_data.get('token')
+        headers = {'Authorization': 'Token {}'.format(token)}
+        
         data = {'name': post_data.get('name')}
 
         file = request.files['file']

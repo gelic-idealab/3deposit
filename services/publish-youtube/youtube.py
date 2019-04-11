@@ -1,7 +1,8 @@
 import os
 import json
 import requests
-import google-api-python-client
+# import google-api-python-client
+# see imports from sample below
 from flask import Flask, request, jsonify
 
 '''
@@ -16,6 +17,7 @@ app = Flask(__name__)
 def youtube():
     if request.method == 'POST':
         # build post request to YouTube
+        # see https://github.com/youtube/api-samples/blob/master/python/upload_video.py
         
         post_data = json.loads(request.form.get('data'))
         token = post_data.get('token')

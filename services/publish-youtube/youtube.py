@@ -18,6 +18,7 @@ def youtube():
     if request.method == 'POST':
         # build post request to YouTube
         # see https://github.com/youtube/api-samples/blob/master/python/upload_video.py
+        # pip install --upgrade google-auth google-auth-oauthlib google-auth-httplib2 
         
         post_data = json.loads(request.form.get('data'))
         token = post_data.get('token')

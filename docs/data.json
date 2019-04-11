@@ -1,0 +1,13 @@
+{
+    "services": {
+        "<service name>": {
+            "<service configuration>": {}
+        }
+    },
+    "metadata": {
+        "<field>": "field value"
+    },
+    "auth": {
+        "<auth key>": "auth value"
+    }
+}

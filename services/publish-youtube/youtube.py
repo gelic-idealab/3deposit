@@ -19,23 +19,19 @@ def youtube():
         # build post request to YouTube
         # see https://github.com/youtube/api-samples/blob/master/python/upload_video.py
         # pip install --upgrade google-auth google-auth-oauthlib google-auth-httplib2 
-        
-        try:
-            post_data = json.loads(request.form.get('data'))
-            token = post_data.get('token')
-            headers = {'Authorization': 'Token {}'.format(token)}
-            
-            metadata = post_data.get('metadata')
-            filename = metadata.get('filename')
 
-            file = request.files['file']
-            file.save(filename)
-            
-            return jsonify({'message': 'post received'})
+        post_data = json.loads(request.form.get('data'))
+        auth = post_data.get('auth')
+        token = auth.get('apitoken')
+        # headers = {'Authorization': 'Token {}'.format(token)}
 
-        except Exception as e:
-            return jsonify({'exception': str(e)})    
+        metadata = post_data.get('metadata')
+        filename = metadata.get('filename')
 
+        file = request.files['file']
+        file.save(filename)
+
+        return jsonify({'message': token})
 
 if __name__ == '__main__':
     app.run()

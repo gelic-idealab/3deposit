@@ -9,6 +9,10 @@ verify_ssl = true
 requests = "*"
 flask = "*"
 google-api-python-client = "*"
+google-auth = "*"
+google = "*"
+google-auth-oauthlib = "*"
+google-auth-httplib2 = "*"
 
 [requires]
 python_version = "3.7"

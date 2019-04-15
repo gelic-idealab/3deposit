@@ -2,9 +2,9 @@
   <div class="banner">
     <div class="jumbotron">
       <h1 class="display-4">{{ title }}</h1>
-        <p class="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
+        <p class="lead">Use this form to upload your 3d models, 360 videos, and VR source code & projects</p>
         <hr class="my-4">
-        <p>It uses utility classes for typography and spacing to space content out within the larger container.</p>
+        <p>Your files will be deposited into a Library repository and published to a third-party website. You will receive a confirmation email when your deposit is processed.</p>
         <p class="lead">
           <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
         </p>

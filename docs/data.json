@@ -1,13 +1,14 @@
 {
     "services": {
         "<service name>": {
-            "<service configuration>": {}
+            "endpoint": "<service endpoint>",
+            "config": {}
         }
     },
     "metadata": {
-        "<field>": "field value"
+        "<field>": "<field value>"
     },
     "auth": {
-        "<auth key>": "auth value"
+        "<auth key>": "<auth value>"
     }
 }

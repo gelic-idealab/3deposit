@@ -7,10 +7,8 @@ verify_ssl = true
 
 [packages]
 pyvimeo = "*"
-pycurl = "*"
+flask = "*"
+requests = "*"
 
 [requires]
-python_version = "3.7"
-
-[pipenv]
-allow_prereleases = true
+python_version = "3.5"

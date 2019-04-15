@@ -1,7 +1,7 @@
 import os
 import json
 import requests
-import PyVimeo
+import vimeo
 from flask import Flask, request, jsonify
 
 '''
@@ -12,7 +12,7 @@ and publishes to YouTube360.
 
 app = Flask(__name__)
 
-@app.route('/youtube', methods=['POST'])
+@app.route('/vimeo', methods=['POST'])
 def youtube():
     if request.method == 'POST':
         # build post request to YouTube

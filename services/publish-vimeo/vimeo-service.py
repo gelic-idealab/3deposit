@@ -15,7 +15,7 @@ app = Flask(__name__)
 @app.route('/vimeo', methods=['POST'])
 def post_to_vimeo():
     if request.method == 'POST':
-        # unpack request
+        # unpack payload
         post_data = json.loads(request.form.get('data'))
 
         auth = post_data.get('auth')
@@ -27,6 +27,8 @@ def post_to_vimeo():
         name = metadata.get('name')
         description = metadata.get('description')
         filename = metadata.get('filename')
+        projection = metadata.get('projection')
+        stereo_format = metadata.get('stereo_format')
 
         file = request.files['file']
         file.save(filename)
@@ -41,7 +43,11 @@ def post_to_vimeo():
         file_name = filename
         uri = client.upload(file_name, data={
         'name': name,
-        'description': description
+        'description': description,
+        'spatial':  {
+                "stereo_format": stereo_format,
+                "projection": projection
+        }
         })
 
         os.remove(filename)

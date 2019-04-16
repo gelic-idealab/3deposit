@@ -26,8 +26,8 @@ def post_to_vimeo():
         metadata = post_data.get('metadata')
         name = metadata.get('name')
         description = metadata.get('description')
-
         filename = metadata.get('filename')
+
         file = request.files['file']
         file.save(filename)
 
@@ -43,6 +43,8 @@ def post_to_vimeo():
         'name': name,
         'description': description
         })
+
+        os.remove(filename)
 
         return jsonify({'uri': uri})
 

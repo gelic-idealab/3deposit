@@ -5,10 +5,11 @@ from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 
-if os.environ.get('DATABASE') == 'sqlite':
-    engine = create_engine('sqlite:///threedeposit.sqlite', convert_unicode=True)
+    
 if os.environ.get('DATABASE') == 'mysql':
     engine = create_engine('mysql+pymysql://root:root@db:3306/threedeposit')
+else:
+    engine = create_engine('sqlite:///threedeposit.sqlite', convert_unicode=True)
 
 db_session = scoped_session(sessionmaker(autocommit=False, bind=engine))
 Base = declarative_base()

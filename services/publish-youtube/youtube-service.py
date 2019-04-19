@@ -20,6 +20,15 @@ def youtube():
         # see https://github.com/youtube/api-samples/blob/master/python/upload_video.py
         # pip install --upgrade google-auth google-auth-oauthlib google-auth-httplib2 
 
+        '''
+        curl --request POST \
+        'https://www.googleapis.com/youtube/v3/videos?key=[YOUR_API_KEY]' \
+        --header 'Accept: application/json' \
+        --header 'Content-Type: application/json' \
+        --data '{}' 
+        --compressed
+        '''
+
         post_data = json.loads(request.form.get('data'))
         auth = post_data.get('auth')
         token = auth.get('apitoken')

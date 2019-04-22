@@ -11,7 +11,8 @@
     "@vue/cli": "^3.5.5",
     "axios": "^0.18.0",
     "bootstrap": "^4.3.1",
-    "jquery": "^3.3.1",
+    "bootstrap-toggle": "^2.2.2",
+    "jquery": "^3.4.0",
     "popper.js": "^1.14.7",
     "vue": "^2.6.6"
   },

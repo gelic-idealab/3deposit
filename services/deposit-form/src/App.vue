@@ -12,7 +12,10 @@
 import Banner from './components/Banner.vue'
 import Fields from './components/Fields.vue'
 import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap-toggle/css/bootstrap-toggle.min.css'
 import axios from 'axios'
+import 'bootstrap'
+
 
 export default {
   name: 'app',
@@ -23,12 +26,11 @@ export default {
   data() {
     return {
       form: {}
-      // mock api - https://1fd4d90a-5118-4b43-bd7d-4c481a1c2f51.mock.pstmn.io/getFormObject
     }
   },
   mounted () {
     axios
-      .get('https://9c18a634-98c7-4ab4-af5c-a393934bd5f6.mock.pstmn.io/getFormObject')
+      .get('https://3b51324e-31d3-4b67-a6cf-82a932707473.mock.pstmn.io/partialMapping')
       .then(response => (this.form = response.data))
   }
 }

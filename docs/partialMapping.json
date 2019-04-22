@@ -16,8 +16,13 @@
             "type": "select",
             "repeatable": false,
             "required": true,
+            "rendered": true,
             "value": [""],
-            "options": [{"value": "u", "label": "Undergraduate"}, {"value": "g", "label": "Graduate"}, {"value": "f", "label": "Faculty"}, {"value": "s", "label": "Staff"}, {"value": "o", "label": "Other"}]
+            "options": [{"value": "u", "label": "Undergraduate"}, 
+                        {"value": "g", "label": "Graduate"}, 
+                        {"value": "f", "label": "Faculty"}, 
+                        {"value": "s", "label": "Staff"}, 
+                        {"value": "o", "label": "Other"}]
         },
         {
             "id": 3,
@@ -44,7 +49,8 @@
             "repeatable": false,
             "required": false,
             "value": [""],
-            "placeholder": "Enter funding agency name"
+            "placeholder": "Enter funding agency name",
+            "dependsOn": {"id": 4, "value": true}
         },
         {
             "id": 6,
@@ -53,7 +59,8 @@
             "repeatable": false,
             "required": true,
             "value": [""],
-            "placeholder": "Enter funding identification number"
+            "placeholder": "Enter funding identification number",
+            "dependsOn": {"id": 4, "value": true}
         }
     ]
 }

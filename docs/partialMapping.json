@@ -1,0 +1,59 @@
+{
+    "title": "Active Deposit Form",
+    "fields": [
+        {
+            "id": 1,
+            "label":"Creator Name",
+            "type": "text",
+            "repeatable": true,
+            "required": true,
+            "value": [""],
+            "placeholder": "Enter creator name"
+        },
+        {
+            "id": 2,
+            "label":"Creator Status",
+            "type": "select",
+            "repeatable": false,
+            "required": true,
+            "value": [""],
+            "options": [{"value": "u", "label": "Undergraduate"}, {"value": "g", "label": "Graduate"}, {"value": "f", "label": "Faculty"}, {"value": "s", "label": "Staff"}, {"value": "o", "label": "Other"}]
+        },
+        {
+            "id": 3,
+            "label":"Creator Affiliation",
+            "type": "text",
+            "repeatable": true,
+            "required": false,
+            "value": [""],
+            "placeholder": "Enter creator's department or team affiliation"
+        },
+        {
+            "id": 4,
+            "label":"Funding",
+            "type": "checkbox",
+            "repeatable": true,
+            "required": false,
+            "children": [5,6],
+            "value": false
+        },
+        {
+            "id": 5,
+            "label":"Funding Agency",
+            "type": "text",
+            "repeatable": false,
+            "required": false,
+            "value": [""],
+            "placeholder": "Enter funding agency name"
+        },
+        {
+            "id": 6,
+            "label":"Funding Number",
+            "type": "text",
+            "repeatable": false,
+            "required": true,
+            "value": [""],
+            "placeholder": "Enter funding identification number"
+        }
+    ]
+}

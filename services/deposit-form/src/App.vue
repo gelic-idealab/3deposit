@@ -30,7 +30,7 @@ export default {
   },
   mounted () {
     axios
-      .get('https://3b51324e-31d3-4b67-a6cf-82a932707473.mock.pstmn.io/partialMapping')
+      .get('https://c78371d1-18dd-4567-b3c5-ec694cfe1d78.mock.pstmn.io/form')
       .then(response => (this.form = response.data))
   }
 }

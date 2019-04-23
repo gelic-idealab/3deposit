@@ -1,7 +1,7 @@
 <template>
   <div class="fields">
     <div class="form-group">
-      <div class="input-group mb-3" v-for="(field, index) in fields" :key="field.id">
+      <div class="input-group mb-3" v-for="(field, index) in renderedFields" :key="field.id">
 
         <template v-if="field.type === 'text'">
           <h4>{{ field.label }}</h4>
@@ -12,7 +12,7 @@
               >
                 <div class="input-group-append" v-if="index > 0">
                     <button type="button" class="btn btn-danger btn-sm" 
-                    v-on:click="removeValue(field.value, index)">Delete</button>
+                    v-on:click="removeValue(field.value, index)">Remove</button>
                 </div>
             </div>
         </template>
@@ -30,7 +30,7 @@
 
         <template v-else-if="field.type === 'checkbox'">
           <h4>{{ field.label }}</h4>
-            <input class="ml-3 mb-3" type="checkbox" v-on:change="toggleCheckbox(index)" v-model="field.value">
+            <input class="ml-3 mb-3" type="checkbox" v-on:change.native="toggleCheckbox(field, index)" v-model="field.value">
         </template>
 
       </div>
@@ -52,8 +52,24 @@ export default {
     removeValue: function (valueList, index) {
       valueList.splice(index, 1)
     },
-    toggleCheckbox: function (index) {
+    toggleCheckbox: function (field, index) {
       field[index].value = !field[index].value
+    },
+    dependenciesAreRendered: function (field) {
+      if (field.dependsOn.length === 0) {
+        return true
+      }
+      parent = this.fields.filter(function (el) {
+        return el.id === field.dependsOn[0].id
+      })
+      if (field.dependsOn[0].value === parent.value) {
+        return true
+      }
+    }
+  },
+  computed: {
+    renderedFields: function () {
+      return this.fields.filter(this.dependenciesAreRendered)
     }
   }
 }

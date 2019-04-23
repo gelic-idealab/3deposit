@@ -8,7 +8,8 @@
             "repeatable": true,
             "required": true,
             "value": [""],
-            "placeholder": "Enter creator name"
+            "placeholder": "Enter creator name",
+            "dependsOn": []
         },
         {
             "id": 2,
@@ -16,13 +17,13 @@
             "type": "select",
             "repeatable": false,
             "required": true,
-            "rendered": true,
             "value": [""],
             "options": [{"value": "u", "label": "Undergraduate"}, 
                         {"value": "g", "label": "Graduate"}, 
                         {"value": "f", "label": "Faculty"}, 
                         {"value": "s", "label": "Staff"}, 
-                        {"value": "o", "label": "Other"}]
+                        {"value": "o", "label": "Other"}],
+            "dependsOn": []
         },
         {
             "id": 3,
@@ -31,7 +32,8 @@
             "repeatable": true,
             "required": false,
             "value": [""],
-            "placeholder": "Enter creator's department or team affiliation"
+            "placeholder": "Enter creator's department or team affiliation",
+            "dependsOn": []
         },
         {
             "id": 4,
@@ -39,8 +41,8 @@
             "type": "checkbox",
             "repeatable": true,
             "required": false,
-            "children": [5,6],
-            "value": false
+            "value": false,
+            "dependsOn": []
         },
         {
             "id": 5,
@@ -50,7 +52,7 @@
             "required": false,
             "value": [""],
             "placeholder": "Enter funding agency name",
-            "dependsOn": {"id": 4, "value": true}
+            "dependsOn": [{"id": 4, "value": true}]
         },
         {
             "id": 6,

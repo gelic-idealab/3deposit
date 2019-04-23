@@ -60,7 +60,7 @@
             "required": true,
             "value": [""],
             "placeholder": "Enter funding identification number",
-            "dependsOn": {"id": 4, "value": true}
+            "dependsOn": [{"id": 4, "value": true}]
         }
     ]
 }

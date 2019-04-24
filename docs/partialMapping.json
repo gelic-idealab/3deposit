@@ -9,7 +9,7 @@
             "required": true,
             "value": [""],
             "placeholder": "Enter creator name",
-            "dependsOn": []
+            "dependsOn": {}
         },
         {
             "id": 2,
@@ -23,7 +23,7 @@
                         {"value": "f", "label": "Faculty"}, 
                         {"value": "s", "label": "Staff"}, 
                         {"value": "o", "label": "Other"}],
-            "dependsOn": []
+            "dependsOn": {}
         },
         {
             "id": 3,
@@ -33,7 +33,7 @@
             "required": false,
             "value": [""],
             "placeholder": "Enter creator's department or team affiliation",
-            "dependsOn": []
+            "dependsOn": {}
         },
         {
             "id": 4,
@@ -42,7 +42,7 @@
             "repeatable": true,
             "required": false,
             "value": false,
-            "dependsOn": []
+            "dependsOn": {}
         },
         {
             "id": 5,
@@ -52,7 +52,7 @@
             "required": false,
             "value": [""],
             "placeholder": "Enter funding agency name",
-            "dependsOn": [{"id": 4, "value": true}]
+            "dependsOn": {"id": 4, "value": true}
         },
         {
             "id": 6,
@@ -62,7 +62,7 @@
             "required": true,
             "value": [""],
             "placeholder": "Enter funding identification number",
-            "dependsOn": [{"id": 4, "value": true}]
+            "dependsOn": {"id": 4, "value": true}
         }
     ]
 }

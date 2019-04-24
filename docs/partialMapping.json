@@ -1,5 +1,9 @@
 {
-    "title": "Active Deposit Form",
+    "banner": {
+        "title": "Active Deposit Form",
+        "description": "Use this form to upload your 3d models, 360 videos, and VR source code & projects",
+        "instructions": "Your files will be deposited into a Library repository and published to a third-party website. You will receive a confirmation email when your deposit is processed."
+    },
     "fields": [
         {
             "id": 1,

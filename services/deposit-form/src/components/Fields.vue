@@ -60,9 +60,9 @@ export default {
         return true
       }
       parent = this.fields.filter(function (el) {
-        return el.id === field.dependsOn[0].id
+        return el.id === field.dependsOn.id
       })
-      if (field.dependsOn[0].value === parent.value) {
+      if (field.dependsOn.value === parent.value) {
         return true
       }
     }

@@ -25,12 +25,12 @@ export default {
   },
   data() {
     return {
-      form: {}
+      form: {"banner": {}, "fields": []}
     }
   },
   mounted () {
     axios
-      .get('https://9bb92562-b7e9-4d42-bf6f-1885eae2ec34.mock.pstmn.io/formJSON')
+      .get('https://01fd7a12-f268-409c-a89a-7d279e598b98.mock.pstmn.io/renderForm')
       .then(response => (this.form = response.data))
   }
 }

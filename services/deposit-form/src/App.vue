@@ -2,7 +2,7 @@
   <div id="app">
     <div class="container-fluid">
       <img alt="logo" src="./assets/logo.png" height="128" width="128">
-      <Banner v-bind:title="form.title"/>
+      <Banner v-bind:banner="form.banner"/>
       <Fields v-bind:fields="form.fields"/>
     </div>
   </div>
@@ -30,7 +30,7 @@ export default {
   },
   mounted () {
     axios
-      .get('https://c78371d1-18dd-4567-b3c5-ec694cfe1d78.mock.pstmn.io/form')
+      .get('https://9bb92562-b7e9-4d42-bf6f-1885eae2ec34.mock.pstmn.io/formJSON')
       .then(response => (this.form = response.data))
   }
 }

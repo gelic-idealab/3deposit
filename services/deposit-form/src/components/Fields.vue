@@ -20,7 +20,7 @@
         <template v-else-if="field.type === 'select'">
           <h4>{{ field.label }}</h4>
               <select class="form-control ml-3 mb-3"
-              v-model="field.value[index]" 
+              v-model="field.value" 
               >
                 <option v-for="option in field.options" :key="option.value">
                 {{ option.label }} 
@@ -56,7 +56,7 @@ export default {
       field[index].value = !field[index].value
     },
     dependenciesAreRendered: function (field) {
-      if (field.dependsOn.length === 0) {
+      if (Object.keys(field.dependsOn).length === 0) {
         return true
       }
       parent = this.fields.filter(function (el) {

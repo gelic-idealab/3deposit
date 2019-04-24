@@ -1,7 +1,8 @@
 <template>
   <div class="fields">
     <div class="form-group">
-      <div class="input-group mb-3" v-for="(field, index) in renderedFields" :key="field.id">
+      <div class="input-group mb-3" v-for="(field, index) in fields" :key="field.id">
+        <template v-if="renderField(field)">
 
         <template v-if="field.type === 'text'">
           <h4>{{ field.label }}</h4>
@@ -30,9 +31,10 @@
 
         <template v-else-if="field.type === 'checkbox'">
           <h4>{{ field.label }}</h4>
-            <input class="ml-3 mb-3" type="checkbox" v-on:change.native="toggleCheckbox(field, index)" v-model="field.value">
+            <input class="ml-3" type="checkbox" v-on:change.native="toggleCheckbox(field, index)" v-model="field.value">
         </template>
 
+      </template>
       </div>
     </div>
   </div>
@@ -55,23 +57,27 @@ export default {
     toggleCheckbox: function (field, index) {
       field[index].value = !field[index].value
     },
-    dependenciesAreRendered: function (field) {
-      if (Object.keys(field.dependsOn).length === 0) {
-        return true
-      }
-      parent = this.fields.filter(function (el) {
+    getParent: function (field) {
+      return this.fields.filter(function (el) {
         return el.id === field.dependsOn.id
       })
+    },
+    renderField: function (field) {
+      var parent = this.getParent(field);
+      console.log(parent)
       if (field.dependsOn.value === parent.value) {
         return true
+      } else {
+        return false
       }
     }
   },
-  computed: {
-    renderedFields: function () {
-      return this.fields.filter(this.dependenciesAreRendered)
-    }
-  }
+  // computed: {
+  //   renderedFields: function () {
+  //     this.fields.map(this.renderField)
+  //     return this.fields
+  //     }
+  // }
 }
 </script>
 

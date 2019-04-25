@@ -76,12 +76,6 @@ export default {
       }
     }
   },
-  // computed: {
-  //   renderedFields: function () {
-  //     this.fields.map(this.renderField)
-  //     return this.fields
-  //     }
-  // }
 }
 </script>
 

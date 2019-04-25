@@ -58,17 +58,21 @@ export default {
       field[index].value = !field[index].value
     },
     getParent: function (field) {
-      return this.fields.filter(function (el) {
+      var parent = this.fields.filter(function (el) {
         return el.id === field.dependsOn.id
       })
+      return parent[0]
     },
     renderField: function (field) {
-      var parent = this.getParent(field);
-      console.log(parent)
-      if (field.dependsOn.value === parent.value) {
+      if (Object.keys(field.dependsOn).length === 0) {
         return true
       } else {
-        return false
+        var pf = this.getParent(field)
+        if (field.dependsOn.value === pf.value) {
+          return true
+        } else {
+          return false
+        }
       }
     }
   },

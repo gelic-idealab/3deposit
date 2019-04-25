@@ -1,5 +1,6 @@
 <template>
   <div class="fields">
+    <div class="container">
     <div class="form-group">
       <div class="input-group mb-3" v-for="(field, index) in fields" :key="field.id">
         <template v-if="renderField(field)">
@@ -36,6 +37,7 @@
 
       </template>
       </div>
+    </div>
     </div>
   </div>
 </template>

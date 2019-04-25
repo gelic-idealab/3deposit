@@ -13,7 +13,7 @@ import Banner from './components/Banner.vue'
 import Fields from './components/Fields.vue'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import axios from 'axios'
-import 'bootstrap'
+
 
 
 export default {

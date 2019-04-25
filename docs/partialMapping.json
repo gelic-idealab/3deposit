@@ -6,12 +6,23 @@
     },
     "fields": [
         {
+            "id": 0,
+            "label":"Media Type",
+            "type": "select",
+            "repeatable": false,
+            "required": true,
+            "value": {},
+            "options": [{"value": "model", "label": "3d Model"},
+                        {"value": "video", "label": "360 Video"},
+                        {"value": "vr", "label": "VR project"}],
+            "dependsOn": {}
+        },
+        {
             "id": 1,
             "label":"Creator Name",
             "type": "text",
             "repeatable": true,
             "required": true,
-            "render": true,
             "value": [""],
             "placeholder": "Enter creator name",
             "dependsOn": {}
@@ -22,7 +33,6 @@
             "type": "select",
             "repeatable": false,
             "required": true,
-            "render": true,
             "value": {},
             "options": [{"value": "u", "label": "Undergraduate"}, 
                         {"value": "g", "label": "Graduate"}, 
@@ -37,7 +47,6 @@
             "type": "text",
             "repeatable": true,
             "required": false,
-            "render": true,
             "value": [""],
             "placeholder": "Enter creator's department or team affiliation",
             "dependsOn": {}
@@ -48,7 +57,6 @@
             "type": "checkbox",
             "repeatable": true,
             "required": false,
-            "render": true,
             "value": false,
             "dependsOn": {}
         },
@@ -58,7 +66,6 @@
             "type": "text",
             "repeatable": false,
             "required": false,
-            "render": false,
             "value": [""],
             "placeholder": "Enter funding agency name",
             "dependsOn": {"id": 4, "value": true}
@@ -69,7 +76,6 @@
             "type": "text",
             "repeatable": false,
             "required": true,
-            "render": false,
             "value": [""],
             "placeholder": "Enter funding identification number",
             "dependsOn": {"id": 4, "value": true}

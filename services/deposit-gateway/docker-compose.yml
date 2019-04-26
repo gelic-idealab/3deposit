@@ -23,6 +23,7 @@ services:
       FLASK_APP: threedeposit
       FLASK_ENV: development
       DATABASE: mysql
+    command: flask run --host=0.0.0.0
 
 volumes:
     db_data: {}    

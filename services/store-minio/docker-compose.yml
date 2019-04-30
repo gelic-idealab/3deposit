@@ -1,0 +1,30 @@
+version: '2'
+
+services:
+  minio1:
+    image: minio/minio:latest
+    volumes:
+      - data1:/data
+    links:
+      - "minio-service"
+    environment:
+      MINIO_ACCESS_KEY: AKIAIOSFODNN7GRAINGER
+      MINIO_SECRET_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYGRAINGERKEY
+    command: server /data
+
+  minio-service:
+    build: .
+    container_name: "minio-service"
+
+volumes:
+  data1:
+
+
+
+
+# docker run -it -p 9000:9000 --name minio1 \
+#   -v minio_data:/data \
+#   -v minio_config:/root/.minio \
+#   -e "MINIO_ACCESS_KEY=AKIAIOSFODNN7GRAINGER" \
+#   -e "MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYGRAINGERKEY" \
+#   minio/minio server /data

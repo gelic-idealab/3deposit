@@ -10,7 +10,6 @@ app = Flask(__name__)
 @app.route('/minio', methods=['POST'])
 def box():
     if request.method == 'POST':
-        response = {}
         post_data = json.loads(request.form.get('data'))
         metadata = post_data.get('metadata')
         deposit_id = metadata['deposit_id']

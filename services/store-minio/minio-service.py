@@ -1,4 +1,5 @@
 import os
+import json
 from flask import Flask, request, jsonify
 from minio import Minio
 from minio.error import (ResponseError, BucketAlreadyOwnedByYou,
@@ -14,7 +15,7 @@ def box():
         metadata = post_data.get('metadata')
         deposit_id = metadata['deposit_id']
         file = request.files['file']
-        file.save(file_path)
+        file.save(deposit_id)
 
         OBJECT_PATH = deposit_id
 

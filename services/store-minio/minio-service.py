@@ -30,13 +30,13 @@ def minio():
 
         # get objects from bucket
         objects = minioClient.list_objects(BUCKET_NAME, recursive=True)
-    # construct response object from objects iterable
-    obj_json = {}
-    for obj in objects:
-        obj_json.update({"bucket": str(obj.bucket_name), "object": str(obj.object_name), "modified": str(obj.last_modified),
-            "etag": str(obj.etag), "size": str(obj.size), "content_type": str(obj.content_type)})
-    print(type(obj_json), obj_json)        
-    return jsonify(obj_json)        
+        # construct response object from objects iterable
+        obj_json = {}
+        for obj in objects:
+            obj_json.update({"bucket": str(obj.bucket_name), "object": str(obj.object_name), "modified": str(obj.last_modified),
+                "etag": str(obj.etag), "size": str(obj.size), "content_type": str(obj.content_type)})
+        # print(type(obj_json), obj_json)        
+        return jsonify(obj_json)        
 
     if request.method == 'POST':
         # get data from request payload

@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   minio-server:
-    container_name: "minio-server"
+    container_name: minio-server
     image: minio/minio:latest
     volumes:
       - data1:/data
@@ -13,14 +13,16 @@ services:
 
   minio-service:
     build: .
+    container_name: minio-service
     ports: 
       - "5000:5000"
     environment: 
       FLASK_ENV: development
       FLASK_APP: minio-service
+    depends_on:
+      - minio-server
     links: 
-      - "minio-server"
-    container_name: "minio-service"
+      - minio-server
     command: pipenv run flask run --host=0.0.0.0
 
 volumes:

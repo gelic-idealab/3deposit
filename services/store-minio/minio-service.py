@@ -33,12 +33,11 @@ def create_app():
                 objects = minioClient.list_objects(BUCKET_NAME, recursive=True)
 
                 # construct response object from objects iterable
-                obj_json = {}
+                objects_list = []
                 for obj in objects:
-                    obj_json.update({"bucket": str(obj.bucket_name), "object": str(obj.object_name), "modified": str(obj.last_modified),
-                        "etag": str(obj.etag), "size": str(obj.size), "content_type": str(obj.content_type)})
-                # print(type(obj_json), obj_json)        
-                return jsonify(obj_json)
+                    objects_list.append({"bucket": str(obj.bucket_name), "deposit_id": str(obj.object_name), "modified": str(obj.last_modified),
+                        "etag": str(obj.etag), "size": str(obj.size), "content_type": str(obj.content_type)})       
+                return jsonify({"objects": objects_list})
 
             except ResponseError as err:
                 return jsonify({"err": err})
@@ -67,16 +66,17 @@ def create_app():
                                 secret_key=secret_key,
                                 secure=False)   
 
-            try:
-                minioClient.make_bucket(BUCKET_NAME)
-            except BucketAlreadyExists as err:
-                return jsonify({"error": err})                    
+            print(minioClient.bucket_exists(BUCKET_NAME))
+            if not minioClient.bucket_exists(BUCKET_NAME):
+                try:
+                    minioClient.make_bucket(BUCKET_NAME)
+                except Exception as err:
+                    return jsonify({"error": err})                    
 
             try:
                 r = minioClient.fput_object(BUCKET_NAME, deposit_id, deposit_id)
                 # cleanup temp file
                 os.remove(deposit_id)
-
                 return jsonify({"etag": r})
 
             except ResponseError as err:

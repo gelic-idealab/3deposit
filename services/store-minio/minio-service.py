@@ -66,7 +66,7 @@ def create_app():
                                 secret_key=secret_key,
                                 secure=False)   
 
-            print(minioClient.bucket_exists(BUCKET_NAME))
+            # print(minioClient.bucket_exists(BUCKET_NAME))
             if not minioClient.bucket_exists(BUCKET_NAME):
                 try:
                     minioClient.make_bucket(BUCKET_NAME)

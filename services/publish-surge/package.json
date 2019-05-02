@@ -1,0 +1,20 @@
+{
+  "name": "publish-surge",
+  "version": "1.0.0",
+  "description": "publish deposit payload to surge.sh",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon surge-service.js"
+  },
+  "author": "rwwalla2",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.16.4",
+    "express-form-data": "^2.0.8",
+    "mongodb": "^3.2.3"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.0"
+  }
+}

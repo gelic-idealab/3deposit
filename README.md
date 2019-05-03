@@ -10,7 +10,7 @@
 * 360 videos
 * Virtual Reality applications
 
-Media  | Publication Endpoint
+Type  | Endpoint
 ------------- | -------------
 3D models  | Sketchfab
 360 Videos  | YouTube360

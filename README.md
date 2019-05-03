@@ -10,11 +10,11 @@
 * 360 videos
 * Virtual Reality applications
 
-Type  | Endpoint
+Type          | Endpoint
 ------------- | -------------
-3D models  | Sketchfab
-360 videos  | YouTube360
-VR* | Surge.sh
+3D models     | Sketchfab
+360 videos    | YouTube360
+VR*           | Surge.sh
 
 *Properly configured WebVR applications will be published to static hosting. There is an experiemental feature to automatically port desktop VR applications to web-embeddable formats. 
 

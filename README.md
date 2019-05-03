@@ -1,5 +1,5 @@
 # 3deposit #
-3deposit is a 3D content preservation & publication platform. Key features include automated deposit metadata mapping, configurable storage & publication endpoints, and a content 'gallery builder'. 3deposit aims to be extensible, portable, and compatible with existing content preservation systems. 
+3deposit is a 3D content preservation & publication platform. Key features include automated deposit metadata mapping, configurable storage & publication endpoints, file integrity checking, and a content 'gallery builder'. 3deposit aims to be extensible, portable, and compatible with existing content preservation systems. 
 
 ## Storage ##
 3deposit uses object storage. Instances can be configured to store objects locally or in a remote bucket. Remote buckets can be self-hosted with a MinIO server or with S3-compatbile services, such as AWS. 
@@ -17,6 +17,8 @@ Media  | Publication Endpoint
 VR* | Surge.sh
 
 *Properly configured WebVR applications will be published to static hosting. There is an experiemental feature to automatically port desktop VR applications to web-embeddable formats. 
+
+Custom services can be added to support additional media types & endpoints. 3deposit's simple API and service SDK makes this a relatively painless affair. 
 
 ## Data flow ##
 ![3deposit](./docs/3deposit-flow.png)

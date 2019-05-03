@@ -3,6 +3,7 @@
     <div class="container-fluid">
       <img alt="logo" src="./assets/logo.png" height="128" width="128">
       <Banner v-bind:banner="form.banner"/>
+      <FileProgress/>
       <Fields v-bind:fields="form.fields"/>
     </div>
   </div>
@@ -11,6 +12,7 @@
 <script>
 import Banner from './components/Banner.vue'
 import Fields from './components/Fields.vue'
+import FileProgress from './components/FileProgress.vue'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import axios from 'axios'
 
@@ -20,7 +22,8 @@ export default {
   name: 'app',
   components: {
     Banner,
-    Fields
+    Fields,
+    FileProgress
   },
   data() {
     return {

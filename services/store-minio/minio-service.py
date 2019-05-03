@@ -77,7 +77,7 @@ def create_app():
                 r = minioClient.fput_object(BUCKET_NAME, deposit_id, deposit_id)
                 # cleanup temp file
                 os.remove(deposit_id)
-                return jsonify({"etag": r})
+                return jsonify({"etag": r, "deposit_id": deposit_id})
 
             except ResponseError as err:
                 return jsonify({"error": err})

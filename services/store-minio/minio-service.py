@@ -2,7 +2,7 @@ import os
 import json
 from flask import Flask, request, jsonify
 from minio import Minio
-from minio.error import ResponseError, BucketAlreadyExists
+from minio.error import ResponseError, BucketAlreadyExists, NoSuchBucket
 
 
 # ACCESS KEY AKIAIOSFODNN7GRAINGER
@@ -30,7 +30,10 @@ def create_app():
                                     secure=False)
 
                 # get objects from bucket
-                objects = minioClient.list_objects(BUCKET_NAME, recursive=True)
+                if minioClient.bucket_exists(BUCKET_NAME):
+                    objects = minioClient.list_objects(BUCKET_NAME, recursive=True)
+                else:
+                    return jsonify({"err": "Bucket does not exist."})
 
                 # construct response object from objects iterable
                 objects_list = []

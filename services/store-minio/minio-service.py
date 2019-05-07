@@ -33,14 +33,19 @@ def create_app():
                 if minioClient.bucket_exists(BUCKET_NAME):
                     objects = minioClient.list_objects(BUCKET_NAME, recursive=True)
                 else:
-                    return jsonify({"err": "Bucket does not exist."})
+                    return jsonify({ "err": "Bucket does not exist." })
 
                 # construct response object from objects iterable
                 objects_list = []
                 for obj in objects:
-                    objects_list.append({"bucket": str(obj.bucket_name), "deposit_id": str(obj.object_name), "modified": str(obj.last_modified),
-                        "etag": str(obj.etag), "size": str(obj.size), "content_type": str(obj.content_type)})       
-                return jsonify({"objects": objects_list})
+                    objects_list.append({ "bucket": str(obj.bucket_name), 
+                                          "deposit_id": str(obj.object_name), 
+                                          "modified": str(obj.last_modified),
+                                          "etag": str(obj.etag), 
+                                          "size": str(obj.size), 
+                                          "content_type": str(obj.content_type) })
+
+                return jsonify({ "objects": objects_list })
 
             except ResponseError as err:
                 return jsonify({"err": err})

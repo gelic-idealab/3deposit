@@ -15,7 +15,7 @@ BUCKET_NAME = '3deposit'
 def create_app():
     app = Flask(__name__)
 
-    @app.route('/minio', methods=['GET', 'POST'])
+    @app.route('/minio', methods=['GET', 'POST','DELETE'])
     def minio():
         if request.method == 'GET':
             # get keys from request args
@@ -51,7 +51,7 @@ def create_app():
                 return jsonify({"err": err})
 
 
-        else:
+        elif request.method == 'POST':
             # get data from request payload
             data = json.loads(request.form.get('data'))
 
@@ -89,5 +89,12 @@ def create_app():
 
             except ResponseError as err:
                 return jsonify({"error": err})
+
+        else:
+            try:
+                object_name = metadata.get('etag')
+                minioClient.remove_object(BUCKET_NAME,object_name)
+            except ResponseError as err:
+                print(err)
     
     return app

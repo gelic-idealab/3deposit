@@ -6,13 +6,9 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-requests = "*"
-flask = "*"
+httplib2 = "*"
 google-api-python-client = "*"
-google-auth = "*"
-google = "*"
-google-auth-oauthlib = "*"
-google-auth-httplib2 = "*"
+oauth2client = "*"
 
 [requires]
 python_version = "3.7"

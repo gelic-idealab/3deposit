@@ -19,9 +19,11 @@ def create_app():
     def minio():
         if request.method == 'GET':
             # get keys from request args
-            access_key = request.args.get('access_key')
-            secret_key = request.args.get('secret_key')
-
+            if request.args.get('access_key') and request.args.get('secret_key'):
+                access_key = request.args.get('access_key')
+                secret_key = request.args.get('secret_key')
+            else:
+                return jsonify({"err": "No auth keys provided"})
             try:
                 # Initialize minioClient with an endpoint and keys.
                 minioClient = Minio(SERVER_ENDPOINT,

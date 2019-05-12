@@ -81,7 +81,7 @@ def create_app():
                 try:
                     minioClient.make_bucket(BUCKET_NAME)
                 except Exception as err:
-                    return jsonify({"error": err})                    
+                    return jsonify({"err": err})                    
 
             try:
                 r = minioClient.fput_object(BUCKET_NAME, deposit_id, deposit_id)
@@ -90,7 +90,7 @@ def create_app():
                 return jsonify({"etag": r, "deposit_id": deposit_id})
 
             except ResponseError as err:
-                return jsonify({"error": err})
+                return jsonify({"err": err})
 
         else:
             try:

@@ -29,7 +29,7 @@ export default {
     submitFile() {
       let formData = new FormData();
       formData.append('file', this.file);
-      axios.post( 'http://localhost:5000/upload',
+      axios.post( 'https://a84503bf-79a4-421a-81bc-20b00eaf5244.mock.pstmn.io/upload',
         formData,
         {
           headers: {

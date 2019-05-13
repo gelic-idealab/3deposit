@@ -32,7 +32,7 @@ export default {
   },
   mounted () {
     axios
-      .get('https://4195a225-329c-4a6c-8ae7-8c8aaae4e56f.mock.pstmn.io/activeForm')
+      .get('https://95657a85-2ede-440d-85c2-1eda1fef91a0.mock.pstmn.io/form')
       .then(response => (this.form = response.data))
   }
 }

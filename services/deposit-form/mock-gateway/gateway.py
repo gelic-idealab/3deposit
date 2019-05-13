@@ -5,11 +5,11 @@ app = Flask(__name__)
 @app.route('/upload', methods = ['POST'])
 def upload():
     return 'working...'
-
+    
 @app.route('/form', methods = ['GET'])
 def form():
     return jsonify(
-    "banner": {
+    {"banner": {
         "title": "Active Deposit Form",
         "description": "Use this form to upload your 3d models, 360 videos, and VR source code & projects",
         "instructions": "Your files will be deposited into a Library repository and published to a third-party website. You will receive a confirmation email when your deposit is processed."
@@ -26,7 +26,7 @@ def form():
                         {"value": "video", "label": "360 Video"},
                         {"value": "vr", "label": "VR project"}],
             "dependsOn": {}
-        },
+        }, 
         {
             "id": 1,
             "label":"Creator Name",
@@ -91,7 +91,7 @@ def form():
             "dependsOn": {"id": 4, "value": "true"}
         }
     ]
-}))
+})
 
 
 if __name__ == '__main__':

@@ -3,12 +3,14 @@ from sqlalchemy import create_engine, MetaData
 from db import deposits, users
 from settings import BASE_DIR, get_config
 
+import time
+
 
 DSN = "postgresql://{user}:{password}@{host}:{port}/{database}"
 
 ADMIN_DB_URL = DSN.format(
     user='postgres', password='postgres', database='postgres',
-    host='localhost', port=5432
+    host='postgres', port=5432
 )
 
 admin_engine = create_engine(ADMIN_DB_URL, isolation_level='AUTOCOMMIT')
@@ -62,8 +64,8 @@ def drop_tables(engine):
 
 
 if __name__ == '__main__':
-
+    time.sleep(15)
     setup_db(USER_CONFIG['postgres'])
     create_tables(engine=user_engine)
     # drop_tables()
-# teardown_db(config)
+    # teardown_db(config)

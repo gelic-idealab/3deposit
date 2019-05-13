@@ -1,6 +1,6 @@
 import os
 import json
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 from minio import Minio
 from minio.error import ResponseError, BucketAlreadyExists, NoSuchBucket
 
@@ -42,23 +42,53 @@ def create_app():
                                     secret_key=secret_key,
                                     secure=False)
 
+                # get data from request payload
+                if json.loads(request.form.get('data')):
+                    data = json.loads(request.form.get('data'))
+                    deposit_id = data.get('deposit_id')
+                else:
+                    return jsonify({"err": "No deposit ID provided"})                
+
                 # get objects from bucket
-                if minioClient.bucket_exists(BUCKET_NAME):
+                if minioClient.bucket_exists(BUCKET_NAME) and deposit_id:
                     objects = minioClient.list_objects(BUCKET_NAME, recursive=True)
                 else:
                     return jsonify({ "err": "Bucket does not exist." })
 
                 # construct response object from objects iterable
-                objects_list = []
-                for obj in objects:
-                    objects_list.append({ "bucket": str(obj.bucket_name), 
-                                          "deposit_id": str(obj.object_name), 
-                                          "modified": str(obj.last_modified),
-                                          "etag": str(obj.etag), 
-                                          "size": str(obj.size), 
-                                          "content_type": str(obj.content_type) })
+                #objects_list = []
 
-                return jsonify({ "objects": objects_list })
+
+                try:
+                    data = minioClient.get_object(BUCKET_NAME, deposit_id)
+                    with open(str(deposit_id), 'wb') as file_data:
+                        for d in data.stream(32*1024):
+                            file_data.write(d)
+                except ResponseError as err:
+                    print(err)
+
+                # check whether object exists in the bucket
+
+                for obj in objects:
+                    if obj.object_name == deposit_id:
+                        # ret_object =   {"bucket": str(obj.bucket_name), 
+                        #                 "deposit_id": str(obj.object_name), 
+                        #                 "modified": str(obj.last_modified),
+                        #                 "etag": str(obj.etag), 
+                        #                 "size": str(obj.size), 
+                        #                 "content_type": str(obj.content_type),
+                        #                 "file":send_file(str(deposit_id), mimetype="application/octet-stream")}
+                        return send_file(str(deposit_id), mimetype="application/octet-stream")
+                    else:
+                        return jsonify({ "err": "Object does not exist." })
+                    # objects_list.append({ "bucket": str(obj.bucket_name), 
+                    #                       "deposit_id": str(obj.object_name), 
+                    #                       "modified": str(obj.last_modified),
+                    #                       "etag": str(obj.etag), 
+                    #                       "size": str(obj.size), 
+                    #                       "content_type": str(obj.content_type) })
+
+                #return jsonify({ "objects": objects_list })
 
             except ResponseError as err:
                 return jsonify({"err": err})

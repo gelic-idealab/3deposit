@@ -1,4 +1,4 @@
-# run 'docker run .' to build
+# run 'docker build .' to build
 # check for successful build with 'docker ps -a'
 
 FROM python:3.7

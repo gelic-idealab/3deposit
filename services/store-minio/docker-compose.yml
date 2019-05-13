@@ -2,6 +2,8 @@ version: '3.7'
 
 services:
   minio-server:
+    ports: 
+       - "9000:9000"
     container_name: minio-server
     image: minio/minio:latest
     volumes:

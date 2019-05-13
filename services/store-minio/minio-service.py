@@ -11,6 +11,14 @@ from minio.error import ResponseError, BucketAlreadyExists, NoSuchBucket
 SERVER_ENDPOINT = 'minio-server:9000'
 BUCKET_NAME = '3deposit'
 
+def minio_keys(request_auth):
+    auth = json.loads(request_auth.form.get('auth'))
+    access_key = auth.get('access_key')
+    secret_key = auth.get('secret_key')
+
+    auth_packed = {"access_key":access_key,"secret_key":secret_key}
+
+    return auth_packed
 
 def create_app():
     app = Flask(__name__)
@@ -19,8 +27,10 @@ def create_app():
     def minio():
         if request.method == 'GET':
             # get keys from request args
-            access_key = request.args.get('access_key')
-            secret_key = request.args.get('secret_key')
+            auth = minio_keys(request)
+            
+            access_key = auth.get("access_key")
+            secret_key = auth.get("secret_key")
 
             try:
                 # Initialize minioClient with an endpoint and keys.
@@ -54,15 +64,15 @@ def create_app():
         elif request.method == 'POST':
             # get data from request payload
             data = json.loads(request.form.get('data'))
+            
+            # extract authentication details
+            auth = minio_keys(request)
+            
+            access_key = auth.get("access_key")
+            secret_key = auth.get("secret_key")
 
-            # extract metadata object & needed values
-            metadata = data.get('metadata')
-            deposit_id = metadata['deposit_id']
-
-            # extract authentication credentials
-            auth = data.get('auth')
-            access_key = auth.get('access_key')
-            secret_key = auth.get('secret_key')
+            # extract deposit_id value
+            deposit_id = data.get('deposit_id')
 
             # extract file & temp save to disk
             file = request.files['file']
@@ -90,11 +100,32 @@ def create_app():
             except ResponseError as err:
                 return jsonify({"error": err})
 
-        else:
+        elif request.method == 'DELETE':
+            # extract authentication details
+            auth = minio_keys(request)
+            
+            access_key = auth.get("access_key")
+            secret_key = auth.get("secret_key")
+
+            # get data from request payload
+            data = json.loads(request.form.get('data'))
+
+            # extract object specific deposit_id
+            deposit_id = data.get('deposit_id')
+
+            minioClient = Minio(SERVER_ENDPOINT,
+                                access_key=access_key,
+                                secret_key=secret_key,
+                                secure=False)
+
             try:
-                object_name = metadata.get('etag')
-                minioClient.remove_object(BUCKET_NAME,object_name)
+                rem_object = minioClient.remove_object(BUCKET_NAME,deposit_id)
             except ResponseError as err:
-                print(err)
+                return jsonify({"error":err})
+
+            return jsonify({"deposit_id": deposit_id})
+
+        else:
+            return jsonify({"err":"Unsupported method"})
     
     return app

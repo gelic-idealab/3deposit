@@ -20,7 +20,9 @@ users = Table(
     'users', meta,
 
     Column('id', Integer, primary_key=True),
-    Column('status', String(200), nullable=False)
+    Column('username', String(64), nullable=False, unique=True),
+    Column('email', String(120)),
+    Column('password_hash', String(128), nullable=False)
 )
 
 
@@ -47,7 +49,7 @@ async def close_pg(app):
     await app['db'].wait_closed()
 
 
-async def get_question(conn, deposit_id):
+async def get_deposit_by_id(conn, deposit_id):
     result = await conn.execute(
         question.select()
         .where(deposits.c.id == deposit_id))
@@ -56,3 +58,18 @@ async def get_question(conn, deposit_id):
         msg = "Deposit with id: {} not found"
         raise RecordNotFound(msg.format(deposit_id))
     return deposit_record
+
+async def get_user_by_name(conn, username):
+    result = await conn.fetchrow(
+        users
+        .select()
+        .where(users.c.username == username)
+    )
+    return result
+
+
+async def get_users(conn):
+    records = await conn.fetch(
+        users.select().order_by(users.c.id)
+    )
+    return records

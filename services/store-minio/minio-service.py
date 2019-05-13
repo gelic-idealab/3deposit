@@ -27,11 +27,19 @@ def create_app():
     def minio():
         if request.method == 'GET':
             # get keys from request args
+<<<<<<< HEAD
             auth = minio_keys(request)
             
             access_key = auth.get("access_key")
             secret_key = auth.get("secret_key")
 
+=======
+            if request.args.get('access_key') and request.args.get('secret_key'):
+                access_key = request.args.get('access_key')
+                secret_key = request.args.get('secret_key')
+            else:
+                return jsonify({"err": "No auth keys provided"})
+>>>>>>> 94ceba313eb125fdeb2f5705e7540337b7931dff
             try:
                 # Initialize minioClient with an endpoint and keys.
                 minioClient = Minio(SERVER_ENDPOINT,
@@ -89,7 +97,7 @@ def create_app():
                 try:
                     minioClient.make_bucket(BUCKET_NAME)
                 except Exception as err:
-                    return jsonify({"error": err})                    
+                    return jsonify({"err": err})                    
 
             try:
                 r = minioClient.fput_object(BUCKET_NAME, deposit_id, deposit_id)
@@ -98,7 +106,7 @@ def create_app():
                 return jsonify({"etag": r, "deposit_id": deposit_id})
 
             except ResponseError as err:
-                return jsonify({"error": err})
+                return jsonify({"err": err})
 
         elif request.method == 'DELETE':
             # extract authentication details

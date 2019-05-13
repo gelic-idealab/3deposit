@@ -1,1 +1,18 @@
-# docker compose for mock server & vue app
+version: '3'
+services:
+  mock-gateway:
+    container_name: mock-gateway
+    build: mock-gateway/.
+    ports:
+     - "5000:5000"
+    command: pipenv run python gateway.py
+  
+  vue-app:
+    build: .
+    links: 
+      - mock-gateway
+    ports:
+      - "8080:8080"
+    container_name: vue-service
+    command: npm run serve
+    

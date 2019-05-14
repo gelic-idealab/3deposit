@@ -1,11 +1,14 @@
 <template>
-  <div class="container">
+  <div class="container sticky-top" style="background-color: white">
     <div class="large-12 medium-12 small-12 cell">
       <label>File
         <input type="file" id="file" ref="file" v-on:change="handleFileUpload()"/>
       </label>
       <br>
-      <progress max="100" :value.prop="uploadPercentage"></progress>
+      <div class="progress">
+        <div class="progress-bar" role="progressbar" :style="{width: uploadPercentage+'%'}" aria-valuemin="0" aria-valuemax="100"></div>
+      </div>
+      <!-- <progress max="100" :value.prop="uploadPercentage"></progress> -->
       <br>
       <!-- <button v-on:click="submitFile()">Submit</button> -->
     </div>

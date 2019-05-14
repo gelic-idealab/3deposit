@@ -20,7 +20,7 @@ export default {
     return {
       file: '',
       uploadPercentage: 0,
-      id: generateUuid()
+      id: ''
     }
   },
   methods: {
@@ -33,7 +33,7 @@ export default {
     },
     submitFile() {
       let formData = new FormData();
-      formData.append('id', this.data.id)
+      formData.append('id', this.id);
       formData.append('file', this.file);
       axios.post( 'https://a84503bf-79a4-421a-81bc-20b00eaf5244.mock.pstmn.io/upload',
         formData,

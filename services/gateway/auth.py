@@ -18,4 +18,4 @@ class DBAuthorizationPolicy(AbstractAuthorizationPolicy):
     async def permits(self, identity, permission, context=None):
         if identity is None:
             return False
-return True
+    return True

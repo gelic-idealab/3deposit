@@ -7,7 +7,7 @@
       <br>
       <progress max="100" :value.prop="uploadPercentage"></progress>
       <br>
-      <button v-on:click="submitFile()">Submit</button>
+      <!-- <button v-on:click="submitFile()">Submit</button> -->
     </div>
   </div>
 </template>
@@ -19,15 +19,21 @@ export default {
   data(){
     return {
       file: '',
-      uploadPercentage: 0
+      uploadPercentage: 0,
+      id: generateUuid();
     }
   },
   methods: {
+    generateUuid() {
+      // https://www.npmjs.com/package/uuid 
+    }
     handleFileUpload() {
       this.file = this.$refs.file.files[0];
+      this.submitFile();
     },
     submitFile() {
       let formData = new FormData();
+      formData.append('id', this.data.id)
       formData.append('file', this.file);
       axios.post( 'https://a84503bf-79a4-421a-81bc-20b00eaf5244.mock.pstmn.io/upload',
         formData,

@@ -30,22 +30,21 @@ def create_app():
 
             if minio_keys(request):
                 auth = minio_keys(request)
-                access_key = auth.get("access_key")
-                secret_key = auth.get("secret_key")
             else:
                 return jsonify({"err": "No auth keys provided"})
 
             try:
                 # Initialize minioClient with an endpoint and keys.
                 minioClient = Minio(SERVER_ENDPOINT,
-                                    access_key=access_key,
-                                    secret_key=secret_key,
+                                    access_key=auth.get("access_key"),
+                                    secret_key=auth.get("secret_key"),
                                     secure=False)
 
                 # get data from request payload
                 if json.loads(request.form.get('data')):
                     data = json.loads(request.form.get('data'))
                     deposit_id = data.get('deposit_id')
+                    metadata = data.get('metadata')
                 else:
                     return jsonify({"err": "No deposit ID provided"})                
 
@@ -56,7 +55,6 @@ def create_app():
                     return jsonify({ "err": "Bucket does not exist." })
 
                 # construct response object from objects iterable
-                #objects_list = []
 
 
                 try:
@@ -69,17 +67,23 @@ def create_app():
 
                 # check whether object exists in the bucket
 
-                for obj in objects:
-                    if obj.object_name == deposit_id:
-                        # ret_object =   {"bucket": str(obj.bucket_name), 
-                        #                 "deposit_id": str(obj.object_name), 
-                        #                 "modified": str(obj.last_modified),
-                        #                 "etag": str(obj.etag), 
-                        #                 "size": str(obj.size), 
-                        #                 "content_type": str(obj.content_type),
-                        #                 "file":send_file(str(deposit_id), mimetype="application/octet-stream")}
-                        return send_file(str(deposit_id), mimetype="application/octet-stream")
+                #objects_list = []
+                for i,obj in enumerate(objects):
+                    if obj.object_name != deposit_id:
+                        continue
                     else:
+                        if metadata == "1":
+                            ret_object =   {"bucket": str(obj.bucket_name), 
+                                            "deposit_id": str(obj.object_name), 
+                                            "modified": str(obj.last_modified),
+                                            "etag": str(obj.etag), 
+                                            "size": str(obj.size), 
+                                            "content_type": str(obj.content_type)}
+                            return jsonify(ret_object)
+                        else:
+                            return send_file(str(deposit_id), mimetype="application/octet-stream")
+
+                    if i == len(objects) - 1:
                         return jsonify({ "err": "Object does not exist." })
                     # objects_list.append({ "bucket": str(obj.bucket_name), 
                     #                       "deposit_id": str(obj.object_name), 
@@ -100,9 +104,6 @@ def create_app():
             
             # extract authentication details
             auth = minio_keys(request)
-            
-            access_key = auth.get("access_key")
-            secret_key = auth.get("secret_key")
 
             # extract deposit_id value
             deposit_id = data.get('deposit_id')
@@ -113,8 +114,8 @@ def create_app():
 
             # Initialize minioClient with an endpoint and keys.
             minioClient = Minio(SERVER_ENDPOINT,
-                                access_key=access_key,
-                                secret_key=secret_key,
+                                access_key=auth.get("access_key"),
+                                secret_key=auth.get("secret_key"),
                                 secure=False)   
 
             # print(minioClient.bucket_exists(BUCKET_NAME))
@@ -136,9 +137,6 @@ def create_app():
         elif request.method == 'DELETE':
             # extract authentication details
             auth = minio_keys(request)
-            
-            access_key = auth.get("access_key")
-            secret_key = auth.get("secret_key")
 
             # get data from request payload
             data = json.loads(request.form.get('data'))
@@ -147,8 +145,8 @@ def create_app():
             deposit_id = data.get('deposit_id')
 
             minioClient = Minio(SERVER_ENDPOINT,
-                                access_key=access_key,
-                                secret_key=secret_key,
+                                access_key=auth.get("access_key"),
+                                secret_key=auth.get("secret_key"),
                                 secure=False)
 
             try:

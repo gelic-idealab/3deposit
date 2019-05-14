@@ -20,13 +20,11 @@ export default {
     return {
       file: '',
       uploadPercentage: 0,
-      id: ''
+      id: this.$parent.id
+
     }
   },
   methods: {
-    generateUuid() {
-      // https://www.npmjs.com/package/uuid 
-    }, 
     handleFileUpload() {
       this.file = this.$refs.file.files[0];
       this.submitFile();

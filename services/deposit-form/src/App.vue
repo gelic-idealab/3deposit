@@ -15,6 +15,7 @@ import Fields from './components/Fields.vue'
 import FileProgress from './components/FileProgress.vue'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import axios from 'axios'
+import uuidv4 from 'uuid'
 
 
 
@@ -27,16 +28,20 @@ export default {
   },
   data() {
     return {
-      form: {"banner": {}, "fields": []}
+      form: {"banner": {}, "fields": []},
+      id: uuidv4()
     }
   },
   mounted () {
     axios
       .get('https://95657a85-2ede-440d-85c2-1eda1fef91a0.mock.pstmn.io/form')
-      .then(response => (this.form = response.data))
-  }
+      .then(response => (this.form = response.data));
+    console.log(this.id)
+  },
 }
 </script>
+
+
 
 <style>
 #app {

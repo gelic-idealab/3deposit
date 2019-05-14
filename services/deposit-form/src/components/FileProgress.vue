@@ -27,6 +27,7 @@ export default {
   methods: {
     handleFileUpload() {
       this.file = this.$refs.file.files[0];
+      // compute checksum here and attach to form component
       this.submitFile();
     },
     submitFile() {

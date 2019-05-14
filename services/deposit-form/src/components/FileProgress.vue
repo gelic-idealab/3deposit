@@ -1,9 +1,14 @@
 <template>
   <div class="container sticky-top" style="background-color: white">
     <div class="large-12 medium-12 small-12 cell">
-      <label>File
+      <!-- <label>File
         <input type="file" id="file" ref="file" v-on:change="handleFileUpload()"/>
-      </label>
+      </label> -->
+        <div class="custom-file">
+          <input type="file" class="custom-file-input" id="file" ref="file" v-on:change="handleFileUpload()" required>
+          <label class="custom-file-label" for="file">Choose file...</label>
+          <div class="invalid-feedback">Example invalid custom file feedback</div>
+        </div>
       <br>
       <div class="progress">
         <div class="progress-bar" role="progressbar" :style="{width: uploadPercentage+'%'}" aria-valuemin="0" aria-valuemax="100"></div>

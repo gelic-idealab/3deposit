@@ -136,6 +136,35 @@
                "repeatable": false,
                "required": true,
                "value": [""],
-               "placeholder": "Enter object title",
+               "placeholder": "Enter object title"
+            },
+            {
+                "id": 13,
+                "label":"Object Identifier",
+                "type": "text",
+                "repeatable": true,
+                "required": true,
+                "value": [""],
+                "placeholder": "Enter object ID"
+             },
+             {
+                "id": 14,
+                "label":"Date Created",
+                "type": "text",
+                "repeatable": true,
+                "required": true,
+                "value": [""],
+                "placeholder": "Enter object's date of creation"
+              },
+              {
+                  "id": 15,
+                  "label":"Description",
+                  "type": "text",
+                  "repeatable": false,
+                  "required": false,
+                  "value": [""],
+                  "placeholder": "Enter object description"
+               },
+                           
     ]
 }

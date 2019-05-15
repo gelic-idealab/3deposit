@@ -79,6 +79,92 @@
             "value": [""],
             "placeholder": "Enter funding identification number",
             "dependsOn": {"id": 4, "value": true}
-        }
+        },
+        {
+            "id": 7,
+            "label":"Course",
+            "type": "checkbox",
+            "repeatable": true,
+            "required": false,
+            "value": false,
+            "dependsOn": {}
+        },
+        {
+            "id": 8,
+            "label":"Course Name",
+            "type": "text",
+            "repeatable": false,
+            "required": true,
+            "value": [""],
+            "placeholder": "Enter course name",
+            "dependsOn": {"id": 7, "value": true}
+        },
+        {
+            "id": 9,
+            "label":"Course Instructor",
+            "type": "text",
+            "repeatable": true,
+            "required": true,
+            "value": [""],
+            "placeholder": "Enter instructor name",
+            "dependsOn": {"id": 7, "value": true}
+         },
+         {
+             "id": 10,
+             "label":"Course Semester",
+             "type": "text",
+             "repeatable": false,
+             "required": true,
+             "value": [""],
+             "placeholder": "Enter course semester",
+             "dependsOn": {"id": 7, "value": true}
+          },
+          {
+              "id": 11,
+              "label":"Course Year",
+              "type": "text",
+              "repeatable": false,
+              "required": true,
+              "value": [""],
+              "placeholder": "Enter course year",
+              "dependsOn": {"id": 7, "value": true}
+           },
+           {
+               "id": 12,
+               "label":"Object Title",
+               "type": "text",
+               "repeatable": false,
+               "required": true,
+               "value": [""],
+               "placeholder": "Enter object title"
+            },
+            {
+                "id": 13,
+                "label":"Object Identifier",
+                "type": "text",
+                "repeatable": true,
+                "required": true,
+                "value": [""],
+                "placeholder": "Enter object ID"
+             },
+             {
+                "id": 14,
+                "label":"Date Created",
+                "type": "text",
+                "repeatable": true,
+                "required": true,
+                "value": [""],
+                "placeholder": "Enter object's date of creation"
+              },
+              {
+                  "id": 15,
+                  "label":"Description",
+                  "type": "text",
+                  "repeatable": false,
+                  "required": false,
+                  "value": [""],
+                  "placeholder": "Enter object description"
+               },
+                           
     ]
 }

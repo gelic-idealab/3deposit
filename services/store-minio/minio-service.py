@@ -55,9 +55,12 @@ def create_app():
 
                 try:
                     obj = minioClient.get_object(BUCKET_NAME, deposit_id)
-                    with open(str(deposit_id), 'wb') as file_data:
-                        for d in obj.stream(32*1024):
-                            file_data.write(d)
+                    try:
+                        with open(str(deposit_id), 'wb') as file_data:
+                            for d in obj.stream(32*1024):
+                                file_data.write(d)
+                    except Exception as err:
+                        return jsonify({"err":str(err)})
                 except NoSuchKey as err:
                     return jsonify({"err":str(err)})
 
@@ -119,7 +122,7 @@ def create_app():
                     return jsonify({"err": err})                    
 
             try:
-                r = minioClient.fput_object(BUCKET_NAME, deposit_id, deposit_id)
+                r = minioClient.fput_object(BUCKET_NAME, deposit_id, content_type='application/octet-stream')
                 # cleanup temp file
                 os.remove(deposit_id)
                 return jsonify({"etag": r, "deposit_id": deposit_id})
@@ -175,7 +178,6 @@ def create_app():
                 if json.loads(request.form.get('data')):
                     data = json.loads(request.form.get('data'))
                     deposit_id_list = data.get('deposit_id_list')
-                    metadata = data.get('metadata')
                 else:
                     return jsonify({"err": "No deposit ID provided"})                
 
@@ -196,33 +198,35 @@ def create_app():
 
                 obj_names = []
                 missing_ids = []
+                test_ids = []
 
+                #return jsonify({"test_ids":test_ids,"missing_ids":missing_ids})
+
+                # for i,obj in enumerate(objects):
+                #     if obj.object_name not in deposit_id_list:
+                #         objects.remove(i)
+
+                objects_list = []
                 for obj in objects:
-                    obj_names.append(obj.object_name)
+                    # try:
+                    if obj.object_name not in deposit_id_list:
+                        continue
+                    ret_object = {"metadata": str(obj.metadata), 
+                                  "deposit_id": str(obj.object_name), 
+                                  "modified": str(obj.last_modified),
+                                  "etag": str(obj.etag), 
+                                  "size": str(obj.size), 
+                                  "content_type": str(obj.content_type)}
+                    objects_list.append(ret_object)
 
-                # if deposit_id_list:
-                #     for i,obj in enumerate(objects):
-                #         if obj.object_name not in deposit_id_list:
-                #             objects.pop(i)
+                    obj_names.append(str(obj.object_name))
 
                 for i,d in enumerate(deposit_id_list):
                     if d not in obj_names:
                         missing_ids.append(d)
 
-
-                objects_list = []
-                for i,obj in enumerate(objects):
-                    try:
-                        ret_object =   {"metadata": str(obj.metadata), 
-                                        "deposit_id": str(obj.object_name), 
-                                        "modified": str(obj.last_modified),
-                                        "etag": str(obj.etag), 
-                                        "size": str(obj.size), 
-                                        "content_type": str(obj.content_type)}
-                        objects_list.append(ret_object)
-                    except Exception as err:
-                        objects_list.append({"requested_id":deposit_id_list[i],"err":err})
                 return jsonify({"objects": objects_list,"missing deposit ids":missing_ids})
+                #return str(objects)
                 # construct response object from objects iterable
 
                 # try:

@@ -7,9 +7,11 @@ from pymongo import MongoClient
 
 
 DATABASE_NAME = 'deposits'
+username = 'root'
+password = 'example'
 
-client = MongoClient('mongodb://localhost:27017/')
-db = client[DATABASE_NAME]
+client = MongoClient('mongodb://{username}:{password}@localhost:27017/'.format(username=username, password=password))
+database = client[DATABASE_NAME]
 
 app = Flask(__name__)
 
@@ -23,4 +25,4 @@ def db():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

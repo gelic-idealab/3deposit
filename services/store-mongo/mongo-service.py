@@ -7,11 +7,13 @@ from pymongo import MongoClient
 
 
 DATABASE_NAME = 'deposits'
+COLLECTION_NAME = 'metadata'
 username = 'root'
 password = 'example'
 
 client = MongoClient('mongodb://{username}:{password}@localhost:27017/'.format(username=username, password=password))
 database = client[DATABASE_NAME]
+collection = database[COLLECTION_NAME]
 
 app = Flask(__name__)
 

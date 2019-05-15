@@ -15,6 +15,8 @@ aiohttp-jinja2 = "*"
 jinja2 = "*"
 aiohttp-security = "*"
 aiohttp-session = "*"
+bcrypt = "*"
+cryptography = "*"
 
 [requires]
 python_version = "3.7"

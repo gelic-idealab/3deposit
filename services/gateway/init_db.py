@@ -2,6 +2,7 @@ from sqlalchemy import create_engine, MetaData
 
 from db import deposits, users
 from settings import BASE_DIR, get_config
+from security import generate_password_hash
 
 import time
 
@@ -62,10 +63,17 @@ def drop_tables(engine):
     meta = MetaData()
     meta.drop_all(bind=engine, tables=[deposits, users])
 
+def create_admin(engine):
+    username = 'admin'
+    password_hash = generate_password_hash('admin')
+    with engine.connect() as conn:
+        conn.execute(users.insert().values(username=username, password_hash=password_hash))
+
 
 if __name__ == '__main__':
-    time.sleep(15)
+    time.sleep(5)
     setup_db(USER_CONFIG['postgres'])
     create_tables(engine=user_engine)
+    create_admin(engine=user_engine)
     # drop_tables()
     # teardown_db(config)

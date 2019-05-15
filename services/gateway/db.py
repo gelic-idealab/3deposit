@@ -42,6 +42,7 @@ async def init_pg(app):
         maxsize=conf['maxsize'],
     )
     app['db'] = engine
+    return engine
 
 
 async def close_pg(app):
@@ -51,25 +52,27 @@ async def close_pg(app):
 
 async def get_deposit_by_id(conn, deposit_id):
     result = await conn.execute(
-        question.select()
+        deposits.select()
         .where(deposits.c.id == deposit_id))
     deposit_record = await result.first()
-    if not question_record:
+    if not deposit_record:
         msg = "Deposit with id: {} not found"
         raise RecordNotFound(msg.format(deposit_id))
     return deposit_record
 
 async def get_user_by_name(conn, username):
-    result = await conn.fetchrow(
+    result = await conn.execute(
         users
         .select()
         .where(users.c.username == username)
     )
-    return result
+    user_record = await result.first()
+    return user_record
 
 
 async def get_users(conn):
-    records = await conn.fetch(
+    records = await conn.execute(
         users.select().order_by(users.c.id)
     )
     return records
+    

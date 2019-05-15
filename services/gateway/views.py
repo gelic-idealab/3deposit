@@ -17,11 +17,10 @@ async def index(request):
     if not username:
         raise redirect(request.app.router, 'login')
 
-    async with request.app['db_pool'].acquire() as conn:
+    async with request.app['db'].acquire() as conn:
         current_user = await db.get_user_by_name(conn, username)
-        posts = await db.get_posts_with_joined_users(conn)
 
-    return {'user': current_user, 'posts': posts}
+    return {'current_user': current_user}
 
 
 @aiohttp_jinja2.template('login.html')
@@ -33,7 +32,7 @@ async def login(request):
     if request.method == 'POST':
         form = await request.post()
 
-        async with request.app['db_pool'].acquire() as conn:
+        async with request.app['db'].acquire() as conn:
             error = await validate_login_form(conn, form)
 
             if error:

@@ -8,7 +8,7 @@ from utils import TRAFARET
 
 BASE_DIR = pathlib.Path(__file__).parent.parent
 DEFAULT_CONFIG_PATH = BASE_DIR / 'gateway' / 'db_config.yml'
-
+PACKAGE_NAME = 'gateway'
 
 def get_config(argv=None):
     ap = argparse.ArgumentParser()

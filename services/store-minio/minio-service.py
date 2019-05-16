@@ -1,5 +1,6 @@
 import os
 import json
+from json import JSONDecodeError
 from flask import Flask, request, jsonify, send_file
 from minio import Minio
 from minio.error import ResponseError, BucketAlreadyExists, NoSuchBucket, NoSuchKey
@@ -17,10 +18,17 @@ SERVER_ENDPOINT = 'minio-server:9000'
 BUCKET_NAME = '3deposit'
 
 def minio_keys(request_auth):
-    auth = json.loads(request_auth.form.get('auth'))
-    auth_packed = {"access_key":auth.get('access_key'),"secret_key":auth.get('secret_key')}
-
-    return auth_packed
+    if not request_auth:
+        return False
+    
+    auth = request_auth.form.get('auth')
+    
+    if auth:
+        auth = json.loads(request_auth.form.get('auth'))
+        auth_packed = {"access_key":auth.get('access_key'),"secret_key":auth.get('secret_key')}
+        return auth_packed
+    else:
+        return False
 
 def create_app():
     app = Flask(__name__)
@@ -33,7 +41,7 @@ def create_app():
             if minio_keys(request):
                 auth = minio_keys(request)
             else:
-                return jsonify({"err": "No auth keys provided"})
+                return jsonify({"err": "No authentication keys provided"})
 
             try:
                 # Initialize minioClient with an endpoint and keys.
@@ -42,14 +50,21 @@ def create_app():
                                     secret_key=auth.get("secret_key"),
                                     secure=False)
 
+                deposit_id = False
                 # get data from request payload
-                if json.loads(request.form.get('data')):
-                    data = json.loads(request.form.get('data'))
-                    deposit_id = data.get('deposit_id')
-                    metadata = data.get('metadata')
-                else:
-                    return jsonify({"err": "No deposit ID provided"})                
+                try:
+                    data = request.form.get('data')
+                    try:
+                        data = json.loads(request.form.get('data'))
+                        deposit_id = data.get('deposit_id')
+                        metadata = data.get('metadata')
+                    except JSONDecodeError as err:
+                        return jsonify({"err":"Incorrect formatting of data"})
+                except TypeError as err:
+                    return jsonify({"err": "No data provided"})
 
+                if not deposit_id:
+                    return jsonify({"err": "No deposit ID provided"})
                 # get objects from bucket
 
                 # construct response object from objects iterable
@@ -169,8 +184,8 @@ def create_app():
         else:
             return jsonify({"err":"Unsupported method"})
     
-
 #**************************************************************************************************************************************************************************************************************************************
+    
     @app.route('/bucket', methods=['GET'])
     def bucket():
         if request.method == 'GET':
@@ -179,7 +194,8 @@ def create_app():
             if minio_keys(request):
                 auth = minio_keys(request)
             else:
-                return jsonify({"err": "No auth keys provided"})
+                return jsonify({"err": "No authentication keys provided"})
+
 
             try:
                 # Initialize minioClient with an endpoint and keys.
@@ -188,12 +204,14 @@ def create_app():
                                     secret_key=auth.get("secret_key"),
                                     secure=False)
 
+                deposit_id_list = []
                 # get data from request payload
-                if json.loads(request.form.get('data')):
-                    data = json.loads(request.form.get('data'))
-                    deposit_id_list = data.get('deposit_id_list')
-                else:
-                    return jsonify({"err": "No deposit ID provided"})                
+                if request.form.get('data'):
+                    if json.loads(request.form.get('data')):
+                        data = json.loads(request.form.get('data'))
+                        deposit_id_list = data.get('deposit_id_list')
+                        if not deposit_id_list:
+                            return jsonify({"err": "No deposit ID provided"})                
 
                 # get objects from bucket
                 if minioClient.bucket_exists(BUCKET_NAME):
@@ -206,22 +224,35 @@ def create_app():
                 test_ids = []
 
                 objects_list = []
-                for obj in objects:
-                    if obj.object_name not in deposit_id_list:
-                        continue
-                    ret_object = {"metadata": str(obj.metadata), 
-                                  "deposit_id": str(obj.object_name), 
-                                  "modified": str(obj.last_modified),
-                                  "etag": str(obj.etag), 
-                                  "size": str(obj.size), 
-                                  "content_type": str(obj.content_type)}
-                    objects_list.append(ret_object)
 
-                    obj_names.append(str(obj.object_name))
+                if deposit_id_list:
+                    for obj in objects:
+                        if obj.object_name not in deposit_id_list:
+                            continue
+                        ret_object = {"metadata": str(obj.metadata), 
+                                      "deposit_id": str(obj.object_name), 
+                                      "modified": str(obj.last_modified),
+                                      "etag": str(obj.etag), 
+                                      "size": str(obj.size), 
+                                      "content_type": str(obj.content_type)}
+                        objects_list.append(ret_object)
 
-                for i,d in enumerate(deposit_id_list):
-                    if d not in obj_names:
-                        missing_ids.append(d)
+                    for i,d in enumerate(deposit_id_list):
+                        if d not in obj_names:
+                            missing_ids.append(d)
+
+                else:
+                    for obj in objects:
+                        ret_object = {"metadata": str(obj.metadata), 
+                                      "deposit_id": str(obj.object_name), 
+                                      "modified": str(obj.last_modified),
+                                      "etag": str(obj.etag), 
+                                      "size": str(obj.size), 
+                                      "content_type": str(obj.content_type)}
+                        objects_list.append(ret_object)
+                    #obj_names.append(str(obj.object_name))
+
+
 
                 return jsonify({"objects": objects_list,"missing deposit ids":missing_ids})
 

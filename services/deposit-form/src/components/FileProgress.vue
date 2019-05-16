@@ -22,6 +22,7 @@
 
 <script>
   import axios from 'axios'
+  import md5File from 'md5-file'
 
 export default {
   data(){
@@ -33,9 +34,17 @@ export default {
     }
   },
   methods: {
+    hashFile(f) {
+      md5File(f, (err, hash)  => {
+        // eslint-disable-next-line
+        console.log(err);
+        return hash;
+      })
+    },
     handleFileUpload() {
       this.file = this.$refs.file.files[0];
       // compute checksum here and attach to form component
+      this.checksum = this.hashFile(this.file);
       this.submitFile();
     },
     submitFile() {

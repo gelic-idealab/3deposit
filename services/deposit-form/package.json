@@ -13,8 +13,9 @@
     "bootstrap": "^4.3.1",
     "bootstrap-toggle": "^2.2.2",
     "jquery": "^3.4.0",
+    "md5-file": "^4.0.0",
     "popper.js": "^1.14.7",
-    "sjcl": "^1.0.8",
+    "ssri": "^6.0.1",
     "uuid": "^3.3.2",
     "vue": "^2.6.6"
   },

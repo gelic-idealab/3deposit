@@ -18,7 +18,6 @@ import axios from 'axios'
 import uuidv4 from 'uuid'
 
 
-
 export default {
   name: 'app',
   components: {
@@ -29,7 +28,8 @@ export default {
   data() {
     return {
       form: {"banner": {}, "fields": []},
-      id: uuidv4()
+      id: uuidv4(),
+      checksum: ''
     }
   },
   mounted () {

@@ -33,11 +33,10 @@ def minio_keys(request_auth):
 def create_app():
     app = Flask(__name__)
 
-    @app.route('/minio', methods=['GET', 'POST','DELETE'])
-    def minio():
+    @app.route('/minio_object', methods=['GET', 'POST','DELETE'])
+    def minio_object():
         if request.method == 'GET':
             # get keys from request args
-
             if minio_keys(request):
                 auth = minio_keys(request)
             else:
@@ -51,6 +50,7 @@ def create_app():
                                     secure=False)
 
                 deposit_id = False
+
                 # get data from request payload
                 try:
                     data = request.form.get('data')
@@ -65,32 +65,25 @@ def create_app():
 
                 if not deposit_id:
                     return jsonify({"err": "No deposit ID provided"})
-                # get objects from bucket
-
-                # construct response object from objects iterable
-
-                # try:
-                #     data = minioClient.get_object(BUCKET_NAME, deposit_id)
-                # except NoSuchKey as err:
-                #     print(err)
 
                 temp_obj_path = str(deposit_id)
 
                 try:
                     obj = minioClient.get_object(BUCKET_NAME, deposit_id)
-                    try:
-                        with open(temp_obj_path, 'wb') as file_data:
-                            for d in obj.stream(32*1024):
-                                file_data.write(d)
-                    except Exception as err:
-                        return jsonify({"err":str(err)})
                 except NoSuchKey as err:
                     return jsonify({"err":str(err)})
+                except NoSuchBucket as err:
+                    return jsonify({"err":str(err)})
+
+                try:
+                    with open(temp_obj_path, 'wb') as file_data:
+                        for d in obj.stream(32*1024):
+                            file_data.write(d)
+                except Exception as err:
+                    return jsonify({"err":str(err)})
+
 
                 # check whether object exists in the bucket
-
-                #objects_list = []
-                #for i,obj in enumerate(objects):
                 if obj:
                     if metadata == "1":
                         meta_obj = minioClient.fget_object(BUCKET_NAME,object_name=deposit_id,file_path=deposit_id)
@@ -104,20 +97,10 @@ def create_app():
                     else:
                         return send_file(temp_obj_path, mimetype="application/octet-stream")
 
-                    # if i == len(objects) - 1:
-                    #     return jsonify({ "err": "Object does not exist." })
-                    # objects_list.append({ "bucket": str(obj.bucket_name), 
-                    #                       "deposit_id": str(obj.object_name), 
-                    #                       "modified": str(obj.last_modified),
-                    #                       "etag": str(obj.etag), 
-                    #                       "size": str(obj.size), 
-                    #                       "content_type": str(obj.content_type) })
-
-                #return jsonify({ "objects": objects_list })
-
             except ResponseError as err:
                 return jsonify({"err": err})
 
+        ####################################################################################################################
 
         elif request.method == 'POST':
             # get data from request payload
@@ -139,12 +122,12 @@ def create_app():
                                 secret_key=auth.get("secret_key"),
                                 secure=False)   
 
-            # print(minioClient.bucket_exists(BUCKET_NAME))
-            if not minioClient.bucket_exists(BUCKET_NAME):
-                try:
-                    minioClient.make_bucket(BUCKET_NAME)
-                except Exception as err:
-                    return jsonify({"err": err})                    
+            # try:
+            #     minioClient.bucket_exists(BUCKET_NAME)
+            # except ResponseError as err:
+            #     return jsonify({"err": err})
+            # except NoSuchBucket as err:
+            #     return jsonify({"err":"This bucket does not exist. Please create this bucket at the bucket scoped endpoint."})
 
             metadata={}
 
@@ -158,6 +141,11 @@ def create_app():
 
             except ResponseError as err:
                 return jsonify({"err": err})
+
+            except NoSuchBucket as err:
+                return jsonify({"err":"This bucket does not exist. Please create this bucket at the bucket scoped endpoint."})
+
+        ####################################################################################################################
 
         elif request.method == 'DELETE':
             # extract authentication details
@@ -183,10 +171,10 @@ def create_app():
 
         else:
             return jsonify({"err":"Unsupported method"})
-    
+
 #**************************************************************************************************************************************************************************************************************************************
     
-    @app.route('/bucket', methods=['GET'])
+    @app.route('/bucket', methods=['GET','POST'])
     def bucket():
         if request.method == 'GET':
             # get keys from request args
@@ -214,9 +202,9 @@ def create_app():
                             return jsonify({"err": "No deposit ID provided"})                
 
                 # get objects from bucket
-                if minioClient.bucket_exists(BUCKET_NAME):
+                try:
                     objects = minioClient.list_objects(BUCKET_NAME, recursive=True)
-                else:
+                except NoSuchBucket:
                     return jsonify({ "err": "Bucket does not exist." })
 
                 obj_names = []
@@ -236,6 +224,8 @@ def create_app():
                                       "size": str(obj.size), 
                                       "content_type": str(obj.content_type)}
                         objects_list.append(ret_object)
+
+                        obj_names.append(str(obj.object_name))
 
                     for i,d in enumerate(deposit_id_list):
                         if d not in obj_names:
@@ -258,5 +248,8 @@ def create_app():
 
             except ResponseError as err:
                 return jsonify({"err": err})
+
+        #elif request.method == 'POST':
+
 
     return app

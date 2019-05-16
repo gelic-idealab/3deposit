@@ -34,7 +34,7 @@ export default {
   },
   mounted () {
     axios
-      .get('https://95657a85-2ede-440d-85c2-1eda1fef91a0.mock.pstmn.io/form')
+      .get('https://f1cf68b1-bff4-449e-a0b2-400c5cc37cac.mock.pstmn.io/form')
       .then(response => (this.form = response.data));
     // eslint-disable-next-line
     console.log(this.id)

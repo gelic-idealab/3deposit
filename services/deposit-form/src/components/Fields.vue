@@ -19,6 +19,11 @@
             </div>
         </template>
 
+        <template v-if="field.type === 'date'">
+          <h4>{{field.label}}</h4>
+          <input class="form-control ml-3 mb-3" type="date" v-model="field.value" value="">
+        </template>
+
         <template v-else-if="field.type === 'select'">
           <h4>{{ field.label }}</h4>
               <select class="form-control ml-3 mb-3"

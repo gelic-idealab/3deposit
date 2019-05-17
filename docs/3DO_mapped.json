@@ -14,16 +14,25 @@
         },
         {
             "id": 1,
+            "label":"Creator",
+            "type": "container",
+            "repeatable": true,
+            "required": true,
+            "value": [{}],
+            "dependsOn": {}
+        },
+        {
+            "id": 2,
             "label":"Creator Name",
             "type": "text",
             "repeatable": true,
             "required": true,
             "value": [""],
             "placeholder": "Enter creator name",
-            "dependsOn": {}
+            "dependsOn": {"id": 1, "value": true}
         },
         {
-            "id": 2,
+            "id": 3,
             "label":"Creator Status",
             "type": "select",
             "repeatable": false,
@@ -34,20 +43,20 @@
                         {"value": "f", "label": "Faculty"}, 
                         {"value": "s", "label": "Staff"}, 
                         {"value": "o", "label": "Other"}],
-            "dependsOn": {}
+            "dependsOn": {"id": 1, "value": true}
         },
         {
-            "id": 3,
+            "id": 4,
             "label":"Creator Affiliation",
             "type": "text",
             "repeatable": true,
             "required": false,
             "value": [""],
             "placeholder": "Enter creator's department or team affiliation",
-            "dependsOn": {}
+            "dependsOn": {"id": 1, "value": true}
         },
         {
-            "id": 4,
+            "id": 5,
             "label":"Funding",
             "type": "container",
             "repeatable": true,
@@ -56,109 +65,122 @@
             "dependsOn": {}
         },
         {
-            "id": 5,
+            "id": 6,
             "label":"Funding Agency",
             "type": "text",
             "repeatable": true,
             "required": true,
             "value": [""],
             "placeholder": "Enter funding agency name",
-            "dependsOn": {"id": 4, "value": true}
+            "dependsOn": {"id": 5, "value": true}
         },
         {
-            "id": 6,
+            "id": 7,
             "label":"Funding Number",
             "type": "text",
             "repeatable": true,
             "required": true,
             "value": [""],
             "placeholder": "Enter funding identification number",
-            "dependsOn": {"id": 4, "value": true}
+            "dependsOn": {"id": 5, "value": true}
         },
         {
-            "id": 7,
+            "id": 8,
             "label":"Course",
-            "type": "checkbox",
+            "type": "container",
             "repeatable": true,
             "required": false,
             "value": false,
             "dependsOn": {}
         },
         {
-            "id": 8,
+            "id": 9,
             "label":"Course Name",
             "type": "text",
             "repeatable": false,
             "required": true,
             "value": [""],
             "placeholder": "Enter course name",
-            "dependsOn": {"id": 7, "value": true}
+            "dependsOn": {"id": 8, "value": true}
         },
         {
-            "id": 9,
+            "id": 10,
             "label":"Course Instructor",
             "type": "text",
             "repeatable": true,
             "required": true,
             "value": [""],
             "placeholder": "Enter instructor name",
-            "dependsOn": {"id": 7, "value": true}
+            "dependsOn": {"id": 8, "value": true}
         },
         {
-            "id": 10,
+            "id": 11,
             "label":"Course Semester",
             "type": "text",
             "repeatable": false,
             "required": true,
             "value": [""],
             "placeholder": "Enter course semester",
-            "dependsOn": {"id": 7, "value": true}
+            "dependsOn": {"id": 8, "value": true}
         },
         {
-            "id": 11,
+            "id": 12,
             "label":"Course Year",
             "type": "text",
             "repeatable": false,
             "required": true,
             "value": [""],
             "placeholder": "Enter course year",
-            "dependsOn": {"id": 7, "value": true}
+            "dependsOn": {"id": 8, "value": true}
         },
         {
-            "id": 12,
+            "id": 13,
+            "label":"Object",
+            "type": "container",
+            "repeatable": false,
+            "required": true,
+            "value": [{}],
+            "dependsOn": {}
+        },
+        {
+            "id": 14,
             "label":"Object Title",
             "type": "text",
             "repeatable": false,
             "required": true,
             "value": [""],
-            "placeholder": "Enter object title"
+            "placeholder": "Enter object title",
+            "dependsOn": {"id": 13, "value": true}
         },
         {
-            "id": 13,
+            "id": 15,
             "label":"Object Identifier",
             "type": "text",
             "repeatable": true,
             "required": true,
             "value": [""],
-            "placeholder": "Enter object ID"
+            "placeholder": "Enter object ID",
+            "dependsOn": {"id": 13, "value": true}
         },
         {
-            "id": 14,
+            "id": 16,
             "label":"Date Created",
             "type": "text",
             "repeatable": true,
             "required": true,
             "value": [""],
-            "placeholder": "Enter object's date of creation"
+            "placeholder": "Enter object's date of creation",
+            "dependsOn": {"id": 13, "value": true}
         },
         {
-            "id": 15,
+            "id": 17,
             "label":"Description",
             "type": "text",
             "repeatable": false,
             "required": false,
             "value": [""],
-            "placeholder": "Enter object description"
+            "placeholder": "Enter object description",
+            "dependsOn": {"id": 13, "value": true}
         },
         {
 

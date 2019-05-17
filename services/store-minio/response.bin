@@ -1,0 +1,31 @@
+version: '3.7'
+
+services:
+  minio-server:
+    ports: 
+       - "9000:9000"
+    container_name: minio-server
+    image: minio/minio:latest
+    volumes:
+      - data1:/data
+    environment:
+      MINIO_ACCESS_KEY: AKIAIOSFODNN7GRAINGER
+      MINIO_SECRET_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYGRAINGERKEY
+    command: server /data
+
+  minio-service:
+    build: .
+    container_name: minio-service
+    ports: 
+      - "5000:5000"
+    environment: 
+      FLASK_ENV: development
+      FLASK_APP: minio-service
+    depends_on:
+      - minio-server
+    links: 
+      - minio-server
+    command: pipenv run flask run --host=0.0.0.0
+
+volumes:
+  data1:

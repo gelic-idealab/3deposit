@@ -40,13 +40,13 @@ export default {
       var fileReader = new FileReader();
       fileReader.onload = function() {
           var buff = fileReader.result;
-          var md5 = CryptoJS.SHA256(buff).toString();
-          callback(md5);
+          var hash = CryptoJS.SHA256(buff).toString();
+          callback(hash);
       };
       fileReader.readAsArrayBuffer(file)
     },
-    updateHash(md5) {
-      this.checksum = md5
+    updateHash(hash) {
+      this.checksum = hash
     },
     handleFileUpload() {
       this.file = this.$refs.file.files[0];

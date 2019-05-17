@@ -205,19 +205,23 @@ def create_app():
                 deposit_id_list = []
                 # get data from request payload
                 if request.form.get('data'):
-                    if json.loads(request.form.get('data')):
+                    try:
                         data = json.loads(request.form.get('data'))
                         try:
+                            bucket_name = data.get('bucket_name')
                             deposit_id_list = data.get('deposit_id_list')
-                        except:
-                            return jsonify({"err": "No deposit ID provided"})                
-
-                # get objects from bucket
-                try:
-                    objects = minioClient.list_objects(bucket_name, recursive=True)
-                except NoSuchBucket:
-                    return jsonify({ "err": "Bucket does not exist." })
-
+                        except Exception:
+                            return jsonify({"err": "No data provided"})                 
+                        # get objects from bucket
+                        try:
+                            objects = minioClient.list_objects(bucket_name, recursive=True)
+                        except NoSuchBucket:
+                            return jsonify({ "err": "Bucket does not exist." })
+                    except JSONDecodeError as err:
+                        return jsonify({ "err": "Incorrect formatting of request." })
+                else:
+                    return jsonify({ "err": "No request provided." })
+                
                 obj_names = []
                 missing_ids = []
                 test_ids = []

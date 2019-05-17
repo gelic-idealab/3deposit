@@ -15,7 +15,7 @@ from minio.error import ResponseError, BucketAlreadyExists, NoSuchBucket, NoSuch
 
 SERVER_ENDPOINT = 'minio-server:9000'
 
-BUCKET_NAME = '3deposit'
+#BUCKET_NAME = 'new-3deposit'
 
 def minio_keys(request_auth):
     if not request_auth:
@@ -58,6 +58,7 @@ def create_app():
                         data = json.loads(request.form.get('data'))
                         deposit_id = data.get('deposit_id')
                         metadata = data.get('metadata')
+                        bucket_name = data.get('bucket_name')
                     except JSONDecodeError as err:
                         return jsonify({"err":"Incorrect formatting of data"})
                 except TypeError as err:
@@ -69,9 +70,9 @@ def create_app():
                 temp_obj_path = str(deposit_id)
 
                 try:
-                    obj = minioClient.get_object(BUCKET_NAME, deposit_id)
+                    obj = minioClient.get_object(bucket_name, deposit_id)
                 except NoSuchKey as err:
-                    return jsonify({"err":str(err)})
+                    return jsonify({"err":"The requested deposit_id does not exist"})
                 except NoSuchBucket as err:
                     return jsonify({"err":str(err)})
 
@@ -86,7 +87,7 @@ def create_app():
                 # check whether object exists in the bucket
                 if obj:
                     if metadata == "1":
-                        meta_obj = minioClient.fget_object(BUCKET_NAME,object_name=deposit_id,file_path=deposit_id)
+                        meta_obj = minioClient.fget_object(bucket_name,object_name=deposit_id,file_path=deposit_id)
                         ret_object =   {"metadata": str(meta_obj.metadata), 
                                         "deposit_id": str(meta_obj.object_name), 
                                         "modified": str(meta_obj.last_modified),
@@ -109,6 +110,9 @@ def create_app():
             # extract authentication details
             auth = minio_keys(request)
 
+            # extract bucket_name value
+            bucket_name = data.get('bucket_name')
+
             # extract deposit_id value
             deposit_id = data.get('deposit_id')
 
@@ -122,19 +126,12 @@ def create_app():
                                 secret_key=auth.get("secret_key"),
                                 secure=False)   
 
-            # try:
-            #     minioClient.bucket_exists(BUCKET_NAME)
-            # except ResponseError as err:
-            #     return jsonify({"err": err})
-            # except NoSuchBucket as err:
-            #     return jsonify({"err":"This bucket does not exist. Please create this bucket at the bucket scoped endpoint."})
-
             metadata={}
 
-            metadata['BUCKET_NAME'] = BUCKET_NAME
+            metadata['BUCKET_NAME'] = bucket_name
 
             try:
-                r = minioClient.fput_object(BUCKET_NAME, object_name=deposit_id, file_path=deposit_id,metadata=metadata)
+                r = minioClient.fput_object(bucket_name, object_name=deposit_id, file_path=deposit_id,metadata=metadata)
                 # cleanup temp file
                 os.remove(deposit_id)
                 return jsonify({"etag": r, "deposit_id": deposit_id,"metadata":metadata})
@@ -154,6 +151,9 @@ def create_app():
             # get data from request payload
             data = json.loads(request.form.get('data'))
 
+            # extract bucket_name value
+            bucket_name = data.get('bucket_name')
+
             # extract object specific deposit_id
             deposit_id = data.get('deposit_id')
 
@@ -163,7 +163,7 @@ def create_app():
                                 secure=False)
 
             try:
-                rem_object = minioClient.remove_object(BUCKET_NAME,deposit_id)
+                rem_object = minioClient.remove_object(bucket_name,deposit_id)
             except ResponseError as err:
                 return jsonify({"error":err})
 
@@ -172,8 +172,18 @@ def create_app():
         else:
             return jsonify({"err":"Unsupported method"})
 
+
+
+
+
+
 #**************************************************************************************************************************************************************************************************************************************
     
+
+
+
+
+
     @app.route('/bucket', methods=['GET','POST'])
     def bucket():
         if request.method == 'GET':
@@ -197,13 +207,14 @@ def create_app():
                 if request.form.get('data'):
                     if json.loads(request.form.get('data')):
                         data = json.loads(request.form.get('data'))
-                        deposit_id_list = data.get('deposit_id_list')
-                        if not deposit_id_list:
+                        try:
+                            deposit_id_list = data.get('deposit_id_list')
+                        except:
                             return jsonify({"err": "No deposit ID provided"})                
 
                 # get objects from bucket
                 try:
-                    objects = minioClient.list_objects(BUCKET_NAME, recursive=True)
+                    objects = minioClient.list_objects(bucket_name, recursive=True)
                 except NoSuchBucket:
                     return jsonify({ "err": "Bucket does not exist." })
 
@@ -249,7 +260,30 @@ def create_app():
             except ResponseError as err:
                 return jsonify({"err": err})
 
-        #elif request.method == 'POST':
+        elif request.method == 'POST':
+            
+            # extract authentication details
+            auth = minio_keys(request)
 
+            # Initialize minioClient with an endpoint and keys.
+            minioClient = Minio(SERVER_ENDPOINT,
+                                access_key=auth.get("access_key"),
+                                secret_key=auth.get("secret_key"),
+                                secure=False)
+
+            # extract bucket name
+            if request.form.get('data'):
+                if json.loads(request.form.get('data')):
+                    data = json.loads(request.form.get('data'))
+                    bucket_name = data.get('bucket_name')
+                    try:
+                        minioClient.make_bucket(bucket_name)
+                        return jsonify({"bucket_name":bucket_name})
+                    except ResponseError as err:
+                        return jsonify({"err":str(err)})
+                else:
+                    return jsonify({"err":"Incorrect formatting of data"})
+            else:
+                return jsonify({"err":"Invalid request"})
 
     return app

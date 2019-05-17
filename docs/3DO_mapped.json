@@ -183,8 +183,365 @@
             "dependsOn": {"id": 13, "value": true}
         },
         {
+            "id": 18,
+            "label":"Derived",
+            "type": "checkbox",
+            "repeatable": true,
+            "required": false,
+            "value": [""],
+            "placeholder": "Is this object derived?",
+            "dependsOn": {}
 
+        },
+        {
+             "id": 19,
+            "label":"Derived Title",
+            "type": "text",
+            "repeatable": true,
+            "required": true,
+            "value": [""],
+            "placeholder": "Enter derived title",
+            "dependsOn": {"id": 18, "value": true}
+        },
+
+        {
+            "id": 20,
+            "label":"Derived Creator",
+            "type": "text",
+            "repeatable": true,
+            "required": true,
+            "value": [""],
+            "placeholder": "Enter derived creator",
+            "dependsOn": {"id": 18, "value": true}
+        },
+
+        {
+            "id": 21,
+            "label":"Real Object",
+            "type": "checkbox",
+            "repeatable": true,
+            "required": false,
+            "value": [""],
+            "placeholder": "Does the object exist in the real world?",
+            "dependsOn": {}
+        },
+
+        {
+            "id": 22,
+            "label":"Holding",
+            "type": "text",
+            "repeatable": false,
+            "required": false,
+            "children": [],
+            "value": [""],
+            "placeholder": "Enter creator name",
+            "dependsOn": {"id": 21, "value": true}
+        },
+
+        {
+            "id": 23,
+            "label":"Original Work",
+            "type": "text",
+            "repeatable": false,
+            "required": false,
+            "value": [""],
+            "placeholder": "Enter name of original work",
+            "dependsOn": {"id": 21, "value": true}
+        },
+
+        {
+            "id": 24,
+            "label":"Model Source Format",
+            "type": "select",
+            "repeatable": false,
+            "required": true,
+            "value": [""],
+            "options": [{}],
+            "dependsOn": {"id": 0, "value": "model"}
+        },
+
+        {
+            "id": 25,
+            "label":"Video Source Format",
+            "type": "select",
+            "repeatable": false,
+            "required": true,
+            "value": [""],
+            "options": [{}],
+            "dependsOn": {"id": 0, "value": "video"}
+        },
+
+        {
+            "id": 26,
+            "label":"VR Source Format",
+            "type": "select",
+            "repeatable": false,
+            "required": true,
+            "value": [""],
+            "options": [{}],
+            "dependsOn": {"id": 0, "value": "vr"}
+        },
+
+        {
+            "id": 27,
+            "label":"Created With",
+            "type": "select",
+            "repeatable": false,
+            "required": true,
+            "value": [""],
+            "dependsOn":{},
+            "options": [{}],
+        },
+
+        {
+            "id": 28,
+            "label":"Software",
+            "type": "container",
+            "repeatable": true,
+            "required": true,
+            "value": [""],
+        },
+
+        {
+            "id": 29,
+            "label":"Software Name",
+            "type": "text",
+            "repeatable": false,
+            "required": true,
+            "value": [""],
+            "placeholder": "Enter software name",
+        },
+
+        {
+            "id": 30,
+            "label":"Software Creator",
+            "type": "text",
+            "repeatable": false,
+            "required": true,
+            "value": [""],
+            "placeholder": "Enter software creator name",
+        },
+
+        {
+            "id": 31,
+            "label":"Software Rights Type",
+            "type": "text",
+            "repeatable": false,
+            "required": false,
+            "value": [""],
+            "placeholder": "Enter software rights type",
+        },
+
+        {
+            "id": 32,
+            "label":"Software Rights Statement",
+            "type": "text",
+            "repeatable": false,
+            "required": false,
+            "value": [""],
+            "placeholder": "Enter software rights statement",
+        },
+
+        {
+            "id": 33,
+            "label":"Hardware",
+            "type": "checkbox",
+            "repeatable": true,
+            "required": false,
+            "value": [""],
+        },
+
+        {
+            "id": 34,
+            "label":"Hardware Name",
+            "type": "text",
+            "repeatable": false,
+            "required": true,
+            "value": [""],
+            "placeholder": "Enter hardware name",
+        },
+
+        {
+            "id": 35,
+            "label":"Hardware Creator",
+            "type": "text",
+            "repeatable": false,
+            "required": true,
+            "value": [""],
+            "placeholder": "Enter hardware creator name",
+        },
+
+        {
+            "id": 36,
+            "label":"Geometry",
+            "type": "checkbox",
+            "repeatable": true,
+            "required": true,
+            "value": [""],
+        },
+
+        {
+            "id": 37,
+            "label":"Geometry Type",
+            "type": "text",
+            "repeatable": false,
+            "required": true,
+            "value": [""],
+            "placeholder": "Enter geometry type",
+        },
+
+        {
+            "id": 38,
+            "label":"Geometry Amount",
+            "type": "text",
+            "repeatable": false,
+            "required": true,
+            "value": [""],
+            "placeholder": "Enter geometry type amount",
+        },
+
+        {
+            "id": 39,
+            "label":"Vertices",
+            "type": "text",
+            "repeatable": false,
+            "required": true,
+            "value": [""],
+            "placeholder": "Enter number of vertices",
+        },
+
+        {
+            "id": 40,
+            "label":"File Size",
+            "type": "text",
+            "repeatable": false,
+            "required": true,
+            "value": [""],
+            "placeholder": "Enter file size",
+        },
+
+        {
+            "id": 41,
+            "label":"Textures",
+            "type": "text",
+            "repeatable": false,
+            "required": true,
+            "value": [""],
+            "placeholder": "Enter number of textures",
+        },
+
+        {
+            "id": 42,
+            "label":"Materials",
+            "type": "text",
+            "repeatable": false,
+            "required": true,
+            "value": [""],
+            "placeholder": "Enter number of materials",
+        },
+
+        {
+            "id": 43,
+            "label":"Rigged",
+            "type": "checkbox",
+            "repeatable": false,
+            "required": true,
+            "value": [""],
+            "placeholder": "Is the object rigged?",
+        },
+
+        {
+            "id": 44,
+            "label":"Animation",
+            "type": "checkbox",
+            "repeatable": false,
+            "required": false,
+            "value": [""],
+            "placeholder": "Is the object animated?",
+        },
+
+        {
+            "id": 45,
+            "label":"Animation Run Time",
+            "type": "text",
+            "repeatable": false,
+            "required": true,
+            "value": [""],
+            "placeholder": "Enter animation run time",
+        },
+
+        {
+            "id": 46,
+            "label":"Normals",
+            "type": "text",
+            "repeatable": false,
+            "required": true,
+            "value": [""],
+            "placeholder": "Enter number of normals",
+        },
+
+        {
+            "id": 47,
+            "label":"Vertex Colors",
+            "type": "text",
+            "repeatable": false,
+            "required": true,
+            "value": [""],
+            "placeholder": "Enter number of vertex colors",
+        },
+
+        {
+            "id": 48,
+            "label":"UV Mapped",
+            "type": "checkbox",
+            "repeatable": false,
+            "required": true,
+            "value": [""],
+            "placeholder": "Is the object UV mapped?",
+        },
+
+        {
+            "id": 49,
+            "label":"Tags",
+            "type": "text",
+            "repeatable": true,
+            "required": true,
+            "value": [""],
+            "placeholder": "Enter object tags",
+        },
+
+        {
+            "id": 50,
+            "label":"Rights",
+            "type": "checkbox",
+            "repeatable": false,
+            "required": true,
+            "value": [""],
+        },
+
+        {
+            "id": 51,
+            "label":"Rights Type",
+            "type": "text",
+            "repeatable": false,
+            "required": true,
+            "value": [""],
+            "placeholder": "Enter object rights type",
+        },
+
+        {
+            "id": 52,
+            "label":"Rights Statement",
+            "type": "text",
+            "repeatable": false,
+            "required": true,
+            "value": [""],
+            "placeholder": "Enter object rights statement",
         }
-                       
-    ]
-}
+
+
+
+
+                                   
+                ]
+            }

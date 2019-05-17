@@ -1,23 +1,22 @@
 import logging
 import sys
 import base64
-from aiohttp import web
+import jinja2
+from cryptography import fernet
 
 from db import close_pg, init_pg
 from settings import get_config, PACKAGE_NAME
+from auth import DBAuthorizationPolicy
+from routes import setup_routes
 
-
-import aiohttp_jinja2
-import jinja2
 from aiohttp import web
+import aiohttp_jinja2
 from aiohttp_security import SessionIdentityPolicy
 from aiohttp_security import authorized_userid
 from aiohttp_security import setup as setup_security
 from aiohttp_session import setup as setup_session
 from aiohttp_session.cookie_storage import EncryptedCookieStorage
-from cryptography import fernet
-from auth import DBAuthorizationPolicy
-from routes import setup_routes
+
 
 
 async def current_user_ctx_processor(request):

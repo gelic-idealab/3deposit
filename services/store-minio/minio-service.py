@@ -75,6 +75,8 @@ def create_app():
                     return jsonify({"err":"The requested deposit_id does not exist"})
                 except NoSuchBucket as err:
                     return jsonify({"err":str(err)})
+                except TypeError as err:
+                    return jsonify({"err":"Please provide the bucket name"})
 
                 try:
                     with open(temp_obj_path, 'wb') as file_data:
@@ -221,7 +223,7 @@ def create_app():
                         return jsonify({ "err": "Incorrect formatting of request." })
                 else:
                     return jsonify({ "err": "No request provided." })
-                
+
                 obj_names = []
                 missing_ids = []
                 test_ids = []

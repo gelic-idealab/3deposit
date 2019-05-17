@@ -29,17 +29,18 @@ export default {
     return {
       file: '',
       uploadPercentage: 0,
-      id: this.$parent.id,
-      checksum: this.$parent.checksum
-
+      checksum: ''
     }
+  },
+  props: {
+    id: String
   },
   methods: {
     hashFile(file, callback) {
       var fileReader = new FileReader();
       fileReader.onload = function() {
           var buff = fileReader.result;
-          var md5 = CryptoJS.MD5(buff).toString();
+          var md5 = CryptoJS.SHA256(buff).toString();
           callback(md5);
       };
       fileReader.readAsArrayBuffer(file)
@@ -55,6 +56,7 @@ export default {
     submitFile() {
       let formData = new FormData();
       formData.append('id', this.id);
+      formData.append('checksum', this.checksum);
       formData.append('file', this.file);
       axios.post( 'https://a84503bf-79a4-421a-81bc-20b00eaf5244.mock.pstmn.io/upload',
         formData,

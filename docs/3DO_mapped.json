@@ -49,18 +49,18 @@
         {
             "id": 4,
             "label":"Funding",
-            "type": "checkbox",
+            "type": "container",
             "repeatable": true,
             "required": false,
-            "value": false,
+            "value": [{}],
             "dependsOn": {}
         },
         {
             "id": 5,
             "label":"Funding Agency",
             "type": "text",
-            "repeatable": false,
-            "required": false,
+            "repeatable": true,
+            "required": true,
             "value": [""],
             "placeholder": "Enter funding agency name",
             "dependsOn": {"id": 4, "value": true}
@@ -69,7 +69,7 @@
             "id": 6,
             "label":"Funding Number",
             "type": "text",
-            "repeatable": false,
+            "repeatable": true,
             "required": true,
             "value": [""],
             "placeholder": "Enter funding identification number",
@@ -161,7 +161,7 @@
             "placeholder": "Enter object description"
         },
         {
-            
+
         }
                        
     ]

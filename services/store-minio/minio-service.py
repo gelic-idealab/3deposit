@@ -3,7 +3,8 @@ import json
 from json import JSONDecodeError
 from flask import Flask, request, jsonify, send_file
 from minio import Minio
-from minio.error import ResponseError, BucketAlreadyExists, NoSuchBucket, NoSuchKey
+from minio.error import ResponseError, BucketAlreadyExists, NoSuchBucket, NoSuchKey, AccessDenied, SignatureDoesNotMatch, InvalidBucketError
+from werkzeug.exceptions import BadRequestKeyError
 
 # ACCESS KEY AKIAIOSFODNN7GRAINGER
 # SECRET KEY wJalrXUtnFEMI/K7MDENG/bPxRfiCYGRAINGERKEY
@@ -44,10 +45,13 @@ def create_app():
 
             try:
                 # Initialize minioClient with an endpoint and keys.
-                minioClient = Minio(SERVER_ENDPOINT,
+                try:
+                    minioClient = Minio(SERVER_ENDPOINT,
                                     access_key=auth.get("access_key"),
                                     secret_key=auth.get("secret_key"),
                                     secure=False)
+                except AccessDenied as err:
+                    return jsonify({"err": str(err)})
 
                 deposit_id = False
 
@@ -77,6 +81,8 @@ def create_app():
                     return jsonify({"err":str(err)})
                 except TypeError as err:
                     return jsonify({"err":"Please provide the bucket name"})
+                except SignatureDoesNotMatch:
+                    return jsonify({"err":"Invalid Authentication Keys"})
 
                 try:
                     with open(temp_obj_path, 'wb') as file_data:
@@ -110,23 +116,40 @@ def create_app():
             data = json.loads(request.form.get('data'))
             
             # extract authentication details
-            auth = minio_keys(request)
-
-            # extract bucket_name value
-            bucket_name = data.get('bucket_name')
-
-            # extract deposit_id value
-            deposit_id = data.get('deposit_id')
-
-            # extract file & temp save to disk
-            file = request.files['file']
-            file.save(deposit_id)
+            if minio_keys(request):
+                auth = minio_keys(request)
+            else:
+                return jsonify({"err": "No authentication keys provided"})
 
             # Initialize minioClient with an endpoint and keys.
-            minioClient = Minio(SERVER_ENDPOINT,
+            try:
+                minioClient = Minio(SERVER_ENDPOINT,
                                 access_key=auth.get("access_key"),
                                 secret_key=auth.get("secret_key"),
-                                secure=False)   
+                                secure=False)
+            except AccessDenied as err:
+                return jsonify({"err": str(err)})
+
+            # extract deposit_id value
+            if data.get('deposit_id'):
+                deposit_id = data.get('deposit_id')
+            else:
+                return jsonify({"err":"Please provide a deposit_id"})
+
+            # extract file & temp save to disk
+            try:
+                file = request.files['file']
+                file.save(deposit_id)
+            except BadRequestKeyError as err:
+                return jsonify({"err":"Please attach a file to the request"})
+
+            # extract bucket_name value
+            if data.get('bucket_name'):
+                bucket_name = data.get('bucket_name')
+                if not minioClient.bucket_exists(bucket_name):
+                    return jsonify({"err":"No such bucket exists"})
+            else:
+                return jsonify({"err":"Please provide a bucket_name"})
 
             metadata={}
 
@@ -157,17 +180,29 @@ def create_app():
             bucket_name = data.get('bucket_name')
 
             # extract object specific deposit_id
-            deposit_id = data.get('deposit_id')
+            if data.get('deposit_id'):
+                deposit_id = data.get('deposit_id')
+            else:
+                return jsonify({"err":"Please enter valid deposit_id."})
 
-            minioClient = Minio(SERVER_ENDPOINT,
+            try:
+                minioClient = Minio(SERVER_ENDPOINT,
                                 access_key=auth.get("access_key"),
                                 secret_key=auth.get("secret_key"),
                                 secure=False)
+            except AccessDenied as err:
+                return jsonify({"err": str(err)})
 
             try:
                 rem_object = minioClient.remove_object(bucket_name,deposit_id)
+            except NoSuchBucket:
+                return jsonify({ "err": "Bucket does not exist." })
+            except InvalidBucketError:
+                return jsonify({ "err": "Bucket does not exist." })
+            except NoSuchKey:
+                return jsonify({ "err": "Please enter valid deposit_id." })
             except ResponseError as err:
-                return jsonify({"error":err})
+                return jsonify({"err":err})
 
             return jsonify({"deposit_id": deposit_id})
 
@@ -199,10 +234,13 @@ def create_app():
 
             try:
                 # Initialize minioClient with an endpoint and keys.
-                minioClient = Minio(SERVER_ENDPOINT,
+                try:
+                    minioClient = Minio(SERVER_ENDPOINT,
                                     access_key=auth.get("access_key"),
                                     secret_key=auth.get("secret_key"),
                                     secure=False)
+                except AccessDenied as err:
+                    return jsonify({"err": str(err)})
 
                 deposit_id_list = []
                 # get data from request payload
@@ -234,11 +272,11 @@ def create_app():
                     for obj in objects:
                         if obj.object_name not in deposit_id_list:
                             continue
-                        ret_object = {"metadata": str(obj.metadata), 
-                                      "deposit_id": str(obj.object_name), 
+                        ret_object = {"metadata": str(obj.metadata),
+                                      "deposit_id": str(obj.object_name),
                                       "modified": str(obj.last_modified),
-                                      "etag": str(obj.etag), 
-                                      "size": str(obj.size), 
+                                      "etag": str(obj.etag),
+                                      "size": str(obj.size),
                                       "content_type": str(obj.content_type)}
                         objects_list.append(ret_object)
 
@@ -272,10 +310,13 @@ def create_app():
             auth = minio_keys(request)
 
             # Initialize minioClient with an endpoint and keys.
-            minioClient = Minio(SERVER_ENDPOINT,
+            try:
+                minioClient = Minio(SERVER_ENDPOINT,
                                 access_key=auth.get("access_key"),
                                 secret_key=auth.get("secret_key"),
                                 secure=False)
+            except AccessDenied as err:
+                return jsonify({"err": str(err)})
 
             # extract bucket name
             if request.form.get('data'):

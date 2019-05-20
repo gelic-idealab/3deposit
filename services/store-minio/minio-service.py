@@ -194,6 +194,7 @@ def create_app():
                 return jsonify({"err": str(err)})
 
             try:
+                error = minioClient.get_object(bucket_name, deposit_id)
                 rem_object = minioClient.remove_object(bucket_name,deposit_id)
             except NoSuchBucket:
                 return jsonify({ "err": "Bucket does not exist." })

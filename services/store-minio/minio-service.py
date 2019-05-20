@@ -270,18 +270,21 @@ def create_app():
                 objects_list = []
 
                 if deposit_id_list:
-                    for obj in objects:
-                        if obj.object_name not in deposit_id_list:
-                            continue
-                        ret_object = {"metadata": str(obj.metadata),
-                                      "deposit_id": str(obj.object_name),
-                                      "modified": str(obj.last_modified),
-                                      "etag": str(obj.etag),
-                                      "size": str(obj.size),
-                                      "content_type": str(obj.content_type)}
-                        objects_list.append(ret_object)
+                    try:
+                        for obj in objects:
+                            if obj.object_name not in deposit_id_list:
+                                continue
+                            ret_object = {"metadata": str(obj.metadata),
+                                          "deposit_id": str(obj.object_name),
+                                          "modified": str(obj.last_modified),
+                                          "etag": str(obj.etag),
+                                          "size": str(obj.size),
+                                          "content_type": str(obj.content_type)}
+                            objects_list.append(ret_object)
 
-                        obj_names.append(str(obj.object_name))
+                            obj_names.append(str(obj.object_name))
+                    except NoSuchBucket as err:
+                        return jsonify({"err":"Bucket does not exist."})
 
                     for i,d in enumerate(deposit_id_list):
                         if d not in obj_names:

@@ -296,6 +296,7 @@ def create_app():
                         if d not in obj_names:
                             missing_ids.append(d)
 
+                            
                 else:
                     for obj in objects:
                         ret_object = {"metadata": str(obj.metadata), 

@@ -3,7 +3,7 @@ import json
 from json import JSONDecodeError
 from flask import Flask, request, jsonify, send_file
 from minio import Minio
-from minio.error import ResponseError, BucketAlreadyExists, NoSuchBucket, NoSuchKey, AccessDenied, SignatureDoesNotMatch, InvalidBucketError
+from minio.error import ResponseError, BucketAlreadyExists, NoSuchBucket, NoSuchKey, AccessDenied, SignatureDoesNotMatch, InvalidBucketError, InvalidAccessKeyId, SignatureDoesNotMatch
 from werkzeug.exceptions import BadRequestKeyError
 
 # ACCESS KEY AKIAIOSFODNN7GRAINGER
@@ -285,6 +285,12 @@ def create_app():
                             obj_names.append(str(obj.object_name))
                     except NoSuchBucket as err:
                         return jsonify({"err":"Bucket does not exist."})
+                    except AccessDenied:
+                        return jsonify({"err":"Invalid Authentication"})
+                    except InvalidAccessKeyId:
+                        return jsonify({"err":"Invalid Authentication"})
+                    except SignatureDoesNotMatch:
+                        return jsonify({"err":"Invalid Authentication"})
 
                     for i,d in enumerate(deposit_id_list):
                         if d not in obj_names:

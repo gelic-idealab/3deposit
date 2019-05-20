@@ -52,7 +52,8 @@
 export default {
   name: 'Fields',
   props: {
-    fields: Array
+    fields: Array,
+    fields: id
   },
   methods: {
     addValue: function (valueList) {

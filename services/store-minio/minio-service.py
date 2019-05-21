@@ -35,8 +35,21 @@ def minio_keys(request_auth):
 def create_app():
     app = Flask(__name__)
 
+    '''
+    #***************************************************************************************************************************************************************************
+    THE OBJECT SCOPED ENDPOINT - THIS ENDPOINT IS SPECIFIC TO THE OBJECT LEVEL, WHERE EACH ACTION HAS AN OBJECT AT IT'S CORE
+    #***************************************************************************************************************************************************************************
+    '''
+
     @app.route('/minio_object', methods=['GET', 'POST','DELETE'])
     def minio_object():
+
+        '''
+        ####################################################################################################################
+        Extract an object (identifed by deposit_id) from a specified bucket (identifed by bucket_name)
+        ####################################################################################################################
+        '''
+
         if request.method == 'GET':
             # get keys from request args
             if minio_keys(request):
@@ -100,23 +113,27 @@ def create_app():
 
 
                 # check whether object exists in the bucket
-                if obj:
-                    if metadata == "1":
-                        meta_obj = minioClient.fget_object(bucket_name,object_name=deposit_id,file_path=deposit_id)
-                        ret_object =   {"metadata": str(meta_obj.metadata), 
-                                        "deposit_id": str(meta_obj.object_name), 
-                                        "modified": str(meta_obj.last_modified),
-                                        "etag": str(meta_obj.etag), 
-                                        "size": str(meta_obj.size), 
-                                        "content_type": str(meta_obj.content_type)}
-                        return jsonify(ret_object)
-                    else:
-                        return send_file(temp_obj_path, mimetype="application/octet-stream")
+                # if obj:
+                #     if metadata == "1":
+                #         meta_obj = minioClient.fget_object(bucket_name,object_name=deposit_id,file_path=deposit_id)
+                #         ret_object =   {"metadata": str(meta_obj.metadata), 
+                #                         "deposit_id": str(meta_obj.object_name), 
+                #                         "modified": str(meta_obj.last_modified),
+                #                         "etag": str(meta_obj.etag), 
+                #                         "size": str(meta_obj.size), 
+                #                         "content_type": str(meta_obj.content_type)}
+                #         return jsonify(ret_object)
+                #     else:
+                #         return send_file(temp_obj_path, mimetype="application/octet-stream")
 
             except ResponseError as err:
                 return jsonify({"err": err})
 
+        '''
+        ####################################################################################################################     
+        Puts a single object in the specified bucket only. An object here represets a single file.
         ####################################################################################################################
+        '''
 
         elif request.method == 'POST':
             # get data from request payload
@@ -178,7 +195,11 @@ def create_app():
             except InvalidBucketError:
                 return jsonify({"err":"This bucket does not exist. Please create this bucket at the bucket scoped endpoint."})
 
+        '''
+        ####################################################################################################################     
+        Delete a single object in the specified bucket only. An object here represets a single file.
         ####################################################################################################################
+        '''
 
         elif request.method == 'DELETE':
             # extract authentication details
@@ -226,7 +247,11 @@ def create_app():
 
 
 
-#**************************************************************************************************************************************************************************************************************************************
+    '''
+    #***************************************************************************************************************************************************************************
+    THE BUCKET SCOPED ENDPOINT - THIS ENDPOINT IS SPECIFIC TO THE BUCKET LEVEL, WHERE EACH ACTION HAS A BUCKET AT IT'S CORE
+    #***************************************************************************************************************************************************************************
+    '''
     
 
 
@@ -235,6 +260,13 @@ def create_app():
 
     @app.route('/bucket', methods=['GET','POST'])
     def bucket():
+
+        '''
+        ###########################################################################################################################
+        Get metadata of all or a list of objects in a specific bucket
+        ###########################################################################################################################
+        '''
+
         if request.method == 'GET':
             # get keys from request args
 
@@ -342,7 +374,11 @@ def create_app():
             except ResponseError as err:
                 return jsonify({"err": err})
 
+        '''
         ###########################################################################################################################
+        Create a new bucket that does not yet exist
+        ###########################################################################################################################
+        '''
 
         elif request.method == 'POST':
             

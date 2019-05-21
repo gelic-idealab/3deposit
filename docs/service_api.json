@@ -1,6 +1,10 @@
+// this template defines the 'data' value of all gateway requests 
+// requests will be of type form data
 // use this template to construct service request hanlders 
 // keys in quotes are required and will not have variable names
 // keys in <brackets> will be user defined and variable
+// if your service handles file objects, they will be attached
+// to the 'file' request key in the form data. 
 
 {
     "config": {

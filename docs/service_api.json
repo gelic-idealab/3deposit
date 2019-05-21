@@ -1,0 +1,14 @@
+{
+    "config": {
+        "auth": {
+            "<auth key>": "<auth value>"
+        },
+        "<key>": "<value>"
+    },
+    "metadata": {
+        "deposit_id": "<value>",
+        "fields": {
+            "<field>": "<field value>"
+        }
+    }
+}

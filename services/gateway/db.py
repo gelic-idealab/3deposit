@@ -11,9 +11,11 @@ meta = MetaData()
 deposits = Table(
     'deposits', meta,
 
-    Column('did', Integer, primary_key=True),
-    Column('etag', String(200), nullable=False),
-    Column('ddate', Date, nullable=False)
+    Column('deposit_id', Integer, primary_key=True),
+    Column('deposit_date', Date, nullable=False),
+    Column('etag', String(256), nullable=False),
+    Column('mongo_id', String(256), nullable=False),
+    Column('location', String(256), nullable=True)
 )
 
 users = Table(
@@ -21,8 +23,9 @@ users = Table(
 
     Column('id', Integer, primary_key=True),
     Column('username', String(64), nullable=False, unique=True),
-    Column('email', String(120)),
-    Column('password_hash', String(128), nullable=False)
+    Column('email', String(128)),
+    Column('password_hash', String(128), nullable=False),
+    Column('role', String(64), nullable=False)
 )
 
 

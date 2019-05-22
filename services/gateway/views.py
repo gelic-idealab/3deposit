@@ -1,7 +1,7 @@
 import aiohttp_jinja2
 from aiohttp import web
 from aiohttp_security import remember, forget, authorized_userid
-
+import json
 import db
 from forms import validate_login_form
 
@@ -54,6 +54,15 @@ async def logout(request):
     return response
 
 async def activeDepositForm(request):
-    async with request.app['db'].acquire() as conn:
-        active_form = await db.get_active_form(conn)
-    return active_form
+    if request.method == 'GET':
+        async with request.app['db'].acquire() as conn:
+            active_forms = await db.get_active_forms(conn)
+        return web.json_response({ 'active_forms': active_forms })
+    if request.method == 'POST':
+        new_form = await request.text()
+        async with request.app['db'].acquire() as conn:
+            try:
+                await db.create_active_form(conn, new_form)
+                return web.json_response({ "succeeded": True, "msg": "New active form created" })
+            except Exception as e:
+                return web.json_response({ "err": str(e) })

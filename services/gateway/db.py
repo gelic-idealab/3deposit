@@ -1,10 +1,10 @@
 import aiopg.sa
 from sqlalchemy import (
     MetaData, Table, Column, ForeignKey,
-    Integer, String, Date
+    Integer, String, Date, Boolean
 )
 
-__all__ = ['deposits', 'users']
+__all__ = ['forms', 'deposits', 'users']
 
 meta = MetaData()
 
@@ -22,8 +22,8 @@ forms = Table(
     'forms', meta,
 
     Column('form_id', Integer, primary_key=True),
-    Column('active', bool, nullable=False, default=False),
-    Column('content', String(1024), nullable=True)
+    Column('active', Boolean, nullable=False, default=False),
+    Column('content', String, nullable=True)
 )
 
 users = Table(
@@ -80,14 +80,6 @@ async def get_user_by_name(conn, username):
     user_record = await result.first()
     return user_record
 
-async def get_active_form(conn):
-    result = await conn.execute(
-        forms
-        .select()
-        .where(forms.c.active == True)
-    )
-    active_form = result.first()
-    return active_form
 
 async def get_users(conn):
     records = await conn.execute(
@@ -95,3 +87,19 @@ async def get_users(conn):
     )
     return records
     
+
+async def get_active_forms(conn):
+    result = await conn.execute(
+        forms
+        .select()
+        .where(forms.c.active == True)
+    )
+    active_forms = await result.fetchall()
+    return [dict(form) for form in active_forms]
+
+async def create_active_form(conn, content):
+    await conn.execute(
+        forms
+        .insert()
+        .values(active=True, content=content)
+    )

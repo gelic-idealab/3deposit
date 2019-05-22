@@ -19,26 +19,13 @@ SERVER_ENDPOINT = 'minio-server:9000'
 
 #BUCKET_NAME = 'new-3deposit'
 
-# {
-#     "config": {
-#         "auth": {
-#             "<auth key>": "<auth value>"
-#         },
-#         "<key>": "<value>"
-#     },
-#     "metadata": {
-#         "deposit_id": "<value>",
-#         "fields": {
-#             "<field>": "<field value>"
-#         }
-#     }
-# }
 
 def minio_keys(request_auth):
     if not request_auth:
         return False
     
-    auth = request_auth.form.get('auth')
+    config = request_auth.form.get('config')
+    auth = config.get('auth')
     
     if auth:
         try:
@@ -56,9 +43,9 @@ def create_app():
     app = Flask(__name__)
 
     
-    #***************************************************************************************************************************************************************************
+    #************************************************************************************************************************************************************************
     #AT THIS ENDPOINT, EACH ACTION IS SPECIFIC TO AN OBJECT AT IT'S CORE
-    #***************************************************************************************************************************************************************************
+    #************************************************************************************************************************************************************************
     
 
     @app.route('/minio_object', methods=['GET', 'POST','DELETE'])
@@ -68,7 +55,7 @@ def create_app():
         ####################################################################################################################
         #Extract an object from a specified bucket
         ####################################################################################################################
-        
+  
 
         if request.method == 'GET':
             # get keys from request args
@@ -95,14 +82,14 @@ def create_app():
 
                 # get data from request payload
                 try:
-                    data = request.form.get('data')
-                    try:
-                        data = json.loads(request.form.get('data'))
-                        deposit_id = data.get('deposit_id')
-                        metadata = data.get('metadata')
-                        bucket_name = data.get('bucket_name')
-                    except JSONDecodeError as err:
-                        return jsonify({"err":"Incorrect formatting of data"})
+                    metadata = request.form.get('metadata')
+                    metadata = json.loads(request.form.get('metadata'))
+                    deposit_id = metadata.get('deposit_id')
+                    #metadata = data.get('metadata')
+                    fields = metadata.get('fields')
+                    bucket_name = fields.get('fields')
+                except JSONDecodeError as err:
+                    return jsonify({"err":"Incorrect formatting of data"})
                 except TypeError as err:
                     return jsonify({"err": "No data provided"})
 
@@ -160,14 +147,15 @@ def create_app():
             # except TypeError as err:
             #     return jsonify({"err":"TEST EXCEPTION"})
 
-        #################################################################################################################
+        ####################################################################################################################
         #Puts one object i.e. a file in the specified bucket only.
-        #################################################################################################################
+        ####################################################################################################################
+     
 
         elif request.method == 'POST':
             # get data from request payload
             try:
-                data = json.loads(request.form.get('data'))
+                metadata = json.loads(request.form.get('metadata'))
             except JSONDecodeError:
                 return jsonify({"err":"Incorrect formatting of data"})
             
@@ -191,7 +179,7 @@ def create_app():
                 return jsonify({"err": str(err)})
 
             # extract deposit_id value
-            if data.get('deposit_id'):
+            if metadata.get('deposit_id'):
                 deposit_id = data.get('deposit_id')
             else:
                 return jsonify({"err":"Please provide a deposit_id"})
@@ -205,13 +193,11 @@ def create_app():
 
             # extract bucket_name value
             try:
-                bucket_name = data.get('bucket_name')
-                try:
-                    minioClient.bucket_exists(bucket_name)
-                except InvalidBucketError:
-                    return jsonify({"err":"No such bucket exists"})
-                # except TypeError:
-                #     return
+                fields = metadata.get('fields')
+                bucket_name = fields.get('bucket_name')
+                minioClient.bucket_exists(bucket_name)
+            except InvalidBucketError:
+                return jsonify({"err":"No such bucket exists"})
             except InvalidAccessKeyId as err:
                 return jsonify({"err":"Invalid Authentication."})
             except AccessDenied as err:
@@ -233,9 +219,24 @@ def create_app():
             except InvalidBucketError:
                 return jsonify({"err":"This bucket does not exist. Please create this bucket at the bucket scoped endpoint."})
 
-        ####################################################################################################################     
+        #################################################################################################################### 
         #Deletes one object i.e. a file from the specified bucket only.
         ####################################################################################################################
+
+# {
+#     "config": {
+#         "auth": {
+#             "<auth key>": "<auth value>"
+#         },
+#         "<key>": "<value>"
+#     },
+#     "metadata": {
+#         "deposit_id": "<value>",
+#         "fields": {
+#             "<field>": "<field value>"
+#         }
+#     }
+# } 
 
         elif request.method == 'DELETE':
             # extract authentication details
@@ -247,14 +248,15 @@ def create_app():
                 return jsonify({"err": "No authentication keys provided"})
 
             # get data from request payload
-            data = json.loads(request.form.get('data'))
+            config = json.loads(request.form.get('config'))
+            metadata = json.loads(request.form.get('metadata'))
 
             # extract bucket_name value
-            bucket_name = data.get('bucket_name')
+            bucket_name = config.get('bucket_name')
 
             # extract object specific deposit_id
-            if data.get('deposit_id'):
-                deposit_id = data.get('deposit_id')
+            if metadata.get('deposit_id'):
+                deposit_id = metadata.get('deposit_id')
             else:
                 return jsonify({"err":"Please enter valid deposit_id."})
 
@@ -293,9 +295,9 @@ def create_app():
 
 
     
-    #***************************************************************************************************************************************************************************
+    #************************************************************************************************************************************************************************
     #AT THIS ENDPOINT, EACH ACTION IS SPECIFIC TO A BUCKET AT IT'S CORE
-    #***************************************************************************************************************************************************************************
+    #************************************************************************************************************************************************************************
     
 
 
@@ -335,10 +337,11 @@ def create_app():
                 # get data from request payload
                 if request.form.get('data'):
                     try:
-                        data = json.loads(request.form.get('data'))
+                        metadata = json.loads(request.form.get('metadata'))
+                        config = json.loads(request.form.get('config'))
                         try:
-                            bucket_name = data.get('bucket_name')
-                            deposit_id_list = data.get('deposit_id_list')
+                            bucket_name = config.get('bucket_name')
+                            deposit_id_list = metadata.get('deposit_id_list')
                         except Exception:
                             return jsonify({"err": "No data provided"})                 
                         # get objects from bucket
@@ -411,7 +414,6 @@ def create_app():
                     except TypeError as err:
                         return jsonify({"err":"Please enter a valid bucket_name"})
                     #obj_names.append(str(obj.object_name))
-
 
 
                 return jsonify({"objects": objects_list,"missing deposit ids":missing_ids})

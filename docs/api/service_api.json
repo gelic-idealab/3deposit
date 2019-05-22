@@ -1,10 +1,25 @@
-// this template defines the 'data' value of all gateway requests 
+// this template defines the payload of all gateway requests 
 // requests will be of type: 'multipart/form-data'
 // use this template to construct service request handlers 
 // keys in quotes are required and will not have variable names
 // keys in <brackets> will be user defined and variable
 // if your service handles file objects, they will be attached
 // to the 'file' request key in the form data. 
+
+// most service requests will be deposit-scoped and will
+// include at least the deposit_id in the 'data' object.
+// top level-scoped service requests, such as a GET/list_all
+// or POST/create_collection request will not include a deposit_id
+// but may instead provide top level-scoped values in the 
+// 'data' object. 
+
+// the 'config' object is akin to HTTP headers. 
+// keys in the 'config' object instruct the service how to 
+// behave, provide flags for business logic, or pass state 
+// from the gateway database. 
+// the 'data' object is the payload of the request, which 
+// is to say its content. 'data' key/values should not be
+// used to control the service.  
 
 {
     "config": {
@@ -13,10 +28,7 @@
         },
         "<key>": "<value>"
     },
-    "metadata": {
-        "deposit_id": "<value>",
-        "fields": {
-            "<field>": "<field value>"
-        }
+    "data": {
+        "<field>": "<field value>"
     }
 }

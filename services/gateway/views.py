@@ -52,3 +52,8 @@ async def logout(request):
     response = redirect(request.app.router, 'login')
     await forget(request, response)
     return response
+
+async def activeDepositForm(request):
+    async with request.app['db'].acquire() as conn:
+        active_form = await db.get_active_form(conn)
+    return active_form

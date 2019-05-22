@@ -1,6 +1,6 @@
 // this template defines the 'data' value of all gateway requests 
 // requests will be of type: 'multipart/form-data'
-// use this template to construct service request hanlders 
+// use this template to construct service request handlers 
 // keys in quotes are required and will not have variable names
 // keys in <brackets> will be user defined and variable
 // if your service handles file objects, they will be attached

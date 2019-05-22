@@ -18,6 +18,14 @@ deposits = Table(
     Column('location', String(256), nullable=True)
 )
 
+forms = Table(
+    'forms', meta,
+
+    Column('form_id', Integer, primary_key=True),
+    Column('active', bool, nullable=False, default=False),
+    Column('content', String(1024), nullable=True)
+)
+
 users = Table(
     'users', meta,
 
@@ -72,6 +80,14 @@ async def get_user_by_name(conn, username):
     user_record = await result.first()
     return user_record
 
+async def get_active_form(conn):
+    result = await conn.execute(
+        forms
+        .select()
+        .where(forms.c.active == True)
+    )
+    active_form = result.first()
+    return active_form
 
 async def get_users(conn):
     records = await conn.execute(

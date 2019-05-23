@@ -33,3 +33,59 @@
         "<field>": "<field value>"
     }
 }
+
+//Object-scoped GET
+
+{
+    "config": {
+        "auth": {
+            "access_key": "<access_key>",
+            "secret_key": "<secret_key>"
+        },
+        "bucket_name": "<bucket_name>",
+        "deposit_id": "<deposit_id>"
+        }
+    }
+}
+
+//Object-scoped POST
+
+{
+    "config": {
+        "auth": {
+            "access_key": "<access_key>",
+            "secret_key": "<secret_key>"
+        },
+        "bucket_name": "<bucket_name>"
+    },
+    "data": {
+        "deposit_id": "<deposit_id>"
+    }
+}
+
+//Bucket-scoped GET
+
+{
+    "config": {
+        "auth": {
+            "access_key": "<access_key>",
+            "secret_key": "<secret_key>"
+        },
+        "bucket_name": "<bucket_name>",
+        "deposit_id_list": "<deposit_id_list>"
+    }
+}
+
+//Bucket-scoped POST
+
+{
+    "config": {
+        "auth": {
+            "access_key": "<access_key>",
+            "secret_key": "<secret_key>"
+        }       
+    },
+    "data": {
+        "bucket_name": "<bucket_name>"
+    }
+}

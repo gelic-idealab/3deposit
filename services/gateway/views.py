@@ -59,7 +59,7 @@ async def activeDepositForm(request):
             active_forms = await db.get_active_forms(conn)
         return web.json_response({ 'active_forms': active_forms })
     if request.method == 'POST':
-        new_form = await request.text()
+        new_form = await request.json()
         async with request.app['db'].acquire() as conn:
             try:
                 await db.create_active_form(conn, new_form)

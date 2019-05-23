@@ -431,7 +431,7 @@ def create_app():
                                     access_key=auth.get("access_key"),
                                     secret_key=auth.get("secret_key"),
                                     secure=False)
-            
+
             config = json.loads(request.form.get('config'))
             deposit_id = config.get('deposit_id')
             bucket_name = config.get('bucket_name')
@@ -440,6 +440,9 @@ def create_app():
                 obj = minioClient.get_object(bucket_name, deposit_id)
             except NoSuchKey as err:
                 return jsonify({"err":"The requested deposit_id does not exist"})
+            except (AccessDenied, InvalidAccessKeyId, SignatureDoesNotMatch):
+                return jsonify({"err":"Invalid Authentication."})
+
             #check whether object exists in the bucket
             meta_obj = minioClient.fget_object(bucket_name,object_name=deposit_id,file_path=deposit_id)
             ret_object =   {"metadata": str(meta_obj.metadata), 

@@ -10,6 +10,11 @@ def redirect(router, route_name):
     location = router[route_name].url_for()
     return web.HTTPFound(location)
 
+"""
+View endpoints for authorizing user
+
+'index', 'login', and 'logout' validate user, store secure cookie
+"""
 
 @aiohttp_jinja2.template('index.html')
 async def index(request):
@@ -53,11 +58,19 @@ async def logout(request):
     await forget(request, response)
     return response
 
+"""
+API endpoint for frontend to request active deposit form
+
+'GET': no params; returns first active form as object 'active_form': {<form>}
+'POST': creates new form from raw request body 'request.json()'
+"""
+
 async def activeDepositForm(request):
     if request.method == 'GET':
         async with request.app['db'].acquire() as conn:
             active_forms = await db.get_active_forms(conn)
         return web.json_response({ 'active_forms': active_forms })
+
     if request.method == 'POST':
         new_form = await request.json()
         async with request.app['db'].acquire() as conn:

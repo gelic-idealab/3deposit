@@ -8,15 +8,15 @@ services:
       volumes:
           - pg_data:/var/lib/postgresql
 
-  gateway:
-      build: .
-      ports:
-          - "8080:8080"
-      links:
-          - postgres
-      depends_on: 
-          - postgres    
-      command: bash -c "pipenv run python init_db.py && pipenv run python gateway.py"
+#   gateway:
+#       build: .
+#       ports:
+#           - "8080:8080"
+#       links:
+#           - postgres
+#       depends_on: 
+#           - postgres    
+#       command: bash -c "pipenv run python init_db.py && pipenv run python gateway.py"
         
 volumes: 
     pg_data:

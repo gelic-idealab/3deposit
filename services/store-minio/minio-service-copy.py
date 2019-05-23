@@ -24,20 +24,19 @@ def minio_keys(request_auth):
     if not request_auth:
         return False
     
-    config = request_auth.form.get('config')
-    auth = config.get('auth')
+    # config = json.loads(request_auth.form.get('config'))
+    # auth = config.get('auth')
     
-    if auth:
-        try:
-            auth = json.loads(request_auth.form.get('auth'))
-            auth_packed = {"access_key":auth.get('access_key'),"secret_key":auth.get('secret_key')}
-            return auth_packed
-        except JSONDecodeError:
-            return {"err":"Invalid formatting of auth data."}
-        except InvalidAccessKeyId as err:
-            return {"err":str(err)}
-    else:
-        return False
+
+    try:
+        config = json.loads(request_auth.form.get('config'))
+        auth = config.get('auth')
+        auth_packed = {"access_key":auth.get('access_key'),"secret_key":auth.get('secret_key')}
+        return auth_packed
+    except JSONDecodeError:
+        return {"err":"Invalid formatting of auth data."}
+    except InvalidAccessKeyId as err:
+        return {"err":str(err)}
 
 def create_app():
     app = Flask(__name__)
@@ -59,12 +58,15 @@ def create_app():
 
         if request.method == 'GET':
             # get keys from request args
-            if minio_keys(request):
-                auth = minio_keys(request)
-                if "err" in auth:
-                    return jsonify(auth)
-            else:
-                return jsonify({"err": "No authentication keys provided"})
+            try:
+                if minio_keys(request):
+                    auth = minio_keys(request)
+                    if "err" in auth:
+                        return jsonify(auth)
+                else:
+                    return jsonify({"err": "No authentication keys provided"})
+            except TypeError as err:
+                return jsonify({"err":"TEST EXCEPTION GET"})
 
             try:
                 # Initialize minioClient with an endpoint and keys.
@@ -73,49 +75,35 @@ def create_app():
                                     access_key=auth.get("access_key"),
                                     secret_key=auth.get("secret_key"),
                                     secure=False)
-                except AccessDenied as err:
-                    return jsonify({"err": str(err)})
-                # except TypeError as err:
-                #     return jsonify({"err":"TEST EXCEPTION"})
 
-                deposit_id = False
+                    deposit_id = False
 
-                # get data from request payload
-                try:
-                    metadata = request.form.get('metadata')
-                    metadata = json.loads(request.form.get('metadata'))
-                    deposit_id = metadata.get('deposit_id')
-                    #metadata = data.get('metadata')
-                    fields = metadata.get('fields')
-                    bucket_name = fields.get('fields')
-                except JSONDecodeError as err:
-                    return jsonify({"err":"Incorrect formatting of data"})
-                except TypeError as err:
-                    return jsonify({"err": "No data provided"})
+                    # get data from request payload
+                    config = request.form.get('config')
+                    config = json.loads(request.form.get('config'))
+                    deposit_id = config.get('deposit_id')
+                    bucket_name = config.get('bucket_name')
+                
 
-                if not deposit_id:
-                    return jsonify({"err": "No deposit ID provided"})
+                    if not deposit_id:
+                        return jsonify({"err": "No deposit ID provided"})
 
-                temp_obj_path = str(deposit_id)
+                    temp_obj_path = str(deposit_id)
 
-                try:
                     obj = minioClient.get_object(bucket_name, deposit_id)
                 except NoSuchKey as err:
                     return jsonify({"err":"The requested deposit_id does not exist"})
                 except NoSuchBucket as err:
                     return jsonify({"err":str(err)})
-                except InvalidBucketError as err:
+                except (InvalidBucketError, TypeError):
                     return jsonify({"err":"Please provide valid bucket_name"})
-                except TypeError as err:
-                    return jsonify({"err":"Please provide the bucket name"})
-                except AccessDenied:
+                except (AccessDenied, InvalidAccessKeyId, SignatureDoesNotMatch):
                     return jsonify({"err":"Invalid Authentication."})
-                except InvalidAccessKeyId:
-                    return jsonify({"err":"Invalid Authentication."})
-                except SignatureDoesNotMatch:
-                    return jsonify({"err":"Invalid Authentication."})
-                except TypeError as err:
-                    return jsonify({"err":"TEST EXCEPTION"})
+                except JSONDecodeError as err:
+                    return jsonify({"err":"Incorrect formatting of data"})
+
+                # except TypeError as err:
+                #     return jsonify({"err":"TEST EXCEPTION"})
 
                 try:
                     with open(temp_obj_path, 'wb') as file_data:
@@ -125,8 +113,6 @@ def create_app():
                 #     return jsonify({"err":"TEST EXCEPTION"})
                 except Exception as err:
                     return jsonify({"err":str(err)})
-
-
 
                 # check whether object exists in the bucket
                 # if obj:
@@ -144,8 +130,9 @@ def create_app():
 
             except ResponseError as err:
                 return jsonify({"err": err})
-            # except TypeError as err:
-            #     return jsonify({"err":"TEST EXCEPTION"})
+            except TypeError as err:
+                return jsonify({"err":"TEST EXCEPTION GET"})
+
 
         ####################################################################################################################
         #Puts one object i.e. a file in the specified bucket only.
@@ -155,88 +142,62 @@ def create_app():
         elif request.method == 'POST':
             # get data from request payload
             try:
-                metadata = json.loads(request.form.get('metadata'))
-            except JSONDecodeError:
-                return jsonify({"err":"Incorrect formatting of data"})
+                config = json.loads(request.form.get('config'))
+                data = json.loads(request.form.get('data'))
+            
             
             # extract authentication details
-            if minio_keys(request):
-                auth = minio_keys(request)
-                if "err" in auth:
-                    return jsonify(auth)
-            else:
-                return jsonify({"err": "No authentication keys provided"})
+                if minio_keys(request):
+                    auth = minio_keys(request)
+                    if "err" in auth:
+                        return jsonify(auth)
+                else:
+                    return jsonify({"err": "No authentication keys provided"})
 
             # Initialize minioClient with an endpoint and keys.
-            try:
                 minioClient = Minio(SERVER_ENDPOINT,
                                 access_key=auth.get("access_key"),
                                 secret_key=auth.get("secret_key"),
                                 secure=False)
-            except AccessDenied as err:
-                return jsonify({"err": str(err)})
-            except InvalidAccessKeyId as err:
-                return jsonify({"err": str(err)})
 
             # extract deposit_id value
-            if metadata.get('deposit_id'):
-                deposit_id = data.get('deposit_id')
-            else:
-                return jsonify({"err":"Please provide a deposit_id"})
+                if data.get('deposit_id'):
+                    deposit_id = data.get('deposit_id')
+                else:
+                    return jsonify({"err":"Please provide a deposit_id"})
 
-            # extract file & temp save to disk
-            try:
+                # extract file & temp save to disk
                 file = request.files['file']
                 file.save(deposit_id)
-            except BadRequestKeyError as err:
-                return jsonify({"err":"Please attach a file to the request"})
+            
 
-            # extract bucket_name value
-            try:
-                fields = metadata.get('fields')
-                bucket_name = fields.get('bucket_name')
+                # extract bucket_name value
+                bucket_name = config.get('bucket_name')
                 minioClient.bucket_exists(bucket_name)
-            except InvalidBucketError:
-                return jsonify({"err":"No such bucket exists"})
-            except InvalidAccessKeyId as err:
-                return jsonify({"err":"Invalid Authentication."})
-            except AccessDenied as err:
-                return jsonify({"err":"Invalid Authentication."})
+                metadata={}
+                metadata['BUCKET_NAME'] = bucket_name
 
-            metadata={}
-
-            metadata['BUCKET_NAME'] = bucket_name
-
-            try:
                 r = minioClient.fput_object(bucket_name, object_name=deposit_id, file_path=deposit_id,metadata=metadata)
                 # cleanup temp file
                 os.remove(deposit_id)
                 return jsonify({"etag": r, "deposit_id": deposit_id,"metadata":metadata})
+            
+            except (NoSuchBucket, InvalidBucketError) as err:
+                return jsonify({"err":"This bucket does not exist. Please create this bucket at the bucket scoped endpoint."})
+            except (InvalidAccessKeyId, AccessDenied) as err:
+                return jsonify({"err":"Invalid Authentication."})
+            except BadRequestKeyError as err:
+                return jsonify({"err":"Please attach a file to the request"})
+            except JSONDecodeError:
+                return jsonify({"err":"Incorrect formatting of data"})
             except ResponseError as err:
                 return jsonify({"err": err})
-            except NoSuchBucket as err:
-                return jsonify({"err":"This bucket does not exist. Please create this bucket at the bucket scoped endpoint."})
-            except InvalidBucketError:
-                return jsonify({"err":"This bucket does not exist. Please create this bucket at the bucket scoped endpoint."})
+
 
         #################################################################################################################### 
         #Deletes one object i.e. a file from the specified bucket only.
         ####################################################################################################################
 
-# {
-#     "config": {
-#         "auth": {
-#             "<auth key>": "<auth value>"
-#         },
-#         "<key>": "<value>"
-#     },
-#     "metadata": {
-#         "deposit_id": "<value>",
-#         "fields": {
-#             "<field>": "<field value>"
-#         }
-#     }
-# } 
 
         elif request.method == 'DELETE':
             # extract authentication details
@@ -249,14 +210,14 @@ def create_app():
 
             # get data from request payload
             config = json.loads(request.form.get('config'))
-            metadata = json.loads(request.form.get('metadata'))
+            data = json.loads(request.form.get('data'))
 
             # extract bucket_name value
             bucket_name = config.get('bucket_name')
 
             # extract object specific deposit_id
-            if metadata.get('deposit_id'):
-                deposit_id = metadata.get('deposit_id')
+            if data.get('deposit_id'):
+                deposit_id = data.get('deposit_id')
             else:
                 return jsonify({"err":"Please enter valid deposit_id."})
 
@@ -322,7 +283,6 @@ def create_app():
             else:
                 return jsonify({"err": "No authentication keys provided"})
 
-
             try:
                 # Initialize minioClient with an endpoint and keys.
                 try:
@@ -335,24 +295,25 @@ def create_app():
 
                 deposit_id_list = []
                 # get data from request payload
-                if request.form.get('data'):
+                
+                # if not request.form.get('config'):
+                #     return jsonify({ "err": "No request provided."})
+                            
+                try:
+                    config = json.loads(request.form.get('config'))
                     try:
-                        metadata = json.loads(request.form.get('metadata'))
-                        config = json.loads(request.form.get('config'))
-                        try:
-                            bucket_name = config.get('bucket_name')
-                            deposit_id_list = metadata.get('deposit_id_list')
-                        except Exception:
-                            return jsonify({"err": "No data provided"})                 
-                        # get objects from bucket
-                        try:
-                            objects = minioClient.list_objects(bucket_name, recursive=True)
-                        except NoSuchBucket:
-                            return jsonify({ "err": "Bucket does not exist." })
-                    except JSONDecodeError as err:
-                        return jsonify({ "err": "Incorrect formatting of data field." })
-                else:
-                    return jsonify({ "err": "No request provided."})
+                        bucket_name = config.get('bucket_name')
+                        deposit_id_list = config.get('deposit_id_list')
+                    except Exception:
+                        return jsonify({"err": "No data provided"})                 
+                    # get objects from bucket
+                    try:
+                        objects = minioClient.list_objects(bucket_name, recursive=True)
+                    except NoSuchBucket:
+                        return jsonify({ "err": "Bucket does not exist." })
+                except JSONDecodeError as err:
+                    return jsonify({ "err": "Incorrect formatting of data field." })
+
 
                 obj_names = []
                 missing_ids = []
@@ -376,43 +337,31 @@ def create_app():
                             obj_names.append(str(obj.object_name))
                     except NoSuchBucket as err:
                         return jsonify({"err":"Bucket does not exist."})
-                    except AccessDenied:
+                    except (AccessDenied, InvalidAccessKeyId, SignatureDoesNotMatch):
                         return jsonify({"err":"Invalid Authentication."})
-                    except InvalidAccessKeyId:
-                        return jsonify({"err":"Invalid Authentication."})
-                    except SignatureDoesNotMatch:
-                        return jsonify({"err":"Invalid Authentication."})
-                    except InvalidBucketError:
-                        return jsonify({"err":"Please enter a valid bucket_name"})
-                    except TypeError as err:
+                    except (InvalidBucketError, TypeError):
                         return jsonify({"err":"Please enter a valid bucket_name"})
 
                     for i,d in enumerate(deposit_id_list):
                         if d not in obj_names:
                             missing_ids.append(d)
 
-                else:
-                    try:
-                        for obj in objects:
-                            ret_object = {"metadata": str(obj.metadata), 
-                                          "deposit_id": str(obj.object_name), 
-                                          "modified": str(obj.last_modified),
-                                          "etag": str(obj.etag), 
-                                          "size": str(obj.size), 
-                                          "content_type": str(obj.content_type)}
-                            objects_list.append(ret_object)
-                    except NoSuchBucket as err:
-                        return jsonify({"err":"Bucket does not exist."})
-                    except AccessDenied:
-                        return jsonify({"err":"Invalid Authentication."})
-                    except InvalidAccessKeyId:
-                        return jsonify({"err":"Invalid Authentication."})
-                    except SignatureDoesNotMatch:
-                        return jsonify({"err":"Invalid Authentication."})
-                    except InvalidBucketError:
-                        return jsonify({"err":"Please enter a valid bucket_name"})
-                    except TypeError as err:
-                        return jsonify({"err":"Please enter a valid bucket_name"})
+                # else:
+                #     try:
+                #         for obj in objects:
+                #             ret_object = {"metadata": str(obj.metadata), 
+                #                           "deposit_id": str(obj.object_name), 
+                #                           "modified": str(obj.last_modified),
+                #                           "etag": str(obj.etag), 
+                #                           "size": str(obj.size), 
+                #                           "content_type": str(obj.content_type)}
+                #             objects_list.append(ret_object)
+                #     except NoSuchBucket as err:
+                #         return jsonify({"err":"Bucket does not exist."})
+                #     except (AccessDenied, InvalidAccessKeyId, SignatureDoesNotMatch):
+                #         return jsonify({"err":"Invalid Authentication."})
+                #     except (InvalidBucketError, TypeError):
+                #         return jsonify({"err":"Please enter a valid bucket_name"})
                     #obj_names.append(str(obj.object_name))
 
 
@@ -442,12 +391,7 @@ def create_app():
                                 access_key=auth.get("access_key"),
                                 secret_key=auth.get("secret_key"),
                                 secure=False)
-            except AccessDenied as err:
-                return jsonify({"err": str(err)})
 
-            # extract bucket name
-            
-            try:
                 if request.form.get('data'):
                     data = json.loads(request.form.get('data'))
                     bucket_name = data.get('bucket_name')
@@ -457,17 +401,13 @@ def create_app():
                     return jsonify({"err":"Invalid request."})
             except ResponseError as err:
                 return jsonify({"err":str(err)})
-            except InvalidAccessKeyId as err:
+            except (InvalidAccessKeyId, AccessDenied) as err:
                 return jsonify({"err":"Invalid Authentication."})
             except BucketAlreadyOwnedByYou as err:
                 return jsonify({"err":str(err)})
             except JSONDecodeError:
                 return jsonify({"err":"Incorrect formatting of data field."})
-            except TypeError:
-                return jsonify({"err":"Please look at rules for valid bucket names here."})
             except InvalidBucketError as err:
                 return jsonify({"err":str(err)})            
-            # except JSONDecodeError:
-            #     return jsonify({"err":"Invalid formatting of data field."})
 
     return app

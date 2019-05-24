@@ -17,24 +17,25 @@ collection = database[COLLECTION_NAME]
 
 app = Flask(__name__)
 
-@app.route('/db', methods=['GET', 'POST', 'DELETE'])
-def db():
+@app.route('/mongo_db', methods=['GET', 'POST', 'DELETE'])
+def mongo_db():
 	try:
 		databases = client.list_database_names()
 		return jsonify({"databases": databases})
 	except Exception as err:
 		return jsonify({"err": err})
 
+# add batch get post and delete above
 
-@app.route('/object', methods=['GET', 'POST', 'DELETE'])		# Change to "mongo_object" and "mongo_db"
-def object():
+
+@app.route('/mongo_object', methods=['GET', 'POST', 'DELETE'])		# DONE - Change to "mongo_object" and "mongo_db"
+def mongo_object():
 	if request.method == 'POST':
 		try:
 			post = json.loads(request.form.get('data')) # also can call it "metadata_obj"
-			db2 = client.MongoTest2
+			db2 = client.MongoTest2		# rename these later too
 			posts = db2.posts
 			post_id = posts.insert_one(post).inserted_id
-			# post_id
 			return jsonify({"post_id": str(post_id)})		# keep this for relational mapping at gateway
 		except Exception as err:				# Exapand exception possibilities later
 			return jsonify({"err": str(err)})
@@ -50,6 +51,16 @@ def object():
 		except Exception as err:
 			return jsonify({"err": str(err)})
 
+	if request.method == 'DELETE':
+		try:
+			obj_data = json.loads(request.form.get('data'))
+			obj_id = obj_data.get('deposit_id')
+			db2 = client.MongoTest2
+			posts = db2.posts
+			del_obj = posts.delete_one({"deposit_id":obj_id})		# If there are two documents with the same deposit_id (for instance, if one of them was inserted twice, creating a duplicate entry), then just one of them is deleted (in the same order as when each was added--i.e., the first one that was added will be the first one that's deleted. I tested this out to see.)
+			return jsonify({"del_obj": str(del_obj)})		# keep this for relational mapping at gateway
+		except Exception as err:
+			return jsonify({"err": str(err)})
 
 if __name__ == '__main__':
 	app.run(debug=True)

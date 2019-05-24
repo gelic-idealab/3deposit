@@ -46,8 +46,25 @@ def mongo_object():
 			obj_id = obj_data.get('deposit_id')
 			db2 = client.MongoTest2
 			posts = db2.posts
-			metadata_obj = posts.find_one({"deposit_id":obj_id})		# How to find 2? Iterate? or is there a find_all?
-			return jsonify({"metadata_obj": str(metadata_obj)})
+			metadata_obj_iter = posts.find({"deposit_id":obj_id})		# How to find 2? Iterate? or is there a find_all?
+			print(metadata_obj_iter)
+			metadata_obj_iter_list = [i for i in metadata_obj_iter]
+			num_metadata_objs = len(metadata_obj_iter_list)
+			if num_metadata_objs > 1:
+				print("You have more than one 3D metadata object with the same deposit_id in your database! We are returning the most recently added metadata object back to you; however, you should seriously consider consolidating them...")
+
+				# Also print out the list of objects to the console, for personal viewing
+				list_of_objs_to_output = [jsonify({"metadata_obj": str(obj)}) for obj in metadata_obj_iter]
+				print(list_of_objs_to_output)
+
+				metadata_obj = metadata_obj_iter_list[-1] # this should reference the most recently added metadata_obj with the particular requested deposit_id
+				return jsonify({"metadata_obj": str(metadata_obj)})
+
+			else:
+				metadata_obj = metadata_obj_iter_list[0]
+				# metadata_obj = posts.find_one({"deposit_id":obj_id})		# This is what we originally used, under the assumption that there is only one metadata_obj for every deposit_id
+				return jsonify({"metadata_obj": str(metadata_obj)})
+
 		except Exception as err:
 			return jsonify({"err": str(err)})
 

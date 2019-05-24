@@ -44,18 +44,17 @@ def create_app():
     app = Flask(__name__)
 
     
-    #************************************************************************************************************************************************************************
+
     #AT THIS ENDPOINT, EACH ACTION IS SPECIFIC TO AN OBJECT AT IT'S CORE
-    #************************************************************************************************************************************************************************
     
 
     @app.route('/minio_object', methods=['GET', 'POST','DELETE'])
     def minio_object():
 
         
-        ####################################################################################################################
+ 
         #Extract an object from a specified bucket
-        ####################################################################################################################
+ 
   
 
         if request.method == 'GET':
@@ -68,78 +67,44 @@ def create_app():
                 return jsonify({"err": "No authentication keys provided"})
 
             try:
-                # Initialize minioClient with an endpoint and keys.
-                try:
-                    minioClient = Minio(SERVER_ENDPOINT,
+                minioClient = Minio(SERVER_ENDPOINT,
                                     access_key=auth.get("access_key"),
                                     secret_key=auth.get("secret_key"),
                                     secure=False)
 
-                    deposit_id = False
+                deposit_id = False
 
-                    # get data from request payload
-                    #config = request.form.get('config')
+                if not deposit_id:
                     config = json.loads(request.form.get('config'))
-                    deposit_id = config.get('deposit_id')
-                    bucket_name = config.get('bucket_name')
                 
+                deposit_id = config.get('deposit_id')
+                bucket_name = config.get('bucket_name')
 
-                    if not deposit_id:
-                        return jsonify({"err": "No deposit ID provided"})
+                temp_obj_path = str(deposit_id)
+                obj = minioClient.get_object(bucket_name, deposit_id)
 
-                    temp_obj_path = str(deposit_id)
+                with open(temp_obj_path, 'wb') as file_data:
+                    for d in obj.stream(32*1024):
+                        file_data.write(d)
 
-                    obj = minioClient.get_object(bucket_name, deposit_id)
-                except NoSuchKey as err:
-                    return jsonify({"err":"The requested deposit_id does not exist"})
-                except NoSuchBucket as err:
-                    return jsonify({"err":str(err)})
-                except (InvalidBucketError, TypeError, NoSuchBucket):
-                    return jsonify({"err":"Please provide valid bucket_name"})
-                except (AccessDenied, InvalidAccessKeyId, SignatureDoesNotMatch):
-                    return jsonify({"err":"Invalid Authentication."})
-                except JSONDecodeError as err:
-                    return jsonify({"err":"Incorrect formatting of data"})
-                except TypeError:
-                    return jsonify({"err":"TEST EXCEPTION 1"})
+                return send_file(temp_obj_path, mimetype="application/octet-stream")
 
-                # except TypeError as err:
-                #     return jsonify({"err":"TEST EXCEPTION"})
-
-                try:
-                    with open(temp_obj_path, 'wb') as file_data:
-                        for d in obj.stream(32*1024):
-                            file_data.write(d)
-                # except TypeError as err:
-                #     return jsonify({"err":"TEST EXCEPTION"})
-                except TypeError:
-                    return jsonify({"err":"TEST EXCEPTION 2"})
-                except Exception as err:
-                    return jsonify({"err":str(err)})
-
-                # check whether object exists in the bucket
-                # if obj:
-                #     if metadata == "1":
-                #         meta_obj = minioClient.fget_object(bucket_name,object_name=deposit_id,file_path=deposit_id)
-                #         ret_object =   {"metadata": str(meta_obj.metadata), 
-                #                         "deposit_id": str(meta_obj.object_name), 
-                #                         "modified": str(meta_obj.last_modified),
-                #                         "etag": str(meta_obj.etag), 
-                #                         "size": str(meta_obj.size), 
-                #                         "content_type": str(meta_obj.content_type)}
-                #         return jsonify(ret_object)
-                #     else:
-                #         return send_file(temp_obj_path, mimetype="application/octet-stream")
-
+            except NoSuchKey as err:
+                return jsonify({"err":"Please provide a valid deposit_id"})
+            except (InvalidBucketError, NoSuchBucket):
+                return jsonify({"err":"Please provide valid bucket_name"})
+            except (AccessDenied, InvalidAccessKeyId, SignatureDoesNotMatch):
+                return jsonify({"err":"Invalid Authentication."})
+            except JSONDecodeError as err:
+                return jsonify({"err":"Incorrect formatting of data"})
             except ResponseError as err:
-                return jsonify({"err": err})
-            except TypeError:
-                    return jsonify({"err":"TEST EXCEPTION 3"})
+                return jsonify({"err": str(err)})
+            except TypeError as err:
+                return jsonify({"err":"Please provide valid bucket_name and deposit_id"})
 
 
-        ####################################################################################################################
         #Puts one object i.e. a file in the specified bucket only.
-        ####################################################################################################################
+
      
 
         elif request.method == 'POST':
@@ -200,9 +165,8 @@ def create_app():
 
 
 
-        #################################################################################################################### 
         #Deletes one object i.e. a file from the specified bucket only.
-        ####################################################################################################################
+        
 
 
         elif request.method == 'DELETE':
@@ -214,28 +178,26 @@ def create_app():
             else:
                 return jsonify({"err": "No authentication keys provided"})
 
-            # get data from request payload
-            config = json.loads(request.form.get('config'))
-            data = json.loads(request.form.get('data'))
+            try:    
+                # get data from request payload
+                config = json.loads(request.form.get('config'))
+                data = json.loads(request.form.get('data'))
 
-            # extract bucket_name value
-            bucket_name = config.get('bucket_name')
+                # extract bucket_name value
+                bucket_name = config.get('bucket_name')
 
-            # extract object specific deposit_id
-            if data.get('deposit_id'):
-                deposit_id = data.get('deposit_id')
-            else:
-                return jsonify({"err":"Please enter valid deposit_id."})
+                # extract object specific deposit_id
+                if data.get('deposit_id'):
+                    deposit_id = data.get('deposit_id')
+                else:
+                    return jsonify({"err":"Please enter valid deposit_id."})
 
-            try:
                 minioClient = Minio(SERVER_ENDPOINT,
                                 access_key=auth.get("access_key"),
                                 secret_key=auth.get("secret_key"),
                                 secure=False)
-            except AccessDenied as err:
-                return jsonify({"err": str(err)})
 
-            try:
+
                 error = minioClient.get_object(bucket_name, deposit_id)
                 rem_object = minioClient.remove_object(bucket_name,deposit_id)
             except (NoSuchBucket, InvalidBucketError, ResponseError, TypeError):
@@ -243,7 +205,9 @@ def create_app():
             except NoSuchKey:
                 return jsonify({ "err": "Please enter valid deposit_id." })
             except (AccessDenied, InvalidAccessKeyId, SignatureDoesNotMatch) as err:
-                return jsonify({"err":"Invalid Authentication."})                
+                return jsonify({"err":"Invalid Authentication."})         
+            except JSONDecodeError:
+                return jsonify({"err":"Incorrect formatting of data"})
 
             return jsonify({"deposit_id": deposit_id})
 
@@ -256,9 +220,7 @@ def create_app():
 
 
     
-    #************************************************************************************************************************************************************************
     #AT THIS ENDPOINT, EACH ACTION IS SPECIFIC TO A BUCKET AT IT'S CORE
-    #************************************************************************************************************************************************************************
     
 
 
@@ -269,9 +231,9 @@ def create_app():
     @app.route('/bucket', methods=['GET','POST'])
     def bucket():
 
-        ###########################################################################################################################
+        
         #Get metadata of all or a list of objects in a specific bucket
-        ###########################################################################################################################
+        
 
         if request.method == 'GET':
             # get keys from request args
@@ -376,9 +338,8 @@ def create_app():
                 return jsonify({"err": err})
 
 
-        ###########################################################################################################################
         #Create a new bucket that does not yet exist
-        ###########################################################################################################################
+        
 
         elif request.method == 'POST':
             
@@ -420,9 +381,9 @@ def create_app():
 
 
 
-    #*************************************************************************************************************************************************************
-    #Create an endpoint for metadata
-    #*************************************************************************************************************************************************************
+    
+    #THIS ENDPOINT HANDLES METADATA AT OBJECT LEVEL
+    
 
 
 

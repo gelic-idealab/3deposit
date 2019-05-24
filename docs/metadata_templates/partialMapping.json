@@ -164,7 +164,7 @@
                 "required": false,
                 "value": [""],
                 "placeholder": "Enter object description"
-               },
+               }
                            
     ]
 }

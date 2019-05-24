@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine, MetaData
 
-from db import deposits, users
+from db import forms, deposits, users
 from settings import BASE_DIR, get_config
 from security import generate_password_hash
 
@@ -11,7 +11,7 @@ DSN = "postgresql://{user}:{password}@{host}:{port}/{database}"
 
 ADMIN_DB_URL = DSN.format(
     user='postgres', password='postgres', database='postgres',
-    host='postgres', port=5432
+    host='localhost', port=5432
 )
 
 admin_engine = create_engine(ADMIN_DB_URL, isolation_level='AUTOCOMMIT')
@@ -56,18 +56,19 @@ def teardown_db(config):
 
 def create_tables(engine):
     meta = MetaData()
-    meta.create_all(bind=engine, tables=[deposits, users])
+    meta.create_all(bind=engine, tables=[forms, deposits, users])
 
 
 def drop_tables(engine):
     meta = MetaData()
-    meta.drop_all(bind=engine, tables=[deposits, users])
+    meta.drop_all(bind=engine, tables=[forms, deposits, users])
 
 def create_admin(engine):
     username = 'admin'
     password_hash = generate_password_hash('admin')
+    role = 'admin'
     with engine.connect() as conn:
-        conn.execute(users.insert().values(username=username, password_hash=password_hash))
+        conn.execute(users.insert().values(username=username, password_hash=password_hash, role=role))
 
 
 if __name__ == '__main__':

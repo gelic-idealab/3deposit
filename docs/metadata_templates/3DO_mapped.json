@@ -185,59 +185,60 @@
         {
             "id": 18,
             "label":"Origin",
-            "type": "container",
+            "type": "select",
             "repeatable": true,
             "required": true,
-            "value": [""],
+            "value": [],
+            "options": [{"value": "derived", "label": "Derived"},
+                        {"value": "real", "label": "Real Object"},],
             "dependsOn": {}
 
         },
         {
-            "id": 18,
+            "id": 19,
             "label":"Derived",
-            "type": "checkbox",
+            "type": "container",
             "repeatable": true,
             "required": false,
             "value": [""],
             "placeholder": "Is this object derived?",
-            "dependsOn": {}
+            "dependsOn": {"id": 18, "value":"derived"}
 
         },
         {
-             "id": 19,
+             "id": 20,
             "label":"Derived Title",
             "type": "text",
             "repeatable": true,
             "required": true,
             "value": [""],
             "placeholder": "Enter derived title",
-            "dependsOn": {"id": 18, "value": true}
+            "dependsOn": {"id": 19, "value": true}
         },
 
         {
-            "id": 20,
+            "id": 21,
             "label":"Derived Creator",
             "type": "text",
             "repeatable": true,
             "required": true,
             "value": [""],
             "placeholder": "Enter derived creator",
-            "dependsOn": {"id": 18, "value": true}
+            "dependsOn": {"id": 19, "value": true}
         },
 
         {
-            "id": 21,
+            "id": 22,
             "label":"Real Object",
             "type": "checkbox",
             "repeatable": true,
             "required": false,
             "value": [""],
-            "placeholder": "Does the object exist in the real world?",
-            "dependsOn": {}
+            "dependsOn": {"id": 18, "value": "real"}
         },
 
         {
-            "id": 22,
+            "id": 23,
             "label":"Holding",
             "type": "text",
             "repeatable": false,
@@ -245,22 +246,22 @@
             "children": [],
             "value": [""],
             "placeholder": "Enter creator name",
-            "dependsOn": {"id": 21, "value": true}
+            "dependsOn": {"id": 22, "value": true}
         },
 
         {
-            "id": 23,
+            "id": 24,
             "label":"Original Work",
             "type": "text",
             "repeatable": false,
             "required": false,
             "value": [""],
             "placeholder": "Enter name of original work",
-            "dependsOn": {"id": 21, "value": true}
+            "dependsOn": {"id": 22, "value": true}
         },
 
         {
-            "id": 24,
+            "id": 25,
             "label":"Model Source Format",
             "type": "select",
             "repeatable": false,
@@ -271,7 +272,7 @@
         },
 
         {
-            "id": 25,
+            "id": 26,
             "label":"Video Source Format",
             "type": "select",
             "repeatable": false,
@@ -282,7 +283,7 @@
         },
 
         {
-            "id": 26,
+            "id": 27,
             "label":"VR Source Format",
             "type": "select",
             "repeatable": false,
@@ -293,116 +294,125 @@
         },
 
         {
-            "id": 27,
+            "id": 28,
             "label":"Created With",
             "type": "select",
             "repeatable": false,
             "required": true,
             "value": [""],
             "dependsOn":{},
-            "options": [{}],
+            "options": [{"value": "software", "label": "Software"},
+                        {"value": "hardware", "label": "Hardware"},],
         },
 
         {
-            "id": 28,
+            "id": 29,
             "label":"Software",
             "type": "container",
             "repeatable": true,
             "required": true,
             "value": [""],
-            "dependsOn": {"id": 27, "value": "true"}
+            "dependsOn": {"id": 28, "value": "software"}
         },
 
         {
-            "id": 29,
+            "id": 30,
             "label":"Software Name",
             "type": "text",
             "repeatable": false,
             "required": true,
             "value": [""],
             "placeholder": "Enter software name",
+            "dependsOn": {"id": 29, "value": "true"}
         },
 
         {
-            "id": 30,
+            "id": 31,
             "label":"Software Creator",
             "type": "text",
             "repeatable": false,
             "required": true,
             "value": [""],
             "placeholder": "Enter software creator name",
+            "dependsOn": {"id": 29, "value": "true"}
         },
 
         {
-            "id": 31,
+            "id": 32,
             "label":"Software Rights Type",
             "type": "text",
             "repeatable": false,
             "required": false,
             "value": [""],
             "placeholder": "Enter software rights type",
+            "dependsOn": {"id": 29, "value": "true"}
         },
 
         {
-            "id": 32,
+            "id": 33,
             "label":"Software Rights Statement",
             "type": "text",
             "repeatable": false,
             "required": false,
             "value": [""],
             "placeholder": "Enter software rights statement",
+            "dependsOn": {"id": 29, "value": "true"}
         },
 
         {
-            "id": 33,
+            "id": 34,
             "label":"Hardware",
             "type": "checkbox",
             "repeatable": true,
             "required": false,
             "value": [""],
+            "dependsOn": {"id": 28, "value": "hardware"}
         },
 
         {
-            "id": 34,
+            "id": 35,
             "label":"Hardware Name",
             "type": "text",
             "repeatable": false,
             "required": true,
             "value": [""],
             "placeholder": "Enter hardware name",
+            "dependsOn": {"id": 34, "value": "true"}
         },
 
         {
-            "id": 35,
+            "id": 36,
             "label":"Hardware Creator",
             "type": "text",
             "repeatable": false,
             "required": true,
             "value": [""],
             "placeholder": "Enter hardware creator name",
+            "dependsOn": {"id": 34, "value": "true"}
         },
 
         {
-            "id": 36,
+            "id": 37,
             "label":"Geometry",
-            "type": "checkbox",
+            "type": "container",
             "repeatable": true,
             "required": true,
             "value": [""],
         },
 
         {
-            "id": 37,
+            "id": 38,
             "label":"Geometry Type",
-            "type": "text",
+            "type": "select",
             "repeatable": false,
             "required": true,
             "value": [""],
-            "placeholder": "Enter geometry type",
+            "options": [{"value": "tri", "label": "Triangle"},
+                        {"value": "quad", "label": "Quadrangle"},],
         },
 
         {
-            "id": 38,
+            "id": 39,
             "label":"Geometry Amount",
             "type": "text",
             "repeatable": false,
@@ -412,7 +422,7 @@
         },
 
         {
-            "id": 39,
+            "id": 40,
             "label":"Vertices",
             "type": "text",
             "repeatable": false,
@@ -422,7 +432,7 @@
         },
 
         {
-            "id": 40,
+            "id": 41,
             "label":"File Size",
             "type": "text",
             "repeatable": false,
@@ -432,7 +442,7 @@
         },
 
         {
-            "id": 41,
+            "id": 42,
             "label":"Textures",
             "type": "text",
             "repeatable": false,
@@ -442,7 +452,7 @@
         },
 
         {
-            "id": 42,
+            "id": 43,
             "label":"Materials",
             "type": "text",
             "repeatable": false,
@@ -452,7 +462,7 @@
         },
 
         {
-            "id": 43,
+            "id": 44,
             "label":"Rigged",
             "type": "checkbox",
             "repeatable": false,
@@ -462,27 +472,29 @@
         },
 
         {
-            "id": 44,
+            "id": 45,
             "label":"Animation",
             "type": "checkbox",
             "repeatable": false,
             "required": false,
             "value": [""],
             "placeholder": "Is the object animated?",
+            "dependsOn": {"id": 44, "value": "true"}
         },
 
         {
-            "id": 45,
+            "id": 46,
             "label":"Animation Run Time",
             "type": "text",
             "repeatable": false,
             "required": true,
             "value": [""],
             "placeholder": "Enter animation run time",
+            "dependsOn": {"id": 44, "value": "true"}
         },
 
         {
-            "id": 46,
+            "id": 47,
             "label":"Normals",
             "type": "text",
             "repeatable": false,
@@ -492,7 +504,7 @@
         },
 
         {
-            "id": 47,
+            "id": 48,
             "label":"Vertex Colors",
             "type": "text",
             "repeatable": false,
@@ -502,7 +514,7 @@
         },
 
         {
-            "id": 48,
+            "id": 49,
             "label":"UV Mapped",
             "type": "checkbox",
             "repeatable": false,
@@ -512,7 +524,7 @@
         },
 
         {
-            "id": 49,
+            "id": 50,
             "label":"Tags",
             "type": "text",
             "repeatable": true,
@@ -522,16 +534,16 @@
         },
 
         {
-            "id": 50,
+            "id": 51,
             "label":"Rights",
-            "type": "checkbox",
+            "type": "container",
             "repeatable": false,
             "required": true,
             "value": [""],
         },
 
         {
-            "id": 51,
+            "id": 52,
             "label":"Rights Type",
             "type": "text",
             "repeatable": false,
@@ -541,7 +553,7 @@
         },
 
         {
-            "id": 52,
+            "id": 53,
             "label":"Rights Statement",
             "type": "text",
             "repeatable": false,

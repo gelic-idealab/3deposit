@@ -142,6 +142,12 @@ def create_app():
                 # extract bucket_name value
                 bucket_name = config.get('bucket_name')
                 minioClient.bucket_exists(bucket_name)
+
+                objects = minioClient.list_objects(bucket_name, recursive=True)
+                for obj in objects:
+                    if obj.object_name == deposit_id:
+                        return jsonify({"err":"This deposit_id is already registered. Please enter a new deposit_id."})
+        
                 metadata={}
                 metadata['BUCKET_NAME'] = bucket_name
 

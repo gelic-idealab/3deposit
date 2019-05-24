@@ -237,7 +237,7 @@ def create_app():
 
 
 
-    @app.route('/bucket', methods=['GET','POST'])
+    @app.route('/bucket', methods=['GET','POST','DELETE'])
     def bucket():
 
         
@@ -353,8 +353,39 @@ def create_app():
                 return jsonify({"err":"Please enter a valid new_bucket_name."})
 
 
+        elif request.method == 'DELETE':
+            if minio_keys(request):
+                auth = minio_keys(request)
+                if "err" in auth:
+                    return jsonify(auth)
+            else:
+                return jsonify({"err": "No authentication keys provided"})
 
+            try:
+                data = json.loads(request.form.get('data'))
+                bucket_name = data.get('bucket_name')
 
+                objects = minioClient.list_objects(bucket_name, recursive=True)
+
+                count = 0
+                for obj in objects:
+                    count += 1
+
+                if count != 0:
+                    return jsonify({"err":"Cannot delete non-empty bucket."})
+
+                minioClient.remove_bucket(bucket_name)
+
+            except ResponseError as err:
+                return jsonify({"err":str(err)})
+            except (InvalidAccessKeyId, AccessDenied, SignatureDoesNotMatch) as err: #Handle authentication related errors
+                return jsonify({"err":"Invalid Authentication."})
+            except BucketAlreadyOwnedByYou as err: #Handle pre-existing bucket_name error
+                return jsonify({"err":str(err)})
+            except JSONDecodeError: #Handle formatting related errors
+                return jsonify({"err":"Incorrect formatting of data field."})
+            except (InvalidBucketError, TypeError) as err: #Handle bucket_name related errors
+                return jsonify({"err":"Please enter a valid new_bucket_name."})
 
     
     #THIS ENDPOINT HANDLES METADATA AT OBJECT LEVEL

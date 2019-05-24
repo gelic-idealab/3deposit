@@ -1,12 +1,11 @@
-{
-    "fields": [
+"fields": [
         {
             "id": 0,
             "label":"Media Type",
             "type": "select",
             "repeatable": false,
             "required": true,
-            "value": {},
+            "value": {"model"},
             "options": [{"value": "model", "label": "3d Model"},
                         {"value": "video", "label": "360 Video"},
                         {"value": "vr", "label": "VR project"}],
@@ -27,7 +26,7 @@
             "type": "text",
             "repeatable": true,
             "required": true,
-            "value": [""],
+            "value": ["Edward Gloor"],
             "placeholder": "Enter creator name",
             "dependsOn": {"id": 1, "value": true}
         },
@@ -37,7 +36,7 @@
             "type": "select",
             "repeatable": false,
             "required": true,
-            "value": {},
+            "value": {"g"},
             "options": [{"value": "u", "label": "Undergraduate"}, 
                         {"value": "g", "label": "Graduate"}, 
                         {"value": "f", "label": "Faculty"}, 
@@ -51,7 +50,7 @@
             "type": "text",
             "repeatable": true,
             "required": false,
-            "value": [""],
+            "value": ["Grainger Engineering Library"],
             "placeholder": "Enter creator's department or team affiliation",
             "dependsOn": {"id": 1, "value": true}
         },
@@ -61,7 +60,7 @@
             "type": "container",
             "repeatable": true,
             "required": false,
-            "value": [{}],
+            "value": ["true"],
             "dependsOn": {}
         },
         {
@@ -70,7 +69,7 @@
             "type": "text",
             "repeatable": true,
             "required": true,
-            "value": [""],
+            "value": ["Grainger Engineering Library"],
             "placeholder": "Enter funding agency name",
             "dependsOn": {"id": 5, "value": true}
         },
@@ -80,7 +79,7 @@
             "type": "text",
             "repeatable": true,
             "required": true,
-            "value": [""],
+            "value": ["67890"],
             "placeholder": "Enter funding identification number",
             "dependsOn": {"id": 5, "value": true}
         },
@@ -90,7 +89,7 @@
             "type": "container",
             "repeatable": true,
             "required": false,
-            "value": false,
+            "value": true,
             "dependsOn": {}
         },
         {
@@ -99,7 +98,7 @@
             "type": "text",
             "repeatable": false,
             "required": true,
-            "value": [""],
+            "value": ["Metadata in Theory and Practice"],
             "placeholder": "Enter course name",
             "dependsOn": {"id": 8, "value": true}
         },
@@ -109,7 +108,7 @@
             "type": "text",
             "repeatable": true,
             "required": true,
-            "value": [""],
+            "value": ["Rhiannon Bettivia"],
             "placeholder": "Enter instructor name",
             "dependsOn": {"id": 8, "value": true}
         },
@@ -119,7 +118,7 @@
             "type": "text",
             "repeatable": false,
             "required": true,
-            "value": [""],
+            "value": ["Spring"],
             "placeholder": "Enter course semester",
             "dependsOn": {"id": 8, "value": true}
         },
@@ -129,7 +128,7 @@
             "type": "text",
             "repeatable": false,
             "required": true,
-            "value": [""],
+            "value": ["2019"],
             "placeholder": "Enter course year",
             "dependsOn": {"id": 8, "value": true}
         },
@@ -148,7 +147,7 @@
             "type": "text",
             "repeatable": false,
             "required": true,
-            "value": [""],
+            "value": ["Pikachu"],
             "placeholder": "Enter object title",
             "dependsOn": {}
         },
@@ -158,7 +157,7 @@
             "type": "text",
             "repeatable": true,
             "required": true,
-            "value": [""],
+            "value": ["SOMETHINGUNIQUE"],
             "placeholder": "Enter object ID",
             "dependsOn": {}
         },
@@ -168,7 +167,7 @@
             "type": "date",
             "repeatable": true,
             "required": true,
-            "value": [""],
+            "value": ["05/24/19"],
             "placeholder": "Enter object's date of creation",
             "dependsOn": {}
         },
@@ -178,7 +177,7 @@
             "type": "text",
             "repeatable": false,
             "required": false,
-            "value": [""],
+            "value": ["A model of Pikachu from the Pokemon Series"],
             "placeholder": "Enter object description",
             "dependsOn": {}
         },
@@ -188,7 +187,7 @@
             "type": "select",
             "repeatable": true,
             "required": true,
-            "value": [],
+            "value": ["derived"],
             "options": [{"value": "derived", "label": "Derived"},
                         {"value": "real", "label": "Real Object"},],
             "dependsOn": {}
@@ -200,7 +199,7 @@
             "type": "container",
             "repeatable": true,
             "required": false,
-            "value": [""],
+            "value": true,
             "placeholder": "Is this object derived?",
             "dependsOn": {"id": 18, "value":"derived"}
 
@@ -211,7 +210,7 @@
             "type": "text",
             "repeatable": true,
             "required": true,
-            "value": [""],
+            "value": ["Pokemon"],
             "placeholder": "Enter derived title",
             "dependsOn": {"id": 19, "value": true}
         },
@@ -222,7 +221,7 @@
             "type": "text",
             "repeatable": true,
             "required": true,
-            "value": [""],
+            "value": ["Game Freak"],
             "placeholder": "Enter derived creator",
             "dependsOn": {"id": 19, "value": true}
         },
@@ -233,7 +232,7 @@
             "type": "checkbox",
             "repeatable": true,
             "required": false,
-            "value": [""],
+            "value": false,
             "dependsOn": {"id": 18, "value": "real"}
         },
 
@@ -266,7 +265,7 @@
             "type": "select",
             "repeatable": false,
             "required": true,
-            "value": [""],
+            "value": [".fbx"],
             "options": [{}],
             "dependsOn": {"id": 0, "value": "model"}
         },
@@ -299,7 +298,7 @@
             "type": "select",
             "repeatable": false,
             "required": true,
-            "value": [""],
+            "value": ["software"],
             "dependsOn":{},
             "options": [{"value": "software", "label": "Software"},
                         {"value": "hardware", "label": "Hardware"},],
@@ -311,7 +310,7 @@
             "type": "container",
             "repeatable": true,
             "required": true,
-            "value": [""],
+            "value": true,
             "dependsOn": {"id": 28, "value": "software"}
         },
 
@@ -321,7 +320,7 @@
             "type": "text",
             "repeatable": false,
             "required": true,
-            "value": [""],
+            "value": ["Autodesk"],
             "placeholder": "Enter software name",
             "dependsOn": {"id": 29, "value": "true"}
         },
@@ -332,7 +331,7 @@
             "type": "text",
             "repeatable": false,
             "required": true,
-            "value": [""],
+            "value": ["Autodesk"],
             "placeholder": "Enter software creator name",
             "dependsOn": {"id": 29, "value": "true"}
         },
@@ -343,7 +342,7 @@
             "type": "text",
             "repeatable": false,
             "required": false,
-            "value": [""],
+            "value": ["Sample Rights"],
             "placeholder": "Enter software rights type",
             "dependsOn": {"id": 29, "value": "true"}
         },
@@ -354,7 +353,7 @@
             "type": "text",
             "repeatable": false,
             "required": false,
-            "value": [""],
+            "value": ["The things you can do with this software are listed here :)"],
             "placeholder": "Enter software rights statement",
             "dependsOn": {"id": 29, "value": "true"}
         },
@@ -365,7 +364,7 @@
             "type": "checkbox",
             "repeatable": true,
             "required": false,
-            "value": [""],
+            "value": false,
             "dependsOn": {"id": 28, "value": "hardware"}
         },
 
@@ -406,7 +405,7 @@
             "type": "select",
             "repeatable": false,
             "required": true,
-            "value": [""],
+            "value": ["tri"],
             "options": [{"value": "tri", "label": "Triangle"},
                         {"value": "quad", "label": "Quadrangle"},],
         },
@@ -417,7 +416,7 @@
             "type": "text",
             "repeatable": false,
             "required": true,
-            "value": [""],
+            "value": ["36600"],
             "placeholder": "Enter geometry type amount",
         },
 
@@ -427,7 +426,7 @@
             "type": "text",
             "repeatable": false,
             "required": true,
-            "value": [""],
+            "value": ["183000"],
             "placeholder": "Enter number of vertices",
         },
 
@@ -437,7 +436,7 @@
             "type": "text",
             "repeatable": false,
             "required": true,
-            "value": [""],
+            "value": ["1 mb"],
             "placeholder": "Enter file size",
         },
 
@@ -447,7 +446,7 @@
             "type": "text",
             "repeatable": false,
             "required": true,
-            "value": [""],
+            "value": ["5"],
             "placeholder": "Enter number of textures",
         },
 
@@ -457,7 +456,7 @@
             "type": "text",
             "repeatable": false,
             "required": true,
-            "value": [""],
+            "value": ["3"],
             "placeholder": "Enter number of materials",
         },
 
@@ -467,7 +466,7 @@
             "type": "checkbox",
             "repeatable": false,
             "required": true,
-            "value": [""],
+            "value": true,
             "placeholder": "Is the object rigged?",
         },
 
@@ -477,7 +476,7 @@
             "type": "checkbox",
             "repeatable": false,
             "required": false,
-            "value": [""],
+            "value": false,
             "placeholder": "Is the object animated?",
             "dependsOn": {"id": 44, "value": "true"}
         },
@@ -499,7 +498,7 @@
             "type": "checkbox",
             "repeatable": false,
             "required": true,
-            "value": [""],
+            "value": true,
             "placeholder": "Does the object have normals?",
         },
 
@@ -509,7 +508,7 @@
             "type": "checkbox",
             "repeatable": false,
             "required": true,
-            "value": [""],
+            "value": true,
             "placeholder": "Does the object have vertex colors?",
         },
 
@@ -519,7 +518,7 @@
             "type": "checkbox",
             "repeatable": false,
             "required": true,
-            "value": [""],
+            "value": true,
             "placeholder": "Is the object UV mapped?",
         },
 
@@ -529,7 +528,7 @@
             "type": "text",
             "repeatable": true,
             "required": true,
-            "value": [""],
+            "value": ["Pikachu", "pokemon", "nintendo", "gaming"],
             "placeholder": "Enter object tags",
         },
 
@@ -548,7 +547,7 @@
             "type": "text",
             "repeatable": false,
             "required": true,
-            "value": [""],
+            "value": ["CCBY"],
             "placeholder": "Enter object rights type",
         },
 
@@ -558,7 +557,7 @@
             "type": "text",
             "repeatable": false,
             "required": true,
-            "value": [""],
+            "value": ["free to share and adapt, must give attribution"],
             "placeholder": "Enter object rights statement",
         }
 

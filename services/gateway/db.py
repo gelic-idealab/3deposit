@@ -89,18 +89,21 @@ async def get_users(conn):
     return records
     
 
-async def get_active_forms(conn):
+async def get_active_form(conn):
     result = await conn.execute(
         forms
         .select()
-        #.where(forms.c.active == True)
+        .where(forms.c.active == True)
     )
-    active_forms = await result.fetchall()
-    return [dict(form) for form in active_forms]
+    first_active_form = await result.fetchone()
+    if first_active_form:
+        return dict(first_active_form)
+    else:
+        return False
 
-async def create_active_form(conn, content):
+async def create_active_form(conn, content, active=False):
     await conn.execute(
         forms
         .insert()
-        .values(content=content)
+        .values(active=active, content=content)
     )

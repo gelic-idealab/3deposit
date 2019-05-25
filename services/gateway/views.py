@@ -61,21 +61,27 @@ async def logout(request):
 """
 API endpoint for frontend to request active deposit form
 
-'GET': no params; returns first active form as object 'active_form': {<form>}
+'GET': no params; returns first active form as object { 'active_form': {<form>} }
 'POST': creates new form from raw request body 'request.json()'
 """
 
 async def activeDepositForm(request):
     if request.method == 'GET':
         async with request.app['db'].acquire() as conn:
-            active_forms = await db.get_active_forms(conn)
-        return web.json_response({ 'active_forms': active_forms })
+            active_form = await db.get_active_form(conn)
+        if active_form:
+            return web.json_response({ 'active_form': active_form })
+        else:
+            return web.json_response({ 'err': 'No active form' })
 
     if request.method == 'POST':
-        new_form = await request.json()
-        async with request.app['db'].acquire() as conn:
-            try:
-                await db.create_active_form(conn, new_form)
-                return web.json_response({ "succeeded": True, "msg": "New active form created" })
-            except Exception as e:
-                return web.json_response({ "err": str(e) })
+        try:
+            req = await request.json()
+            async with request.app['db'].acquire() as conn:
+                try:
+                    await db.create_active_form(conn, req['content'], req['active'])
+                    return web.json_response({ "succeeded": True, "msg": "New active form created" })
+                except Exception as e:
+                    return web.json_response({ "err": str(e) })
+        except Exception as e:
+            return web.json_response({ "err": str(e) })

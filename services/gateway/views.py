@@ -65,7 +65,7 @@ API endpoint for frontend to request active deposit form
 'POST': creates new form from raw request body 'request.json()'
 """
 
-async def activeDepositForm(request):
+async def active_deposit_form(request):
     if request.method == 'GET':
         async with request.app['db'].acquire() as conn:
             active_form = await db.get_active_form(conn)

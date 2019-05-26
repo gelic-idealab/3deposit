@@ -53,7 +53,7 @@ export default {
   name: 'Fields',
   props: {
     fields: Array,
-    fields: id
+    id: String
   },
   methods: {
     addValue: function (valueList) {
@@ -66,7 +66,7 @@ export default {
       field[index].value = !field[index].value
     },
     getParent: function (field) {
-      var parent = this.fields.filter(function (el) {
+      let parent = this.fields.filter(function (el) {
         return el.id === field.dependsOn.id
       })
       return parent[0]
@@ -75,7 +75,7 @@ export default {
       if (Object.keys(field.dependsOn).length === 0) {
         return true
       } else {
-        var pf = this.getParent(field)
+        let pf = this.getParent(field)
         if (field.dependsOn.value === pf.value) {
           return true
         } else {

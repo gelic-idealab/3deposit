@@ -58,6 +58,7 @@ async def logout(request):
     await forget(request, response)
     return response
 
+
 """
 API endpoint for frontend to request active deposit form
 
@@ -85,3 +86,9 @@ async def active_deposit_form(request):
                     return web.json_response({ "err": str(e) })
         except Exception as e:
             return web.json_response({ "err": str(e) })
+
+
+"""
+API endpoint for frontend to upload files with support for chunking
+'POST': only allowed method
+"""

@@ -4,7 +4,7 @@
       <img alt="logo" src="./assets/logo.png" height="128" width="128">
       <Banner v-bind:banner="form.banner"/>
       <FileProgress v-bind:id="id"/>
-      <Fields v-bind:fields="form.fields"/>
+      <Fields v-bind:fields="form.fields" :id="id"/>
     </div>
   </div>
 </template>

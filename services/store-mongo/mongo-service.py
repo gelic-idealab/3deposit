@@ -54,9 +54,8 @@ def object():
 			metadata_obj_iter_list = [i for i in metadata_obj_iter]
 			num_metadata_objs = len(metadata_obj_iter_list)
 			if num_metadata_objs > 1:
-				print("You have more than one 3D metadata object with the same deposit_id in your database! We are returning the most recently added metadata object back to you; however, you should seriously consider consolidating them...")
+				#print("You have more than one 3D metadata object with the same deposit_id in your database! We are returning the most recently added metadata object back to you; however, you should seriously consider consolidating them...")
 
-				# Also print out the list of objects to the console, for personal viewing
 				list_of_objs_to_output = [jsonify({"metadata_obj": str(obj)}) for obj in metadata_obj_iter]
 				print(list_of_objs_to_output)
 
@@ -65,7 +64,7 @@ def object():
 
 			else:
 				metadata_obj = metadata_obj_iter_list[0]
-				# metadata_obj = posts.find_one({"deposit_id":obj_id})		# This is what we originally used, under the assumption that there is only one metadata_obj for every deposit_id
+				# metadata_obj = posts.find_one({"deposit_id":obj_id})
 				return jsonify({"metadata_obj": str(metadata_obj)})
 
 		except Exception as err:
@@ -73,11 +72,15 @@ def object():
 
 	if request.method == 'DELETE':
 		try:
-			obj_data = json.loads(request.form.get('data'))
-			obj_id = obj_data.get('deposit_id')
+			config = json.loads(request.form.get('config')) # also can call it "metadata_obj"
+			data = json.loads(request.form.get('data'))
+			db_name = config.get('db_name')
+			object_id = data.get('object_id')
 			db2 = client.MongoTest2
 			posts = db2.posts
-			del_obj = posts.delete_one({"deposit_id":obj_id})		# If there are two documents with the same deposit_id (for instance, if one of them was inserted twice, creating a duplicate entry), then just one of them is deleted (in the same order as when each was added--i.e., the first one that was added will be the first one that's deleted. I tested this out to see.)
+			del_obj = posts.delete_one({"deposit_id":obj_id})
+			# If there are two documents with the same deposit_id (for instance, if one of them was inserted twice, creating a duplicate entry), then just one of them
+			# is deleted (in the same order as when each was added--i.e., the first one that was added will be the first one that's deleted. I tested this out to see.)
 			return jsonify({"del_obj": str(del_obj)})		# keep this for relational mapping at gateway
 		except Exception as err:
 			return jsonify({"err": str(err)})

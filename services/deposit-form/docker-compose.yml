@@ -1,18 +1,23 @@
 version: '3'
 services:
-  mock-gateway:
-    container_name: mock-gateway
-    build: mock-gateway/.
-    ports:
-     - "5000:5000"
-    command: pipenv run python gateway.py
+  # mock-gateway:
+  #   container_name: mock-gateway
+  #   build: mock-gateway/.
+  #   ports:
+  #    - "5000:5000"
+  #   command: pipenv run python gateway.py
   
   vue-app:
     build: .
-    links: 
-      - mock-gateway
+    # links: 
+    #   - mock-gateway
     ports:
-      - "8080:8080"
+      - "0.0.0.0:8080:8080"
+    networks:
+      - frontend 
     container_name: vue-service
     command: npm run serve
+
+networks:
+  frontend:    
     

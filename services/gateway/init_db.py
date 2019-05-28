@@ -11,7 +11,7 @@ DSN = "postgresql://{user}:{password}@{host}:{port}/{database}"
 
 ADMIN_DB_URL = DSN.format(
     user='postgres', password='postgres', database='postgres',
-    host='localhost', port=5432
+    host='postgres', port=5432
 )
 
 admin_engine = create_engine(ADMIN_DB_URL, isolation_level='AUTOCOMMIT')

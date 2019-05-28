@@ -92,3 +92,11 @@ async def active_deposit_form(request):
 API endpoint for frontend to upload files with support for chunking
 'POST': only allowed method
 """
+
+async def upload_file(request):
+    if request.method == 'POST':
+        try:
+            req = await request.json()
+            return web.json_response({ 'upload succeeded' })
+        except Exception as err:
+            return web.json_response({ 'err': str(err) })

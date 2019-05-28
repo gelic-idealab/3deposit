@@ -21,7 +21,8 @@ services:
       networks:
         - frontend
       command: bash -c "pipenv run python init_db.py && pipenv run python gateway.py"
-        
+      labels:
+        - "traefik.frontend.rule=Host:gateway.docker.localhost"
 volumes: 
     pg_data:
 

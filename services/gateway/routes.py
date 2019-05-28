@@ -1,4 +1,5 @@
-from views import index, login, logout, active_deposit_form
+from views import (index, login, logout, 
+                    active_deposit_form, upload_file)
 
 
 def setup_routes(app):
@@ -19,3 +20,4 @@ def setup_routes(app):
     # deposit form routes
     app.router.add_get('/deposit_form/active', active_deposit_form)
     app.router.add_post('/deposit_form/active', active_deposit_form)
+    app.router.add_post('/deposit_form/upload', upload_file)

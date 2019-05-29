@@ -15,7 +15,7 @@ from werkzeug.exceptions import BadRequestKeyError
 # else:
 #     SERVER_ENDPOINT = 'localhost:9000'
 
-SERVER_ENDPOINT = 'minio-server:9000'
+# SERVER_ENDPOINT = 'minio-server:9000'
 
 #BUCKET_NAME = 'new-3deposit'
 
@@ -76,11 +76,18 @@ def create_app():
                                     secret_key=auth.get("secret_key"),
                                     secure=False)
 
-                deposit_id = False
+                # deposit_id = False
 
-                if not deposit_id:
-                    config = json.loads(request.form.get('config'))
+                # if not deposit_id:
+                #     config = json.loads(request.form.get('config'))
+
+                config = json.loads(request.form.get('config'))                
                 
+                if config.get('remote') == "1":
+                    SERVER_ENDPOINT = "http://bb6907c2-c50e-4329-ae61-78d889d79210.s3.us-east-2.amazonaws.com/"
+                else:
+                    SERVER_ENDPOINT = 'minio-server:9000'
+
                 deposit_id = config.get('deposit_id')
                 bucket_name = config.get('bucket_name')
 
@@ -122,7 +129,11 @@ def create_app():
             try:
                 config = json.loads(request.form.get('config'))
                 data = json.loads(request.form.get('data'))
-            
+                
+                if config.get('remote') == "1":
+                    SERVER_ENDPOINT = "http://bb6907c2-c50e-4329-ae61-78d889d79210.s3.us-east-2.amazonaws.com/"
+                else:
+                    SERVER_ENDPOINT = 'minio-server:9000'
             
             # extract authentication details
                 if minio_keys(request):
@@ -210,6 +221,11 @@ def create_app():
                 config = json.loads(request.form.get('config'))
                 data = json.loads(request.form.get('data'))
 
+                if config.get('remote') == "1":
+                    SERVER_ENDPOINT = "http://bb6907c2-c50e-4329-ae61-78d889d79210.s3.us-east-2.amazonaws.com/"
+                else:
+                    SERVER_ENDPOINT = 'minio-server:9000'
+
                 # extract bucket_name value
                 bucket_name = config.get('bucket_name')
 
@@ -294,6 +310,12 @@ def create_app():
                 objects_list = []
 
                 config = json.loads(request.form.get('config'))
+
+                if config.get('remote') == "1":
+                    SERVER_ENDPOINT = "http://bb6907c2-c50e-4329-ae61-78d889d79210.s3.us-east-2.amazonaws.com/"
+                else:
+                    SERVER_ENDPOINT = 'minio-server:9000'
+
                 bucket_name = config.get('bucket_name')
                 deposit_id_list = config.get('deposit_id_list')
 
@@ -370,6 +392,14 @@ def create_app():
                                 secret_key=auth.get("secret_key"),
                                 secure=False)
 
+                if request.form.get('config'):
+                    config = json.loads(request.form.get('config'))
+
+                    if config.get('remote') == "1":
+                        SERVER_ENDPOINT = "http://bb6907c2-c50e-4329-ae61-78d889d79210.s3.us-east-2.amazonaws.com/"
+                    else:
+                        SERVER_ENDPOINT = 'minio-server:9000'
+
                 if request.form.get('data'):
                     data = json.loads(request.form.get('data'))
                     new_bucket_name = data.get('new_bucket_name')
@@ -408,6 +438,14 @@ def create_app():
                                 access_key=auth.get("access_key"),
                                 secret_key=auth.get("secret_key"),
                                 secure=False)
+
+                if request.form.get('config'):
+                    config = json.loads(request.form.get('config'))
+
+                    if config.get('remote') == "1":
+                        SERVER_ENDPOINT = "http://bb6907c2-c50e-4329-ae61-78d889d79210.s3.us-east-2.amazonaws.com/"
+                    else:
+                        SERVER_ENDPOINT = 'minio-server:9000'
 
                 data = json.loads(request.form.get('data'))
                 bucket_name = data.get('bucket_name')
@@ -456,8 +494,8 @@ def create_app():
 
 
 
-    @app.route('/minio_metadata', methods=['GET'])
-    def minio_metadata():
+    @app.route('/metadata', methods=['GET'])
+    def metadata():
         if request.method == 'GET':
 
             if minio_keys(request):
@@ -474,6 +512,12 @@ def create_app():
                                     secure=False)
 
             config = json.loads(request.form.get('config'))
+
+            if config.get('remote') == "1":
+                SERVER_ENDPOINT = "http://bb6907c2-c50e-4329-ae61-78d889d79210.s3.us-east-2.amazonaws.com/"
+            else:
+                SERVER_ENDPOINT = 'minio-server:9000'
+            
             deposit_id = config.get('deposit_id')
             bucket_name = config.get('bucket_name')
 

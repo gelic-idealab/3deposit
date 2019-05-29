@@ -44,6 +44,7 @@ def object():
             posts = db_name.posts
             post_id = posts.insert_one(data).inserted_id
             return jsonify({"post_id": str(post_id)})
+
         except Exception as err:
             return jsonify({"err": str(err)})
 
@@ -58,25 +59,24 @@ def object():
             metadata_obj_iter = posts.find({"deposit_id":deposit_id})
             metadata_obj_iter_list = [i for i in metadata_obj_iter]
             num_metadata_objs = len(metadata_obj_iter_list)
-            if num_metadata_objs > 1:
-                # Problem with returning instead of printing:
-                # would not be able to return most recently added object later
-                return jsonify({"warn": "You have more than one 3D metadata \
-                object with the same deposit_id in your database! We are \
-                returning the most recently added metadata object back to you;\
-                 however, you should seriously consider consolidating them..."})
 
-                list_of_metadata_objs = [ 
+            if num_metadata_objs > 1:
+                list_of_metadata_objs = [
                     str('{"metadata_obj": ' + str(obj) + '}')
                     for obj in metadata_obj_iter_list ]
-                # list_of_metadata_objs = [str(obj) for obj in metadata_obj_iter_list]
-                print(list_of_metadata_objs)
-                return jsonify({"list_of_metadata_objs": list_of_metadata_objs})
 
-                # Next, assign the most recently added 3D metadata object with
-                # the particular deposit_id of interest to "metadata_obj"
-                metadata_obj = metadata_obj_iter_list[-1]
-                return jsonify({"metadata_obj": str(metadata_obj)})
+                # Assign the most recently added 3D metadata object with the
+                # particular deposit_id of interest to "most_recent_metadata_obj"
+                most_recent_metadata_obj = metadata_obj_iter_list[-1]
+
+                return jsonify({
+                    "err":"You have more than one 3D metadata object with the \
+                      same deposit_id in your database! We are returning a list \
+                      of these objects back to you; however, you should consider \
+                      consolidating them...",
+                    "list_of_metadata_objs": list_of_metadata_objs,
+                    "most_recent_metadata_obj": str(most_recent_metadata_obj)
+                     })
 
             else:
                 metadata_obj = metadata_obj_iter_list[0]

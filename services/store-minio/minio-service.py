@@ -19,6 +19,7 @@ from werkzeug.exceptions import BadRequestKeyError
 
 #BUCKET_NAME = 'new-3deposit'
 
+minioClient = ''
 
 def minio_keys(request_auth):
     if not request_auth:
@@ -54,6 +55,20 @@ def get_endpoint(request):
             provider = tolower(config.get('provider'))
             if provider == 'aws':
                 server_endpoint = 's3.amazonaws.com'
+                region = config.get('region')
+                if minio_keys(request):
+                    auth = minio_keys(request)
+                    if "err" in auth:
+                        return jsonify(auth)
+                else:
+                    return jsonify({"err": "No authentication keys provided",
+                                    "log":str(err)})
+                minioClient = Minio(server_endpoint,
+                                    access_key=auth.get("access_key"),
+                                    secret_key=auth.get("secret_key"),
+                                    region=region,
+                                    secure=False)
+
             elif provider == 'azure':
                 True
             elif provider == 'google cloud':
@@ -86,13 +101,6 @@ def create_app():
 
         if request.method == 'GET':
             # get keys from request args
-            if minio_keys(request):
-                auth = minio_keys(request)
-                if "err" in auth:
-                    return jsonify(auth)
-            else:
-                return jsonify({"err": "No authentication keys provided",
-                                "log":str(err)})
 
             try:
                 # select endpoint

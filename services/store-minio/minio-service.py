@@ -47,39 +47,39 @@ def create_client(request):
     if not request:
         return False
 
-    try:
-        config = json.loads(request.form.get('config'))
-        remote = config.get('remote')
-        region = None
+    # try:
+    config = json.loads(request.form.get('config'))
+    remote = config.get('remote')
+    region = None
 
-        if minio_keys(request):
-            auth = minio_keys(request)
-            if "err" in auth:
-                return jsonify(auth)
-        else:
-            return jsonify({"err": "No authentication keys provided",
-                            "log":str(err)})
-        if remote:
-            provider = tolower(config.get('provider'))
-            if provider == 'aws':
-                server_endpoint = 's3.amazonaws.com'
-                region = config.get('region')
+    if minio_keys(request):
+        auth = minio_keys(request)
+        if "err" in auth:
+            return jsonify(auth)
+    else:
+        return jsonify({"err": "No authentication keys provided",
+                        "log":str(err)})
+    if remote:
+        provider = config.get('provider').lower()
+        if provider == 'aws':
+            server_endpoint = 's3.amazonaws.com'
+            region = config.get('region')
 
-            elif provider == 'azure':
-                True
-            elif provider == 'google cloud':
-                True
-        else:
-            server_endpoint = 'minio-server:9000'
+        elif provider == 'azure':
+            True
+        elif provider == 'google cloud':
+            True
+    else:
+        server_endpoint = 'minio-server:9000'
 
-        minioClient = Minio(endpoint=server_endpoint,
-                            access_key=auth.get("access_key"),
-                            secret_key=auth.get("secret_key"),
-                            region=region,
-                            secure=False)
+    minioClient = Minio(endpoint=server_endpoint,
+                        access_key=auth.get("access_key"),
+                        secret_key=auth.get("secret_key"),
+                        region=region,
+                        secure=False)
 
-    except Exception as err:
-        return err
+    # except Exception as err:
+    #     return err
 
     return minioClient
 
@@ -108,8 +108,8 @@ def create_app():
                 # select endpoint
                 minioClient = create_client(request)
 
-                if type(minioClient) != Exception:
-                    return jsonify("err":str(minioClient))
+                if type(minioClient) == Exception:
+                    return jsonify({"err":str(minioClient)})
 
                 config = json.loads(request.form.get('config'))
                 deposit_id = config.get('deposit_id')
@@ -157,7 +157,7 @@ def create_app():
                 minioClient = create_client(request)
 
                 if type(minioClient) != Exception:
-                    return jsonify("err":str(minioClient))
+                    return jsonify({"err":str(minioClient)})
 
                 # extract deposit_id value
                 if data.get('deposit_id'):
@@ -245,7 +245,7 @@ def create_app():
                 minioClient = create_client(request)
 
                 if type(minioClient) != Exception:
-                    return jsonify("err":str(minioClient))
+                    return jsonify({"err":str(minioClient)})
 
                 #Check whether requested object exists
                 error = minioClient.get_object(bucket_name, deposit_id)
@@ -306,7 +306,7 @@ def create_app():
                 minioClient = create_client(request)
 
                 if type(minioClient) != Exception:
-                    return jsonify("err":str(minioClient))
+                    return jsonify({"err":str(minioClient)})
 
                 deposit_id_list = []
                 obj_names = []
@@ -390,7 +390,7 @@ def create_app():
                 minioClient = create_client(request)
 
                 if type(minioClient) != Exception:
-                    return jsonify("err":str(minioClient))
+                    return jsonify({"err":str(minioClient)})
 
                 if request.form.get('config'):
                     config = json.loads(request.form.get('config'))
@@ -433,7 +433,7 @@ def create_app():
                 minioClient = create_client(request)
 
                 if type(minioClient) != Exception:
-                    return jsonify("err":str(minioClient))
+                    return jsonify({"err":str(minioClient)})
 
                 if request.form.get('config'):
                     config = json.loads(request.form.get('config'))
@@ -501,7 +501,7 @@ def create_app():
             minioClient = create_client(request)
 
             if type(minioClient) != Exception:
-                    return jsonify("err":str(minioClient))
+                    return jsonify({"err":str(minioClient)})
 
             config = json.loads(request.form.get('config'))
             

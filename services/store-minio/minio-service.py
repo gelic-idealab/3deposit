@@ -156,7 +156,7 @@ def create_app():
             
                 minioClient = create_client(request)
 
-                if type(minioClient) != Exception:
+                if type(minioClient) == Exception:
                     return jsonify({"err":str(minioClient)})
 
                 # extract deposit_id value
@@ -244,7 +244,7 @@ def create_app():
                 # extract object specific deposit_id
                 minioClient = create_client(request)
 
-                if type(minioClient) != Exception:
+                if type(minioClient) == Exception:
                     return jsonify({"err":str(minioClient)})
 
                 #Check whether requested object exists
@@ -305,7 +305,7 @@ def create_app():
                 # select endpoint
                 minioClient = create_client(request)
 
-                if type(minioClient) != Exception:
+                if type(minioClient) == Exception:
                     return jsonify({"err":str(minioClient)})
 
                 deposit_id_list = []
@@ -389,7 +389,7 @@ def create_app():
                 # select endpoint
                 minioClient = create_client(request)
 
-                if type(minioClient) != Exception:
+                if type(minioClient) == Exception:
                     return jsonify({"err":str(minioClient)})
 
                 if request.form.get('config'):
@@ -432,7 +432,7 @@ def create_app():
                 # select endpoint
                 minioClient = create_client(request)
 
-                if type(minioClient) != Exception:
+                if type(minioClient) == Exception:
                     return jsonify({"err":str(minioClient)})
 
                 if request.form.get('config'):
@@ -500,7 +500,7 @@ def create_app():
             # select endpoint
             minioClient = create_client(request)
 
-            if type(minioClient) != Exception:
+            if type(minioClient) == Exception:
                     return jsonify({"err":str(minioClient)})
 
             config = json.loads(request.form.get('config'))

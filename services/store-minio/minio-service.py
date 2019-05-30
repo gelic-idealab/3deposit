@@ -26,7 +26,6 @@ def minio_keys(request_auth):
     
     # config = json.loads(request_auth.form.get('config'))
     # auth = config.get('auth')
-    
 
     try:
         config = json.loads(request_auth.form.get('config'))
@@ -43,18 +42,43 @@ def minio_keys(request_auth):
         return jsonify({"err":"Please provide auth keys.",
                 "log":str(err)})
 
+def get_endpoint(request):
+    if not request:
+        return False
+
+    try:
+        config = json.loads(request.form.get('config'))
+        remote = config.get('remote')
+
+        if remote:
+            provider = tolower(config.get('provider'))
+            if provider == 'aws':
+                server_endpoint = 's3.amazonaws.com'
+            elif provider == 'azure':
+                True
+            elif provider == 'google cloud':
+                True
+        else:
+            server_endpoint = 'minio-server:9000'
+
+    except Exception as err:
+        return err
+
+    return server_endpoint
+
+
+
 def create_app():
     app = Flask(__name__)
 
     
-
     #AT THIS ENDPOINT, EACH ACTION IS SPECIFIC TO AN OBJECT AT IT'S CORE
     
 
     @app.route('/object', methods=['GET', 'POST','DELETE'])
     def object():
 
-        
+       
  
         #Extract an object from a specified bucket
  
@@ -71,23 +95,18 @@ def create_app():
                                 "log":str(err)})
 
             try:
-                minioClient = Minio(SERVER_ENDPOINT,
+                # select endpoint
+                server_endpoint = get_endpoint(request)
+
+                if type(server_endpoint) != str:
+                    return jsonify({"err":str(server_endpoint)})
+
+                minioClient = Minio(server_endpoint,
                                     access_key=auth.get("access_key"),
                                     secret_key=auth.get("secret_key"),
                                     secure=False)
 
-                # deposit_id = False
-
-                # if not deposit_id:
-                #     config = json.loads(request.form.get('config'))
-
-                config = json.loads(request.form.get('config'))                
-                
-                if config.get('remote') == "1":
-                    SERVER_ENDPOINT = "http://bb6907c2-c50e-4329-ae61-78d889d79210.s3.us-east-2.amazonaws.com/"
-                else:
-                    SERVER_ENDPOINT = 'minio-server:9000'
-
+                config = json.loads(request.form.get('config'))
                 deposit_id = config.get('deposit_id')
                 bucket_name = config.get('bucket_name')
 
@@ -129,13 +148,8 @@ def create_app():
             try:
                 config = json.loads(request.form.get('config'))
                 data = json.loads(request.form.get('data'))
-                
-                if config.get('remote') == "1":
-                    SERVER_ENDPOINT = "http://bb6907c2-c50e-4329-ae61-78d889d79210.s3.us-east-2.amazonaws.com/"
-                else:
-                    SERVER_ENDPOINT = 'minio-server:9000'
             
-            # extract authentication details
+                # extract authentication details
                 if minio_keys(request):
                     auth = minio_keys(request)
                     if "err" in auth:
@@ -143,8 +157,14 @@ def create_app():
                 else:
                     return jsonify({"err": "No authentication keys provided"})
 
-            # Initialize minioClient with an endpoint and keys.
-                minioClient = Minio(SERVER_ENDPOINT,
+                # select endpoint
+                server_endpoint = get_endpoint(request)
+
+                if type(server_endpoint) != str:
+                    return jsonify({"err":str(server_endpoint)})
+
+                # Initialize minioClient with an endpoint and keys.
+                minioClient = Minio(server_endpoint,
                                 access_key=auth.get("access_key"),
                                 secret_key=auth.get("secret_key"),
                                 secure=False)
@@ -166,11 +186,18 @@ def create_app():
                 minioClient.bucket_exists(bucket_name)
 
                 # check for existing object with same deposit_id
-                objects = minioClient.list_objects(bucket_name, recursive=True)
-                for obj in objects:
-                    if obj.object_name == deposit_id:
-                        return jsonify({"err":"This deposit_id is already registered. Please enter a new deposit_id.",
-                                        "log":str(err)})
+                #objects = minioClient.list_objects(bucket_name, recursive=True)
+
+                try:
+                    minioClient.get_object(bucket_name,deposit_id)
+                except ResponseError as err:
+                    return jsonify({"err":"This deposit_id is already registered. Please enter a new deposit_id.",
+                                    "log":str(err)})
+
+                # for obj in objects:
+                #     if obj.object_name == deposit_id:
+                #         return jsonify({"err":"This deposit_id is already registered. Please enter a new deposit_id.",
+                #                         "log":str(err)})
 
                 metadata={}
                 metadata['BUCKET_NAME'] = bucket_name
@@ -221,11 +248,6 @@ def create_app():
                 config = json.loads(request.form.get('config'))
                 data = json.loads(request.form.get('data'))
 
-                if config.get('remote') == "1":
-                    SERVER_ENDPOINT = "http://bb6907c2-c50e-4329-ae61-78d889d79210.s3.us-east-2.amazonaws.com/"
-                else:
-                    SERVER_ENDPOINT = 'minio-server:9000'
-
                 # extract bucket_name value
                 bucket_name = config.get('bucket_name')
 
@@ -236,7 +258,13 @@ def create_app():
                     return jsonify({"err":"Please enter valid deposit_id.",
                                     "log":str(err)})
 
-                minioClient = Minio(SERVER_ENDPOINT,
+                # select endpoint
+                server_endpoint = get_endpoint(request)
+
+                if type(server_endpoint) != str:
+                    return jsonify({"err":str(server_endpoint)})
+
+                minioClient = Minio(server_endpoint,
                                 access_key=auth.get("access_key"),
                                 secret_key=auth.get("secret_key"),
                                 secure=False)
@@ -269,11 +297,9 @@ def create_app():
 
 
 
-
     
     #AT THIS ENDPOINT, EACH ACTION IS SPECIFIC TO A BUCKET AT IT'S CORE
     
-
 
 
 
@@ -298,8 +324,14 @@ def create_app():
                                 "log":str(err)})
 
             try:
+                # select endpoint
+                server_endpoint = get_endpoint(request)
+
+                if type(server_endpoint) != str:
+                    return jsonify({"err":str(server_endpoint)})
+
                 # Initialize minioClient with an endpoint and keys.
-                minioClient = Minio(SERVER_ENDPOINT,
+                minioClient = Minio(server_endpoint,
                                 access_key=auth.get("access_key"),
                                 secret_key=auth.get("secret_key"),
                                 secure=False)
@@ -310,11 +342,6 @@ def create_app():
                 objects_list = []
 
                 config = json.loads(request.form.get('config'))
-
-                if config.get('remote') == "1":
-                    SERVER_ENDPOINT = "http://bb6907c2-c50e-4329-ae61-78d889d79210.s3.us-east-2.amazonaws.com/"
-                else:
-                    SERVER_ENDPOINT = 'minio-server:9000'
 
                 bucket_name = config.get('bucket_name')
                 deposit_id_list = config.get('deposit_id_list')
@@ -387,18 +414,19 @@ def create_app():
 
             # Initialize minioClient with an endpoint and keys.
             try:
-                minioClient = Minio(SERVER_ENDPOINT,
+                # select endpoint
+                server_endpoint = get_endpoint(request)
+
+                if type(server_endpoint) != str:
+                    return jsonify({"err":str(server_endpoint)})
+
+                minioClient = Minio(server_endpoint,
                                 access_key=auth.get("access_key"),
                                 secret_key=auth.get("secret_key"),
                                 secure=False)
 
                 if request.form.get('config'):
                     config = json.loads(request.form.get('config'))
-
-                    if config.get('remote') == "1":
-                        SERVER_ENDPOINT = "http://bb6907c2-c50e-4329-ae61-78d889d79210.s3.us-east-2.amazonaws.com/"
-                    else:
-                        SERVER_ENDPOINT = 'minio-server:9000'
 
                 if request.form.get('data'):
                     data = json.loads(request.form.get('data'))
@@ -434,18 +462,19 @@ def create_app():
                 return jsonify({"err": "No authentication keys provided"})
 
             try:
-                minioClient = Minio(SERVER_ENDPOINT,
+                # select endpoint
+                server_endpoint = get_endpoint(request)
+
+                if type(server_endpoint) != str:
+                    return jsonify({"err":str(server_endpoint)})
+
+                minioClient = Minio(server_endpoint,
                                 access_key=auth.get("access_key"),
                                 secret_key=auth.get("secret_key"),
                                 secure=False)
 
                 if request.form.get('config'):
                     config = json.loads(request.form.get('config'))
-
-                    if config.get('remote') == "1":
-                        SERVER_ENDPOINT = "http://bb6907c2-c50e-4329-ae61-78d889d79210.s3.us-east-2.amazonaws.com/"
-                    else:
-                        SERVER_ENDPOINT = 'minio-server:9000'
 
                 data = json.loads(request.form.get('data'))
                 bucket_name = data.get('bucket_name')
@@ -506,17 +535,18 @@ def create_app():
                 return jsonify({"err": "No authentication keys provided.",
                                 "log":str(err)})
 
+            # select endpoint
+                server_endpoint = get_endpoint(request)
+
+                if type(server_endpoint) != str:
+                    return jsonify({"err":str(server_endpoint)})
+
             minioClient = Minio(SERVER_ENDPOINT,
                                     access_key=auth.get("access_key"),
                                     secret_key=auth.get("secret_key"),
                                     secure=False)
 
             config = json.loads(request.form.get('config'))
-
-            if config.get('remote') == "1":
-                SERVER_ENDPOINT = "http://bb6907c2-c50e-4329-ae61-78d889d79210.s3.us-east-2.amazonaws.com/"
-            else:
-                SERVER_ENDPOINT = 'minio-server:9000'
             
             deposit_id = config.get('deposit_id')
             bucket_name = config.get('bucket_name')

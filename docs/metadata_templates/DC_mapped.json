@@ -5,7 +5,8 @@
 		"type": "text",
 		"repeatable": true,
 		"mandatory": false,
-		"value": {""}
+		"value": {""},
+		"formValues": [{"id": 6, "id": 7, "id": 31, "id": 36, }]
 	},
 	{
 		"id": 1,
@@ -13,7 +14,8 @@
 		"type": "text",
 		"repeatable": true,
 		"mandatory": false,
-		"value": {""}
+		"value": {""},
+		"formValues": [{"id": 9, "id": 10, "id": 11, "id": 12}]
 	},
 	{
 		"id": 2,
@@ -21,7 +23,8 @@
 		"type": "text",
 		"repeatable": true,
 		"mandatory": false,
-		"value": {""}
+		"value": {""},
+		"formValues": [{"id": 2, "id": 3, "id": 4,}]
 	},
 	{
 		"id": 3,
@@ -29,7 +32,8 @@
 		"type": "date",
 		"repeatable": true,
 		"mandatory": false,
-		"value": {""}
+		"value": {""},
+		"formValues": [{"id": 16}]
 	},
 	{
 		"id": 4,
@@ -37,90 +41,92 @@
 		"type": "text",
 		"repeatable": true,
 		"mandatory": false,
-		"value": {""}
+		"value": {""},
+		"formValues": [{"id": 17, "id": 30, "id": 35}]
 	},
 	{
 		"id": 5,
-		"label": "Coverage",
-		"type": "text",
-		"repeatable": true,
-		"mandatory": false,
-		"value": {""}
-	},
-	{
-		"id": 6,
 		"label": "Format",
 		"type": "text",
 		"repeatable": true,
 		"mandatory": false,
-		"value": {""},	
+		"value": {""},
+		"formValues": [{"id": 25, "id": 26, "id": 27, "id": 38, "id": 39, "id": 40, "id": 41, "id": 42, "id": 43, "id": 44, "id": 46, "id": 47, "id": 48, "id": 49}]	
 	},
 	{
-		"id": 7,
+		"id": 6,
 		"label": "identifier",
 		"type": "text",
 		"repeatable": true,
 		"mandatory": false,
-		"value": {""}
+		"value": {""},
+		"formValues": [{"id": 15}]
 	},
 	{
-		"id": 8,
+		"id": 7,
 		"label": "language",
 		"type": "select",
 		"repeatable": true,
 		"mandatory": false,
-		"value": {""}
+		"value": {""},
+		"formValues": [{}]
 	},
 	{
-		"id": 9,
+		"id": 8,
 		"label": "publisher",
 		"type": "text",
 		"repeatable": true,
 		"mandatory": false,
-		"value": {""}
+		"value": {""},
+		"formValues": [{}]
 	},
 	{
-		"id": 10,
+		"id": 9,
 		"label": "relation",
 		"type": "text",
 		"repeatable": true,
 		"mandatory": false,
-		"value": {""}
+		"value": {""},
+		"formValues": [{}]
 	},
 	{
-		"id": 11,
+		"id": 10,
 		"label": "rights",
 		"type": "text",
 		"repeatable": true,
 		"mandatory": false,
-		"value": {""}
+		"value": {"id": 32, "id": 33, "id": 51, "id": 52, "id": 53},
+		"formValues": [{}]
 	},
 	{
-		"id": 12,
+		"id": 11,
 		"label": "source",
 		"type": "text",
 		"repeatable": true,
 		"mandatory": false,
-		"value": {""}
+		"value": {""},
+		"formValues": [{"id": 20, "id": 21, "id": 23, "id": 24}]
 	},
 	{
-		"id": 13,
+		"id": 12,
 		"label": "subject",
 		"type": "text",
 		"repeatable": true,
 		"mandatory": false,
-		"value": {""}
+		"value": {""},
+		"formValues": [{"id": 50}]
 	},
 	{
-		"id": 14,
+		"id": 13,
 		"label": "title",
 		"type": "text",
 		"repeatable": true,
 		"mandatory": false,
-		"value": {""}
+		"value": {""},
+		"formValues": [{"id": 14}]
 	},
 	{
-		"id": 15,
+		"id": 14,
 		"label": "type",
 		"type": "select",
 		"repeatable": true,
@@ -129,5 +135,6 @@
 		"options": [{"value": "model", "label": "3d Model"},
                     {"value": "video", "label": "360 Video"},
                     {"value": "vr", "label": "VR project"}],
+		"formValues": [{"id": 0}]
 	},
 ]

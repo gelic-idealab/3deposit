@@ -9,6 +9,8 @@ services:
           - frontend    
       volumes:
           - pg_data:/var/lib/postgresql
+      labels:
+        - "traefik.frontend.rule=Host:postgres.docker.localhost"    
 
   gateway:
       build: .

@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3'
 
 services:
   minio-server:
@@ -26,6 +26,8 @@ services:
     links: 
       - minio-server
     command: pipenv run flask run --host=0.0.0.0
+    labels:
+        - "traefik.frontend.rule=Host:minio-service.docker.localhost"
 
 volumes:
   data1:

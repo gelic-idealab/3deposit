@@ -6,27 +6,33 @@ services:
       ports:
           - "5432:5432"
       networks:
-          - frontend    
+          - internal    
       volumes:
           - pg_data:/var/lib/postgresql
       labels:
-        - "traefik.frontend.rule=Host:postgres.docker.localhost"    
+        - "traefik.enable=false"    
 
   gateway:
       build: .
-      ports:
-          - "0.0.0.0:8888:8080"
+    #   ports:
+    #       - "8888:8080"
       links:
           - postgres
       depends_on: 
           - postgres
       networks:
-        - frontend
+        - internal
+        - proxy
       command: bash -c "pipenv run python init_db.py && pipenv run python gateway.py"
       labels:
-        - "traefik.frontend.rule=Host:gateway.docker.localhost"
+        - "traefik.frontend.rule=Host:gateway.localhost"
+        - "traefik.backend=gateway"
+        - "traefik.port=8080"
 volumes: 
     pg_data:
 
 networks:
-    frontend:
+    proxy:
+        external: true
+    internal:
+        external: false

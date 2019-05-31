@@ -1,0 +1,69 @@
+"fields": [
+	{
+		"id": 0,
+		"label": "Object",
+		"type": "Container",
+		"repeatable": false,
+		"mandatory": true,
+		"value": {}
+	},
+	{
+		"id": 1,
+		"label": "Object Identifier",
+		"type": "container",
+		"repeatable": true,
+		"mandatory": true,
+		"value": true
+	},
+	{
+		"id": 2,
+		"label": "Object Identifier Type",
+		"type": "text",
+		"repeatable": false,
+		"mandatory": true,
+		"value": {""},
+		"dependsOn": {"id": 1, "value": true}
+	},
+	{
+		"id": 3,
+		"label": "Object Identifier Value",
+		"type": "text",
+		"repeatable": false,
+		"mandatory": true,
+		"value": {""},
+		"dependsOn": {"id": 1, "value": true}
+	},
+	{
+		"id": 4,
+		"label": "Object Category",
+		"type": "select",
+		"repeatable": false,
+		"mandatory": true,
+		"value": {},
+		"options": [{"value": "bit", "label": "Bitsteam",}
+					{"value": "file", "label": "File"},
+					{"value": "ie", "label": "Intellectual Entity"},
+					{"value": "rep", "label": "Representation"}],
+	},
+	{
+		"id": 5,
+		"label": "Preservation Level",
+		"type": "container",
+		"repeatable": true,
+		"mandatory": false,
+		"value": false,
+		"dependsOn":[{"id": 4, "value": "file",}
+					{"id": 4, "value": "ie",}
+					{"id": 4, "value": "rep",}],
+	},
+	{
+		"id": 6,
+		"label": "Preservation Level Type",
+		"type": "select",
+		"repeatable": false,
+		"mandatory": true,
+		"value": {""},
+		"dependsOn": {"id": 1, "value": true}
+	},
+
+]

@@ -6,7 +6,7 @@
     "log": "<message to be added to application log>",
     "err": "<error message>",
     "res": {
-        "<resource_location": "<uri/url/id>"
+        "<service_uri_key>": "service_uri>"
     }
 
 }

@@ -3,7 +3,8 @@
     <div class="container-fluid">
       <img alt="logo" src="./assets/logo.png" height="128" width="128">
       <Banner v-bind:banner="form.banner"/>
-      <FileProgress v-bind:id="id"/>
+      <!-- <FileProgress v-bind:id="id"/> -->
+      <Upload v-bind:id="id"/>
       <Fields v-bind:fields="form.fields" :id="id"/>
     </div>
   </div>
@@ -12,7 +13,8 @@
 <script>
 import Banner from './components/Banner.vue'
 import Fields from './components/Fields.vue'
-import FileProgress from './components/FileProgress.vue'
+// import FileProgress from './components/FileProgress.vue'
+import Upload from './components/Upload.vue'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import axios from 'axios'
 import uuidv4 from 'uuid'
@@ -23,7 +25,8 @@ export default {
   components: {
     Banner,
     Fields,
-    FileProgress
+    // FileProgress,
+    Upload
   },
   data() {
     return {

@@ -105,7 +105,7 @@ def create_app():
                 print(type(minioClient))
 
                 if type(minioClient) == dict and 'err' in minioClient:
-                    return jsonify({"err":str(minioClient)})        
+                    return jsonify(minioClient) 
 
                 config = json.loads(request.form.get('config'))
                 deposit_id = config.get('deposit_id')
@@ -153,8 +153,8 @@ def create_app():
                 minioClient = create_client(request)
                 #print(type(minioClient))
 
-                if 'err' in minioClient:
-                    return jsonify({"err":str(minioClient)})
+                if type(minioClient) == dict and 'err' in minioClient:
+                    return jsonify(minioClient) 
 
                 # extract deposit_id value
                 if data.get('deposit_id'):
@@ -239,10 +239,12 @@ def create_app():
                 bucket_name = config.get('bucket_name')
 
                 # extract object specific deposit_id
+                deposit_id = data.get('deposit_id')
+
                 minioClient = create_client(request)
 
-                if 'err' in minioClient:
-                    return jsonify({"err":str(minioClient)})
+                if type(minioClient) == dict and 'err' in minioClient:
+                    return jsonify(minioClient)
 
                 #Check whether requested object exists
                 error = minioClient.get_object(bucket_name, deposit_id)
@@ -302,8 +304,8 @@ def create_app():
                 # select endpoint
                 minioClient = create_client(request)
 
-                if 'err' in minioClient:
-                    return jsonify({"err":str(minioClient)})
+                if type(minioClient) == dict and 'err' in minioClient:
+                    return jsonify(minioClient)
 
                 deposit_id_list = []
                 obj_names = []
@@ -386,8 +388,8 @@ def create_app():
                 # select endpoint
                 minioClient = create_client(request)
 
-                if 'err' in minioClient:
-                    return jsonify({"err":str(minioClient)})
+                if type(minioClient) == dict and 'err' in minioClient:
+                    return jsonify(minioClient)
 
                 if request.form.get('config'):
                     config = json.loads(request.form.get('config'))
@@ -429,8 +431,8 @@ def create_app():
                 # select endpoint
                 minioClient = create_client(request)
 
-                if 'err' in minioClient:
-                    return jsonify({"err":str(minioClient)})
+                if type(minioClient) == dict and 'err' in minioClient:
+                    return jsonify(minioClient)
 
                 if request.form.get('config'):
                     config = json.loads(request.form.get('config'))

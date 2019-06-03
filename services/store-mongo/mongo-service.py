@@ -6,7 +6,7 @@ from pymongo import MongoClient
 # https://api.mongodb.com/python/current/tutorial.html
 
 
-DATABASE_NAME = 'deposits'
+DATABASE_NAME = '3deposit'
 COLLECTION_NAME = 'metadata'
 username = 'root'
 password = 'example'
@@ -52,10 +52,12 @@ def object():
             # config = json.loads(request.form.get('config'))
             # db_name = config.get('db_name')
             db_name = client.MongoTest2
-            data = json.loads(request.form.get('data'))
-            deposit_id = data.get('deposit_id')
+            config = json.loads(request.form.get('config'))
+            #data = json.loads(request.form.get('data'))
+            
+            deposit_id = config.get('deposit_id')
             posts = db_name.posts
-
+            
             # Make sure an object with the deposit ID doesn't already exist
             if posts.find_one({"deposit_id":deposit_id}):
                 return jsonify({"err":("A metadata object with that deposit_id"

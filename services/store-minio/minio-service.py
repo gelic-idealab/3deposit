@@ -6,6 +6,11 @@ from minio import Minio
 from minio.error import ResponseError, BucketAlreadyExists, NoSuchBucket, NoSuchKey, AccessDenied
 from minio.error import SignatureDoesNotMatch, InvalidBucketError, InvalidAccessKeyId, SignatureDoesNotMatch, BucketAlreadyOwnedByYou
 from werkzeug.exceptions import BadRequestKeyError
+from sys import path
+
+path.append("C:\Users\mihirsj2\Desktop\3deposit\libs\python\")
+
+import unpack
 
 # ACCESS KEY AKIAIOSFODNN7GRAINGER
 # SECRET KEY wJalrXUtnFEMI/K7MDENG/bPxRfiCYGRAINGERKEY

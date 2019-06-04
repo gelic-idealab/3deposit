@@ -21,10 +21,9 @@ def flatten_json(y):
     flatten(y)
     return out
 
-def get_value_from_request_key(request, scope, field):
+def get_value(request, scope, field):
     # for key in request[scope].unpack():
     #     value = key['value']
-
     # return key
 
     request_json = json.loads(request.form.get(scope))
@@ -34,4 +33,4 @@ def get_value_from_request_key(request, scope, field):
     if key in flat_request:
         return flat_request.get(key)
     else:
-        return {"err":"Please provide valid keys."}        
+        return {"err":"Please provide valid scope and keys."}        

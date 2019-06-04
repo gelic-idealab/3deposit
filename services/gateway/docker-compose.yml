@@ -6,7 +6,7 @@ services:
     #   ports:
     #       - "5432:5432"
       networks:
-          - internal    
+          - gateway_internal    
       volumes:
           - pg_data:/var/lib/postgresql
       labels:
@@ -21,7 +21,7 @@ services:
       depends_on: 
           - postgres
       networks:
-        - internal
+        - gateway_internal
         - proxy
       command: bash -c "pipenv run python init_db.py && pipenv run python gateway.py"
       labels:
@@ -35,5 +35,5 @@ volumes:
 networks:
     proxy:
         external: true
-    internal:
+    gateway_internal:
         external: false

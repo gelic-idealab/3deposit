@@ -14,11 +14,31 @@ JSON data can be arbitrary: needs at least a 'name' field for the title of the
 published model. Everything else can get dumped into a 'description' field. 
 
 '''
-#git pull
+
 app = Flask(__name__)
 
-@app.route('/sketchfab', methods=['POST'])
+@app.route('/sketchfab', methods=['POST', 'GET', 'DELETE'])
 def sketchfab():
+    if request.method == 'GET':
+        SKETCHFAB_DOMAIN = 'sketchfab.com'
+        SKETCHFAB_API_URL = 'https://api.{}/v3'.format(SKETCHFAB_DOMAIN)
+        MODEL_ENDPOINT = SKETCHFAB_API_URL + '/me/models'
+        
+        config = json.loads(request.form.get('config'))
+        auth = config.get('auth')
+        token = auth.get('token')
+        headers = {'Authorization': 'Token {}'.format(token)}
+
+        try:
+            r = requests.get(MODEL_ENDPOINT, headers=headers)
+        except requests.exceptions.RequestException as e:
+            return jsonify({'requestException': e})
+        else:
+            response = r.json()
+            print(response)
+            return jsonify(response)
+
+
     if request.method == 'POST':
         SKETCHFAB_DOMAIN = 'sketchfab.com'
         SKETCHFAB_API_URL = 'https://api.{}/v3'.format(SKETCHFAB_DOMAIN)
@@ -48,6 +68,5 @@ def sketchfab():
                 os.remove('model.zip')
             return jsonify(response)
     
-
 if __name__ == '__main__':
     app.run()

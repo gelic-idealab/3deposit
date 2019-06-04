@@ -100,3 +100,25 @@ async def upload_file(request):
             return web.json_response({ 'upload succeeded' })
         except Exception as err:
             return web.json_response({ 'err': str(err) })
+
+
+"""
+Relay endpoint to make object storage calls
+Endpoints are scoped for objects and buckets
+"""
+async def minio_bucket(request):
+    if request.method == 'GET':
+        try:
+            req = await request.multipart()
+            req_values = [req[k] for k in req.keys()] # "err": "'MultipartReader' object has no attribute 'keys'"
+            return web.json_response({ 'req': str(req_values) })
+        except Exception as err:
+            return web.json_response({ 'err': str(err) })
+
+    if request.method == 'POST':
+        try:
+            req = await request.post()
+            config = req['config']
+            return web.json_response({ 'config': str(config) })
+        except Exception as err:
+            return web.json_response({ 'err': str(err) })

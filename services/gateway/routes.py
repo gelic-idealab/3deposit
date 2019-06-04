@@ -1,5 +1,6 @@
 from views import (index, login, logout, 
-                    active_deposit_form, upload_file)
+                    active_deposit_form, upload_file,
+                    minio_bucket)
 
 
 def setup_routes(app):
@@ -21,3 +22,7 @@ def setup_routes(app):
     app.router.add_get('/deposit_form/active', active_deposit_form)
     app.router.add_post('/deposit_form/active', active_deposit_form)
     app.router.add_post('/deposit_form/upload', upload_file)
+
+    # object storage routes
+    app.router.add_get('/minio_bucket', minio_bucket)
+    app.router.add_post('/minio_bucket', minio_bucket)

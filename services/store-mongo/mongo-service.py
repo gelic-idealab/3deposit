@@ -6,18 +6,19 @@ from pymongo import MongoClient
 # https://api.mongodb.com/python/current/tutorial.html
 
 
-DATABASE_NAME = 'deposits'
-COLLECTION_NAME = 'metadata'
-username = 'root'
-password = 'example'
+def create_client(request):
+    DATABASE_NAME = 'deposits'
+    COLLECTION_NAME = 'metadata'
+    username = 'root'
+    password = 'example'
 
-client = MongoClient(
-    'mongodb://{username}:{password}@localhost:27017/'.format(
-        username=username,
-        password=password)
-    )
-database = client[DATABASE_NAME]
-collection = database[COLLECTION_NAME]
+    client = MongoClient(
+        'mongodb://{username}:{password}@localhost:27017/'.format(
+            username=username,
+            password=password)
+        )
+    database = client[DATABASE_NAME]
+    collection = database[COLLECTION_NAME]
 
 app = Flask(__name__)
 
@@ -37,10 +38,11 @@ def objects():
     if request.method == 'POST':
         try:
             client = create_client(request)
-            # config = json.loads(request.form.get('config'))
-            # db_name = config.get('db_name')
-            db_name = client.MongoTest2
+            config = json.loads(request.form.get('config'))
+            # db_name = client.MongoTest2
             data = json.loads(request.form.get('data'))
+
+            db_name = config.get('db_name')
             deposit_id = data.get('deposit_id')
             posts = db_name.posts
             post_id = posts.insert_one(data).inserted_id

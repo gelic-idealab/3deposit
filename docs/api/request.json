@@ -33,3 +33,23 @@
         "<field>": "<field value>"
     }
 }
+
+
+{
+    "config": {
+        "<auth key>": "<auth value>",
+        "<key>": "<value>"
+    },
+    "data": {
+        "<field>": "<field value>"
+    }
+}
+
+
+auth_obj = get_value_from_request_key(request, scope='config', key='access_key')
+
+def get_value_from_request_key(request, scope, key):
+    for key in request[scope].unpack():
+        value = key['value']
+
+    return key       

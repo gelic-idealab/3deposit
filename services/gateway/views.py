@@ -109,9 +109,9 @@ Endpoints are scoped for objects and buckets
 async def minio_bucket(request):
     if request.method == 'GET':
         try:
-            req = await request.multipart()
-            req_values = [req[k] for k in req.keys()] # "err": "'MultipartReader' object has no attribute 'keys'"
-            return web.json_response({ 'req': str(req_values) })
+            q = request.query
+            config = q['config']
+            return web.json_response({ 'config': config})
         except Exception as err:
             return web.json_response({ 'err': str(err) })
 

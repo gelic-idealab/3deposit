@@ -171,7 +171,6 @@ def create_app():
                 # extract file & temp save to disk
                 file = request.files['file']
                 file.save(deposit_id)
-            
 
                 # extract bucket_name value
                 bucket_name = config.get('bucket_name')
@@ -198,7 +197,7 @@ def create_app():
                                     "log":str(err)})
                 os.remove(deposit_id)
                 return jsonify({"etag": r, "deposit_id": deposit_id,"metadata":metadata})
-            
+
             except (NoSuchBucket, InvalidBucketError) as err: #Handle bucket_name related errors
                 return jsonify({"err":"This bucket does not exist. Please create this bucket at the bucket scoped endpoint.",
                                 "log":str(err)})
@@ -220,7 +219,10 @@ def create_app():
 
 
 
+
+
         #Deletes one object i.e. a file from the specified bucket only.
+
 
 
 

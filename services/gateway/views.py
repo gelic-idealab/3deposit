@@ -1,7 +1,7 @@
 import json
 
 import aiohttp_jinja2
-from aiohttp import web, ClientSession
+from aiohttp import web, ClientSession, FormData
 from aiohttp_security import remember, forget, authorized_userid
 
 import db
@@ -126,9 +126,12 @@ async def minio_bucket(request):
 
         if request.method == 'POST':
             try:
-                data = {'config': {'auth': {'access_key': '1234', 'secret_key': '5678'}}}
-                headers = {'content-type': 'multipart/form-data'}
-                async with session.post(SERVICE_ENDPOINT, data=data, headers=headers) as resp:
-                    return web.json_response({ 'resp': str(resp) })
+                config = {'config': {'auth': {'access_key': '1234', 'secret_key': '5678'}}}
+                data = FormData()
+                data.add_field('form', config)
+                # headers = {'content-type': 'multipart/form-data'}
+                async with session.post(SERVICE_ENDPOINT, data=data) as resp:
+                    resp_text = await resp.text()
+                    return web.json_response({ 'resp': resp_text, 'data': str(data) })
             except Exception as err:
                 return web.json_response({ 'err': str(err) })

@@ -1,7 +1,9 @@
-import aiohttp_jinja2
-from aiohttp import web
-from aiohttp_security import remember, forget, authorized_userid
 import json
+
+import aiohttp_jinja2
+from aiohttp import web, ClientSession
+from aiohttp_security import remember, forget, authorized_userid
+
 import db
 from forms import validate_login_form
 
@@ -107,18 +109,26 @@ Relay endpoint to make object storage calls
 Endpoints are scoped for objects and buckets
 """
 async def minio_bucket(request):
-    if request.method == 'GET':
-        try:
-            q = request.query
-            config = q['config']
-            return web.json_response({ 'config': config})
-        except Exception as err:
-            return web.json_response({ 'err': str(err) })
+    async with ClientSession() as session:
 
-    if request.method == 'POST':
-        try:
-            req = await request.post()
-            config = req['config']
-            return web.json_response({ 'config': str(config) })
-        except Exception as err:
-            return web.json_response({ 'err': str(err) })
+        SERVICE_ENDPOINT = 'http://minio-service:5000/bucket'
+            
+        if request.method == 'GET':
+            try:
+                # construct form data
+                data = {'config': {'auth': {'access_key': '1234', 'secret_key': '5678'}}}
+                headers = {'content-type': 'multipart/form-data'}
+                async with session.get(SERVICE_ENDPOINT, data=data, headers=headers) as resp:
+                    resp_json = await resp.json()
+                    return web.json_response({ 'resp': resp_json })
+            except Exception as err:
+                return web.json_response({ 'err': str(err) })
+
+        if request.method == 'POST':
+            try:
+                data = {'config': {'auth': {'access_key': '1234', 'secret_key': '5678'}}}
+                headers = {'content-type': 'multipart/form-data'}
+                async with session.post(SERVICE_ENDPOINT, data=data, headers=headers) as resp:
+                    return web.json_response({ 'resp': str(resp) })
+            except Exception as err:
+                return web.json_response({ 'err': str(err) })

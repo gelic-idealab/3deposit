@@ -85,7 +85,7 @@ def create_client(request):
 
     return minioClient
     
-def create_app()
+def create_app():
     app = Flask(__name__)
 
     @app.route('/databases', methods=['GET', 'POST', 'DELETE'])
@@ -129,7 +129,7 @@ def create_app()
                 posts = db_name.posts
 
                 temp_obj_path = str(deposit_id)
-                    obj = minioClient.get_object(bucket_name, deposit_id)
+                obj = minioClient.get_object(bucket_name, deposit_id)
 
                 with open(temp_obj_path, 'wb') as file_data:
                     for d in obj.stream(32*1024):

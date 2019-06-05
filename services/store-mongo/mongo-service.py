@@ -131,8 +131,8 @@ def create_app():
                 obj = client.find_one(deposit_id)
 
                 return send_file(temp_obj_path, mimetype="application/octet-stream")
-                return jsonify(client.find_one({"deposit_id":deposit_id))
-
+                return jsonify(client.find_one({"deposit_id":deposit_id})
+            
             except Exception as err:
                 return jsonify({"err": str(err)})
 

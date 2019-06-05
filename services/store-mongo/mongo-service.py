@@ -3,7 +3,11 @@ import json
 from flask import Flask, request, jsonify
 from pymongo import MongoClient
 
+import unpack
+
 # https://api.mongodb.com/python/current/tutorial.html
+
+DATABASE_NAME = '3deposit'
 
 def mongo_keys(request_auth):
     if not request_auth:
@@ -35,13 +39,12 @@ def create_client(request):
     if not request:
         return False
 
-    DATABASE_NAME = '3deposit'
-    COLLECTION_NAME = 'metadata'
+    #COLLECTION_NAME = 'metadata'
     username = 'root'
     password = 'example'
     
-    database = client.DATABASE_NAME
-    collection = database.COLLECTION_NAME
+    # database = client.DATABASE_NAME
+    #collection = database.COLLECTION_NAME
 
     #try:
     minioClient = ''
@@ -88,11 +91,26 @@ def create_app():
             try:
                 client = create_client(request)
 
+                database = client.DATABASE_NAME
+
                 collection = get_value(request=request, scope='config', field='collection')
                 deposit_id = get_value(request=request, scope='data', field='deposit_id')
+                
+                data = json.loads(request.form.get('data'))
+                deposit_metadata = data.get('deposit_metadata')
 
-                posts = collection.posts
-                post_id = posts.insert_one(data).inserted_id
+                if not collection:
+                    return jsonify({"err":"Please enter a valid collection."})
+
+                if not deposit_id:
+                    return jsonify({"err":"Please enter a valid deposit_id."})
+
+                # extract file & temp save to disk
+                # file = request.files['file']
+                # file.save(deposit_id)
+
+                posts = database.posts
+                post_id = posts.insert_one(deposit_metadata).inserted_id
                 return jsonify({"post_id": str(post_id)})
 
             except Exception as err:
@@ -100,22 +118,21 @@ def create_app():
 
         if request.method == 'GET':
             try:
+                client = create_client(request)
                 deposit_id = get_value(request=request, scope='config', field='deposit_id')
                 collection = get_value(request=request, scope='config', field='collection')
 
-                posts = collection.posts
+                posts = database.posts
 
                 temp_obj_path = str(deposit_id)
-                obj = minioClient.get_object(bucket_name, deposit_id)
+                obj = client.get_object(bucket_name, deposit_id)
 
-                with open(temp_obj_path, 'wb') as file_data:
-                    for d in obj.stream(32*1024):
-                        file_data.write(d)
+                # with open(temp_obj_path, 'wb') as file_data:
+                #     for d in obj.stream(32*1024):
+                #         file_data.write(d)
 
                 return send_file(temp_obj_path, mimetype="application/octet-stream")
 
-                    # Assign the most recently added 3D metadata object with the
-                    # particular deposit_id of interest to "most_recent_metadata_obj"
                     most_recent_metadata_obj = metadata_obj_iter_list[-1]
 
                     return jsonify({

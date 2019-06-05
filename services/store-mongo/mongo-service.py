@@ -119,49 +119,39 @@ def create_app():
         if request.method == 'GET':
             try:
                 client = create_client(request)
+
+                database = client.DATABASE_NAME
+
                 deposit_id = get_value(request=request, scope='config', field='deposit_id')
                 collection = get_value(request=request, scope='config', field='collection')
 
                 posts = database.posts
-
+                
                 temp_obj_path = str(deposit_id)
-                obj = client.get_object(bucket_name, deposit_id)
-
-                # with open(temp_obj_path, 'wb') as file_data:
-                #     for d in obj.stream(32*1024):
-                #         file_data.write(d)
+                obj = client.find_one(deposit_id)
 
                 return send_file(temp_obj_path, mimetype="application/octet-stream")
-
-                    most_recent_metadata_obj = metadata_obj_iter_list[-1]
-
-                    return jsonify({
-                        "err":"You have more than one 3D metadata object with the \
-                        same deposit_id in your database! We are returning a list \
-                        of these objects back to you; however, you should consider \
-                        consolidating them...",
-                        "list_of_metadata_objs": list_of_metadata_objs,
-                        "most_recent_metadata_obj": str(most_recent_metadata_obj)
-                        })
+                return jsonify(client.find_one({"deposit_id":deposit_id))
 
             except Exception as err:
                 return jsonify({"err": str(err)})
 
         if request.method == 'DELETE':
             try:
+                client = create_client(request)
+
+                database = client.DATABASE_NAME
+
                 deposit_id = get_value(request=request, scope='data', field='deposit_id')
                 collection = get_value(request=request, scope='config', field='collection')
                 posts = collection.posts
                 del_obj = posts.delete_one({"deposit_id": deposit_id})
 
-                # NOTE: If there are >1 documents with the same deposit_id
-                # (for instance, if one of them was inserted twice,
-                # creating a duplicate entry), then just one of them
-                # is deleted (in the same order as when each was added
-                # --i.e., the first one that was added will be the first
-                # one that's deleted.)
+                if del_obj:
+                    return jsonify({"del_obj": deposit_id})
+                else:
+                    return jsonify({"err":"Document not deleted."})
 
-                return jsonify({"del_obj": str(del_obj)})
             except Exception as err:
                 return jsonify({"err": str(err)})
 

@@ -116,22 +116,21 @@ async def minio_bucket(request):
         if request.method == 'GET':
             try:
                 # construct form data
-                data = {'config': {'auth': {'access_key': '1234', 'secret_key': '5678'}}}
-                headers = {'content-type': 'multipart/form-data'}
-                async with session.get(SERVICE_ENDPOINT, data=data, headers=headers) as resp:
-                    resp_json = await resp.json()
-                    return web.json_response({ 'resp': resp_json })
+                req = await request.json()
+                async with session.get(SERVICE_ENDPOINT, json=req) as resp:
+                    try:
+                        resp_json = await resp.json()
+                    except Exception as err:
+                        return web.json_response({'err': str(err), 'resp': await resp.text()})
+                    return web.json_response({ 'resp': resp_json, 'req': req })
             except Exception as err:
-                return web.json_response({ 'err': str(err) })
+                return web.json_response({ 'origin': 'gateway', 'err': str(err), 'req': req })
 
         if request.method == 'POST':
             try:
-                config = {'config': {'auth': {'access_key': '1234', 'secret_key': '5678'}}}
-                data = FormData()
-                data.add_field('form', config)
-                # headers = {'content-type': 'multipart/form-data'}
-                async with session.post(SERVICE_ENDPOINT, data=data) as resp:
-                    resp_text = await resp.text()
-                    return web.json_response({ 'resp': resp_text, 'data': str(data) })
+                req = await request.json()
+                async with session.post(SERVICE_ENDPOINT, json=req) as resp:
+                    resp_json = await resp.json()
+                    return web.json_response({ 'resp': resp_json, 'req': req })
             except Exception as err:
-                return web.json_response({ 'err': str(err) })
+                return web.json_response({ 'origin': 'gateway', 'err': str(err) })

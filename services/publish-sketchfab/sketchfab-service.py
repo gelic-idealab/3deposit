@@ -3,6 +3,8 @@ import json
 import requests
 from flask import Flask, request, jsonify
 
+from unpack import get_value
+
 '''
 Flask app that takes in zipped 3d model file, JSON data, and Sketchfab API token
 and publishes to Sketchfab. 
@@ -79,20 +81,21 @@ def account():
             print(response)
             return jsonify(response)
 
-@app.route('/models/<string:uid>', methods=['POST', 'GET', 'DELETE'])
+@app.route('/models', methods=['POST', 'GET', 'DELETE'])
 def delete_model(model):
     #Deletes one of account models.
     if request.method == 'DELETE':
+        uid = get_value(request, 'data', 'uid')
         SKETCHFAB_DOMAIN = 'sketchfab.com'
         SKETCHFAB_API_URL = 'https://api.{}/v3'.format(SKETCHFAB_DOMAIN)
-        MODEL_ENDPOINT = SKETCHFAB_API_URL + '/models/models['uid']'
-
+        
         post_data = json.loads(request.form.get('data'))
         token = post_data.get('token')
         headers = {'Authorization': 'Token {}'.format(token)}
+        model_endpoint = SKETCHFAB_API_URL + '/models/{}'.format(uid)
 
         try:
-            r = requests.delete(MODEL_ENDPOINT, data={'models': [model['uid']]}, json_payload=True, headers=headers)
+            r = requests.delete(model_endpoint, headers=headers)
         except requests.exceptions.RequestException as e:
             return jsonify({'requestException': e})
         else:

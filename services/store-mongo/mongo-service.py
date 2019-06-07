@@ -1,9 +1,16 @@
 import os
 import json
+from json import JSONDecodeError
 from flask import Flask, request, jsonify
 from pymongo import MongoClient
+from unpack import *
+from bson import ObjectId
 
-import unpack
+class JSONEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, ObjectId):
+            return str(o)
+        return json.JSONEncoder.default(self, o)
 
 # https://api.mongodb.com/python/current/tutorial.html
 
@@ -16,23 +23,23 @@ def mongo_keys(request_auth):
     # config = json.loads(request_auth.form.get('config'))
     # auth = config.get('auth')
 
-    try:
-        # config = json.loads(request_auth.form.get('config'))
-        access_key = get_value(request=request, scope='config', field='access_key')
-        secret_key = get_value(request=request, scope='config', field='secret_key')
+    # try:
+    # config = json.loads(request_auth.form.get('config'))
+    access_key = get_value(request=request, scope='config', field='access_key')
+    secret_key = get_value(request=request, scope='config', field='secret_key')
 
-        auth_packed = {"access_key":access_key, "secret_key":secret_key}
-        return auth_packed
+    auth_packed = {"access_key":access_key, "secret_key":secret_key}
+    return auth_packed
 
-    except JSONDecodeError as err:
-        return {"err":"Invalid formatting of data.",
-                        "log":str(err)}
-    except (InvalidAccessKeyId,SignatureDoesNotMatch,AccessDenied) as err:
-        return {"err":"Invalid Authentication.",
-                        "log":str(err)}
-    except AttributeError as err:
-        return {"err":"Please provide auth keys.",
-                        "log":str(err)}
+    # except JSONDecodeError as err:
+    #     return {"err":"Invalid formatting of data.",
+    #                     "log":str(err)}
+    # except (InvalidAccessKeyId,SignatureDoesNotMatch,AccessDenied) as err:
+    #     return {"err":"Invalid Authentication.",
+    #                     "log":str(err)}
+    # except AttributeError as err:
+    #     return {"err":"Please provide auth keys.",
+    #                     "log":str(err)}
 
 
 def create_client(request):
@@ -42,15 +49,11 @@ def create_client(request):
     #COLLECTION_NAME = 'metadata'
     username = 'root'
     password = 'example'
-    
-    # database = client.DATABASE_NAME
+
+    # database = client['3deposit']
     #collection = database.COLLECTION_NAME
 
     #try:
-    minioClient = ''
-    remote = get_value(request=request, scope='config', field='remote')
-    region = None
-    server_endpoint = 'err'
 
     if mongo_keys(request):
         auth = mongo_keys(request)
@@ -67,93 +70,91 @@ def create_client(request):
         )
     )
 
-    if server_endpoint == 'err':
-        return {"err":"Please enter a valid provider."}
-
     return client
-    
+
 def create_app():
     app = Flask(__name__)
 
     @app.route('/databases', methods=['GET', 'POST', 'DELETE'])
     def databases():
-        try:
-            databases = client.list_database_names()
-            return jsonify({"databases": databases})
-        except Exception as err:
-            return jsonify({"err": str(err)})
+        # try:
+        client = create_client(request)
+        databases = client.list_database_names()
+        return jsonify({"databases": databases})
 
-    # TO DO: Add Get, Post, and Delete request methods above
+        # except Exception as err:
+        #     return jsonify({"err": str(err)})
 
     @app.route('/objects', methods=['GET', 'POST', 'DELETE'])
     def objects():
         if request.method == 'POST':
-            try:
-                client = create_client(request)
+            # try:
+            client = create_client(request)
 
-                database = client.DATABASE_NAME
+            database = client['3deposit']
 
-                collection = get_value(request=request, scope='config', field='collection')
-                deposit_id = get_value(request=request, scope='data', field='deposit_id')
-                
-                data = json.loads(request.form.get('data'))
-                deposit_metadata = data.get('deposit_metadata')
+            collection_name = get_value(request=request, scope='config', field='collection_name')
+            deposit_id = get_value(request=request, scope='data', field='deposit_id')
+            
+            data = json.loads(request.form.get('data'))
+            deposit_metadata = data.get('deposit_metadata')
 
-                if not collection:
-                    return jsonify({"err":"Please enter a valid collection."})
+            if not collection_name:
+                return jsonify({"err":"Please enter a valid collection."})
 
-                if not deposit_id:
-                    return jsonify({"err":"Please enter a valid deposit_id."})
+            if not deposit_id:
+                return jsonify({"err":"Please enter a valid deposit_id."})
 
-                # extract file & temp save to disk
-                # file = request.files['file']
-                # file.save(deposit_id)
-
-                posts = database.posts
-                post_id = posts.insert_one(deposit_metadata).inserted_id
+            collection = database[collection_name]
+            post_id = collection.insert_one(deposit_metadata).inserted_id
+            if post_id:
                 return jsonify({"post_id": str(post_id)})
 
-            except Exception as err:
-                return jsonify({"err": str(err)})
+            # except Exception as err:
+            #     return jsonify({"err": str(err)})
 
         if request.method == 'GET':
             try:
                 client = create_client(request)
 
-                database = client.DATABASE_NAME
+                database = client['3deposit']
 
                 deposit_id = get_value(request=request, scope='config', field='deposit_id')
-                collection = get_value(request=request, scope='config', field='collection')
+                collection_name = get_value(request=request, scope='config', field='collection_name')
 
-                posts = database.posts
-                
-                temp_obj_path = str(deposit_id)
-                obj = client.find_one(deposit_id)
+                # JSONEncoder().encode()
 
-                return send_file(temp_obj_path, mimetype="application/octet-stream")
-                return jsonify(client.find_one({"deposit_id":deposit_id})
-            
+                collection = database[collection_name]
+
+                document = collection.find_one(filter={"deposit_id": deposit_id},projection={'_id':False})
+                #deposit_metadata = document.get('deposit_metadata')
+
+                return jsonify(document)
+
             except Exception as err:
-                return jsonify({"err": str(err)})
+                return jsonify({"err":str(err),
+                                "collection":str(collection)})
 
         if request.method == 'DELETE':
-            try:
-                client = create_client(request)
+            # try:
+            client = create_client(request)
 
-                database = client.DATABASE_NAME
+            database = client['3deposit']
 
-                deposit_id = get_value(request=request, scope='data', field='deposit_id')
-                collection = get_value(request=request, scope='config', field='collection')
-                posts = collection.posts
-                del_obj = posts.delete_one({"deposit_id": deposit_id})
+            deposit_id = get_value(request=request, scope='data', field='deposit_id')
+            collection_name = get_value(request=request, scope='config', field='collection_name')
 
-                if del_obj:
-                    return jsonify({"del_obj": deposit_id})
-                else:
-                    return jsonify({"err":"Document not deleted."})
+            collection = database[collection_name]
 
-            except Exception as err:
-                return jsonify({"err": str(err)})
+            del_obj = collection.delete_one({"deposit_id": deposit_id})
 
-    if __name__ == '__main__':
-        app.run(debug=True)
+            if del_obj:
+                return jsonify({"del_obj": deposit_id})
+            else:
+                return jsonify({"err":"Document not deleted."})
+
+            # except Exception as err:
+            #     return jsonify({"err": str(err)})
+
+
+    return app

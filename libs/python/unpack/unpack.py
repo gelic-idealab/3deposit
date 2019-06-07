@@ -20,4 +20,4 @@ def flatten_json(y):
 def get_value(request, scope, field):
     request_json = json.loads(request.form.get(scope))
     flat_request = flatten_json(request_json)
-    return flat_request.get(field)   
+    return flat_request.get(field)

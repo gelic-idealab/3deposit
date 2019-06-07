@@ -17,7 +17,7 @@ published model. Everything else can get dumped into a 'description' field.
 
 app = Flask(__name__)
 
-@app.route('/v3/account/models', methods=['POST', 'GET'])
+@app.route('/models', methods=['POST', 'GET', 'DELETE'])
 def models():
     #Posts models to sketchfab.
     if request.method == 'POST':
@@ -44,7 +44,7 @@ def models():
         f = open('model.zip', 'rb')
         files = {'modelFile': f}
 
-        # upload to Sketchfab
+
         try:
             r = requests.post(MODEL_ENDPOINT, data=data, files=files, headers=headers)
             f.close()
@@ -57,8 +57,9 @@ def models():
                 os.remove('model.zip')
             return jsonify(response)
 
+@app.route('/account', methods=['POST', 'GET', 'DELETE'])
 def account():
-    #Gets a published list of models from sketchfab account
+    #Gets a published list of models from sketchfab account.
     if request.method == 'GET':
         SKETCHFAB_DOMAIN = 'sketchfab.com'
         SKETCHFAB_API_URL = 'https://api.{}/v3'.format(SKETCHFAB_DOMAIN)
@@ -71,6 +72,27 @@ def account():
 
         try:
             r = requests.get(MODEL_ENDPOINT, headers=headers)
+        except requests.exceptions.RequestException as e:
+            return jsonify({'requestException': e})
+        else:
+            response = r.json()
+            print(response)
+            return jsonify(response)
+
+@app.route('/models/<string:uid>', methods=['POST', 'GET', 'DELETE'])
+def delete_model(model):
+    #Deletes one of account models.
+    if request.method == 'DELETE':
+        SKETCHFAB_DOMAIN = 'sketchfab.com'
+        SKETCHFAB_API_URL = 'https://api.{}/v3'.format(SKETCHFAB_DOMAIN)
+        MODEL_ENDPOINT = SKETCHFAB_API_URL + '/models/models['uid']'
+
+        post_data = json.loads(request.form.get('data'))
+        token = post_data.get('token')
+        headers = {'Authorization': 'Token {}'.format(token)}
+
+        try:
+            r = requests.delete(MODEL_ENDPOINT, data={'models': [model['uid']]}, json_payload=True, headers=headers)
         except requests.exceptions.RequestException as e:
             return jsonify({'requestException': e})
         else:

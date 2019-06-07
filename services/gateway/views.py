@@ -108,7 +108,7 @@ async def upload_file(request):
 Relay endpoint to make object storage calls
 Endpoints are scoped for objects and buckets
 """
-async def minio_bucket(request):
+async def minio_buckets(request):
     async with ClientSession() as session:
 
         SERVICE_ENDPOINT = 'http://minio-service:5000/bucket'

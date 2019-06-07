@@ -31,7 +31,7 @@ export default {
   mounted () {
     let comp = this
     let r = new Resumable({ 
-            target:'https://a84503bf-79a4-421a-81bc-20b00eaf5244.mock.pstmn.io/upload',
+            target:'http://gateway.docker.localhost/deposit_form/upload',
             chunkSize: 10*1024*1024, // 10MB
             uploadMethod: 'POST',
             maxFileSize: 1000*10*1024*1024 // 10GB

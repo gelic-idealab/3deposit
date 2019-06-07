@@ -49,137 +49,121 @@
                                 "placeholder": "Enter creator's department or team affiliation"
                             }
                         ],
-            "dependsOn": {}
         },
         {
-            "id": 5,
+            "id": 2,
             "label":"Funding",
             "type": "container",
             "repeatable": true,
             "required": false,
             "value": ["true"],
-            "dependsOn": {}
+            "subfields": [
+                           {
+                                "label":"Funding Agency",
+                                "type": "text",
+                                "repeatable": true,
+                                "required": true,
+                                "value": ["Grainger Engineering Library"],
+                                "placeholder": "Enter funding agency name",
+                            },
+                            {
+                                "label":"Funding Number",
+                                "type": "text",
+                                "repeatable": true,
+                                "required": true,
+                                "value": ["67890"],
+                                "placeholder": "Enter funding identification number",
+                            },
+                        ]
         },
         {
-            "id": 6,
-            "label":"Funding Agency",
-            "type": "text",
-            "repeatable": true,
-            "required": true,
-            "value": ["Grainger Engineering Library"],
-            "placeholder": "Enter funding agency name",
-            "dependsOn": {"id": 5, "value": true}
-        },
-        {
-            "id": 7,
-            "label":"Funding Number",
-            "type": "text",
-            "repeatable": true,
-            "required": true,
-            "value": ["67890"],
-            "placeholder": "Enter funding identification number",
-            "dependsOn": {"id": 5, "value": true}
-        },
-        {
-            "id": 8,
+            "id": 3,
             "label":"Course",
             "type": "container",
             "repeatable": true,
             "required": false,
             "value": true,
-            "dependsOn": {}
+            "subfields":[
+                            {
+                                "label":"Course Name",
+                                "type": "text",
+                                "repeatable": false,
+                                "required": true,
+                                "value": ["Metadata in Theory and Practice"],
+                                "placeholder": "Enter course name",
+                            },
+                            {
+                                "label":"Course Instructor",
+                                "type": "text",
+                                "repeatable": true,
+                                "required": true,
+                                "value": ["Rhiannon Bettivia"],
+                                "placeholder": "Enter instructor name",
+                            },
+                            {
+                                "label":"Course Semester",
+                                "type": "text",
+                                "repeatable": false,
+                                "required": true,
+                                "value": ["Spring"],
+                                "placeholder": "Enter course semester",
+                            },
+                            {
+                                "label":"Course Year",
+                                "type": "text",
+                                "repeatable": false,
+                                "required": true,
+                                "value": ["2019"],
+                                "placeholder": "Enter course year",
+                            },
+                        ]
         },
+        
         {
-            "id": 9,
-            "label":"Course Name",
-            "type": "text",
-            "repeatable": false,
-            "required": true,
-            "value": ["Metadata in Theory and Practice"],
-            "placeholder": "Enter course name",
-            "dependsOn": {"id": 8, "value": true}
-        },
-        {
-            "id": 10,
-            "label":"Course Instructor",
-            "type": "text",
-            "repeatable": true,
-            "required": true,
-            "value": ["Rhiannon Bettivia"],
-            "placeholder": "Enter instructor name",
-            "dependsOn": {"id": 8, "value": true}
-        },
-        {
-            "id": 11,
-            "label":"Course Semester",
-            "type": "text",
-            "repeatable": false,
-            "required": true,
-            "value": ["Spring"],
-            "placeholder": "Enter course semester",
-            "dependsOn": {"id": 8, "value": true}
-        },
-        {
-            "id": 12,
-            "label":"Course Year",
-            "type": "text",
-            "repeatable": false,
-            "required": true,
-            "value": ["2019"],
-            "placeholder": "Enter course year",
-            "dependsOn": {"id": 8, "value": true}
-        },
-        {
-            "id": 13,
+            "id": 4,
             "label":"Object",
             "type": "container",
             "repeatable": false,
             "required": true,
             "value": [{}],
-            "dependsOn": {}
+            "subfields":[
+                            {
+                                "label":"Object Title",
+                                "type": "text",
+                                "repeatable": false,
+                                "required": true,
+                                "value": ["Pikachu"],
+                                "placeholder": "Enter object title",
+                            },
+                            {
+                                "label":"Object Identifier",
+                                "type": "text",
+                                "repeatable": true,
+                                "required": true,
+                                "value": ["SOMETHINGUNIQUE"],
+                                "placeholder": "Enter object ID",
+                            },
+                            {
+                                "label":"Date Created",
+                                "type": "date",
+                                "repeatable": true,
+                                "required": true,
+                                "value": ["05/24/19"],
+                                "placeholder": "Enter object's date of creation",
+                            },
+                            {
+                                "label":"Description",
+                                "type": "text",
+                                "repeatable": false,
+                                "required": false,
+                                "value": ["A model of Pikachu from the Pokemon Series"],
+                                "placeholder": "Enter object description",
+                            },  
+                        ]
         },
+     
         {
-            "id": 14,
-            "label":"Object Title",
-            "type": "text",
-            "repeatable": false,
-            "required": true,
-            "value": ["Pikachu"],
-            "placeholder": "Enter object title",
-            "dependsOn": {}
-        },
-        {
-            "id": 15,
-            "label":"Object Identifier",
-            "type": "text",
-            "repeatable": true,
-            "required": true,
-            "value": ["SOMETHINGUNIQUE"],
-            "placeholder": "Enter object ID",
-            "dependsOn": {}
-        },
-        {
-            "id": 16,
-            "label":"Date Created",
-            "type": "date",
-            "repeatable": true,
-            "required": true,
-            "value": ["05/24/19"],
-            "placeholder": "Enter object's date of creation",
-            "dependsOn": {}
-        },
-        {
-            "id": 17,
-            "label":"Description",
-            "type": "text",
-            "repeatable": false,
-            "required": false,
-            "value": ["A model of Pikachu from the Pokemon Series"],
-            "placeholder": "Enter object description",
-            "dependsOn": {}
-        },
-        {
-            "id": 18,
+            "id": 5,
             "label":"Origin",
             "type": "select",
             "repeatable": true,
@@ -187,77 +171,68 @@
             "value": ["derived"],
             "options": [{"value": "derived", "label": "Derived"},
                         {"value": "real", "label": "Real Object"},],
-            "dependsOn": {}
-
         },
         {
-            "id": 19,
+            "id": 6,
             "label":"Derived",
             "type": "container",
             "repeatable": true,
             "required": false,
             "value": true,
             "placeholder": "Is this object derived?",
-            "dependsOn": {"id": 18, "value":"derived"}
+            "dependsOn": {"id": 5, "value":"derived"},
+            "subfields":[
+                            {
+                                "label":"Derived Title",
+                                "type": "text",
+                                "repeatable": true,
+                                "required": true,
+                                "value": ["Pokemon"],
+                                "placeholder": "Enter derived title",
+                            },
+                            {
+                                "label":"Derived Creator",
+                                "type": "text",
+                                "repeatable": true,
+                                "required": true,
+                                "value": ["Game Freak"],
+                                "placeholder": "Enter derived creator",
+                            },
+                        ]
 
         },
         {
-             "id": 20,
-            "label":"Derived Title",
-            "type": "text",
-            "repeatable": true,
-            "required": true,
-            "value": ["Pokemon"],
-            "placeholder": "Enter derived title",
-            "dependsOn": {"id": 19, "value": true}
-        },
-
-        {
-            "id": 21,
-            "label":"Derived Creator",
-            "type": "text",
-            "repeatable": true,
-            "required": true,
-            "value": ["Game Freak"],
-            "placeholder": "Enter derived creator",
-            "dependsOn": {"id": 19, "value": true}
-        },
-
-        {
-            "id": 22,
+            "id": 7,
             "label":"Real Object",
             "type": "checkbox",
             "repeatable": true,
             "required": false,
             "value": false,
-            "dependsOn": {"id": 18, "value": "real"}
+            "dependsOn": {"id": 5, "value": "real"},
+            "subfields":[
+                            {
+                                "label":"Holding",
+                                "type": "text",
+                                "repeatable": false,
+                                "required": false,
+                                "children": [],
+                                "value": [""],
+                                "placeholder": "Enter holding institution name",
+                            },
+                            {
+                                "label":"Original Work",
+                                "type": "text",
+                                "repeatable": false,
+                                "required": false,
+                                "value": [""],
+                                "placeholder": "Enter name of original work",
+                            },      
+                        ]
         },
+        
 
         {
-            "id": 23,
-            "label":"Holding",
-            "type": "text",
-            "repeatable": false,
-            "required": false,
-            "children": [],
-            "value": [""],
-            "placeholder": "Enter creator name",
-            "dependsOn": {"id": 22, "value": true}
-        },
-
-        {
-            "id": 24,
-            "label":"Original Work",
-            "type": "text",
-            "repeatable": false,
-            "required": false,
-            "value": [""],
-            "placeholder": "Enter name of original work",
-            "dependsOn": {"id": 22, "value": true}
-        },
-
-        {
-            "id": 25,
+            "id": 8,
             "label":"Model Source Format",
             "type": "select",
             "repeatable": false,
@@ -268,7 +243,7 @@
         },
 
         {
-            "id": 26,
+            "id": 9,
             "label":"Video Source Format",
             "type": "select",
             "repeatable": false,
@@ -279,7 +254,7 @@
         },
 
         {
-            "id": 27,
+            "id": 10,
             "label":"VR Source Format",
             "type": "select",
             "repeatable": false,
@@ -290,7 +265,7 @@
         },
 
         {
-            "id": 28,
+            "id": 11,
             "label":"Created With",
             "type": "select",
             "repeatable": false,
@@ -302,123 +277,114 @@
         },
 
         {
-            "id": 29,
+            "id": 12,
             "label":"Software",
             "type": "container",
             "repeatable": true,
             "required": true,
             "value": true,
-            "dependsOn": {"id": 28, "value": "software"}
+            "dependsOn": {"id": 11, "value": "software"},
+            "subfields":[
+                            {
+                                "label":"Software Name",
+                                "type": "text",
+                                "repeatable": false,
+                                "required": true,
+                                "value": ["Autodesk"],
+                                "placeholder": "Enter software name",
+                            },
+
+                            {
+                                "label":"Software Creator",
+                                "type": "text",
+                                "repeatable": false,
+                                "required": true,
+                                "value": ["Autodesk"],
+                                "placeholder": "Enter software creator name",
+                            },
+
+                            {
+                                "label":"Software Rights Type",
+                                "type": "text",
+                                "repeatable": false,
+                                "required": false,
+                                "value": ["Sample Rights"],
+                                "placeholder": "Enter software rights type",
+                            },
+
+                            {
+                                "label":"Software Rights Statement",
+                                "type": "text",
+                                "repeatable": false,
+                                "required": false,
+                                "value": ["The things you can do with this software are listed here :)"],
+                                "placeholder": "Enter software rights statement",
+                            },
+                        ]
         },
 
-        {
-            "id": 30,
-            "label":"Software Name",
-            "type": "text",
-            "repeatable": false,
-            "required": true,
-            "value": ["Autodesk"],
-            "placeholder": "Enter software name",
-            "dependsOn": {"id": 29, "value": "true"}
-        },
+        
 
         {
-            "id": 31,
-            "label":"Software Creator",
-            "type": "text",
-            "repeatable": false,
-            "required": true,
-            "value": ["Autodesk"],
-            "placeholder": "Enter software creator name",
-            "dependsOn": {"id": 29, "value": "true"}
-        },
-
-        {
-            "id": 32,
-            "label":"Software Rights Type",
-            "type": "text",
-            "repeatable": false,
-            "required": false,
-            "value": ["Sample Rights"],
-            "placeholder": "Enter software rights type",
-            "dependsOn": {"id": 29, "value": "true"}
-        },
-
-        {
-            "id": 33,
-            "label":"Software Rights Statement",
-            "type": "text",
-            "repeatable": false,
-            "required": false,
-            "value": ["The things you can do with this software are listed here :)"],
-            "placeholder": "Enter software rights statement",
-            "dependsOn": {"id": 29, "value": "true"}
-        },
-
-        {
-            "id": 34,
+            "id": 13,
             "label":"Hardware",
             "type": "checkbox",
             "repeatable": true,
             "required": false,
             "value": false,
-            "dependsOn": {"id": 28, "value": "hardware"}
+            "dependsOn": {"id": 11, "value": "hardware"},
+            "subfields":[
+                            {
+                                "label":"Hardware Name",
+                                "type": "text",
+                                "repeatable": false,
+                                "required": true,
+                                "value": [""],
+                                "placeholder": "Enter hardware name",
+                            },
+
+                            {
+                                "label":"Hardware Creator",
+                                "type": "text",
+                                "repeatable": false,
+                                "required": true,
+                                "value": [""],
+                                "placeholder": "Enter hardware creator name",
+                            },
+                        ]
         },
 
         {
-            "id": 35,
-            "label":"Hardware Name",
-            "type": "text",
-            "repeatable": false,
-            "required": true,
-            "value": [""],
-            "placeholder": "Enter hardware name",
-            "dependsOn": {"id": 34, "value": "true"}
-        },
-
-        {
-            "id": 36,
-            "label":"Hardware Creator",
-            "type": "text",
-            "repeatable": false,
-            "required": true,
-            "value": [""],
-            "placeholder": "Enter hardware creator name",
-            "dependsOn": {"id": 34, "value": "true"}
-        },
-
-        {
-            "id": 37,
+            "id": 14,
             "label":"Geometry",
             "type": "container",
             "repeatable": true,
             "required": true,
             "value": [""],
+            "subfields":[
+                            {
+                                "label":"Geometry Type",
+                                "type": "select",
+                                "repeatable": false,
+                                "required": true,
+                                "value": ["tri"],
+                                "options": [{"value": "tri", "label": "Triangle"},
+                                            {"value": "quad", "label": "Quadrangle"},],
+                            },
+
+                            {
+                                "label":"Geometry Amount",
+                                "type": "text",
+                                "repeatable": false,
+                                "required": true,
+                                "value": ["36600"],
+                                "placeholder": "Enter geometry type amount",
+                            },
+                        ]
         },
 
         {
-            "id": 38,
-            "label":"Geometry Type",
-            "type": "select",
-            "repeatable": false,
-            "required": true,
-            "value": ["tri"],
-            "options": [{"value": "tri", "label": "Triangle"},
-                        {"value": "quad", "label": "Quadrangle"},],
-        },
-
-        {
-            "id": 39,
-            "label":"Geometry Amount",
-            "type": "text",
-            "repeatable": false,
-            "required": true,
-            "value": ["36600"],
-            "placeholder": "Enter geometry type amount",
-        },
-
-        {
-            "id": 40,
+            "id": 15,
             "label":"Vertices",
             "type": "text",
             "repeatable": false,
@@ -428,7 +394,7 @@
         },
 
         {
-            "id": 41,
+            "id": 16,
             "label":"File Size",
             "type": "text",
             "repeatable": false,
@@ -438,7 +404,7 @@
         },
 
         {
-            "id": 42,
+            "id": 17,
             "label":"Textures",
             "type": "text",
             "repeatable": false,
@@ -448,7 +414,7 @@
         },
 
         {
-            "id": 43,
+            "id": 18,
             "label":"Materials",
             "type": "text",
             "repeatable": false,
@@ -458,7 +424,7 @@
         },
 
         {
-            "id": 44,
+            "id": 19,
             "label":"Rigged",
             "type": "checkbox",
             "repeatable": false,
@@ -468,29 +434,29 @@
         },
 
         {
-            "id": 45,
+            "id": 20,
             "label":"Animation",
             "type": "checkbox",
             "repeatable": false,
             "required": false,
             "value": false,
             "placeholder": "Is the object animated?",
-            "dependsOn": {"id": 44, "value": "true"}
+            "dependsOn": {"id": 19, "value": "true"}
         },
 
         {
-            "id": 46,
+            "id": 21,
             "label":"Animation Run Time",
             "type": "text",
             "repeatable": false,
             "required": true,
             "value": [""],
             "placeholder": "Enter animation run time",
-            "dependsOn": {"id": 44, "value": "true"}
+            "dependsOn": {"id": 20, "value": "true"}
         },
 
         {
-            "id": 47,
+            "id": 22,
             "label":"Normals",
             "type": "checkbox",
             "repeatable": false,
@@ -500,7 +466,7 @@
         },
 
         {
-            "id": 48,
+            "id": 23,
             "label":"Vertex Colors",
             "type": "checkbox",
             "repeatable": false,
@@ -510,7 +476,7 @@
         },
 
         {
-            "id": 49,
+            "id": 24,
             "label":"UV Mapped",
             "type": "checkbox",
             "repeatable": false,
@@ -520,7 +486,7 @@
         },
 
         {
-            "id": 50,
+            "id": 25,
             "label":"Tags",
             "type": "text",
             "repeatable": true,
@@ -530,34 +496,32 @@
         },
 
         {
-            "id": 51,
+            "id": 26,
             "label":"Rights",
             "type": "container",
             "repeatable": false,
             "required": true,
             "value": [""],
+            "subfields":[
+                            {
+                                "label":"Rights Type",
+                                "type": "text",
+                                "repeatable": false,
+                                "required": true,
+                                "value": ["CCBY"],
+                                "placeholder": "Enter object rights type",
+                            },
+
+                            {
+                                "label":"Rights Statement",
+                                "type": "text",
+                                "repeatable": false,
+                                "required": true,
+                                "value": ["free to share and adapt, must give attribution"],
+                                "placeholder": "Enter object rights statement",
+                            }
+                        ]
         },
-
-        {
-            "id": 52,
-            "label":"Rights Type",
-            "type": "text",
-            "repeatable": false,
-            "required": true,
-            "value": ["CCBY"],
-            "placeholder": "Enter object rights type",
-        },
-
-        {
-            "id": 53,
-            "label":"Rights Statement",
-            "type": "text",
-            "repeatable": false,
-            "required": true,
-            "value": ["free to share and adapt, must give attribution"],
-            "placeholder": "Enter object rights statement",
-        }
-
                                    
         ]
     }

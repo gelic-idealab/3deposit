@@ -17,7 +17,7 @@ published model. Everything else can get dumped into a 'description' field.
 
 '''
 
-app = Flask(__name__)
+app = Flask(__name__) 
 
 @app.route('/models', methods=['POST', 'GET', 'DELETE'])
 def models():
@@ -27,19 +27,16 @@ def models():
         SKETCHFAB_API_URL = 'https://api.{}/v3'.format(SKETCHFAB_DOMAIN)
         MODEL_ENDPOINT = SKETCHFAB_API_URL + '/models'
         
-        post_data = json.loads(request.form.get('data'))
-        token = post_data.get('token')
+        token = get_value(request, 'config', 'token')
         headers = {'Authorization': 'Token {}'.format(token)}
+        name = get_value(request, 'data', 'name')
+        data = {'name': name}
         
-        data = {'name': post_data.get('name'),
-                'description': post_data.get('description'),
-                'tags': post_data.get('tags'),
-                'categories': post_data.get('categories'),
-                'license': post_data.get('license'),
-                'private': post_data.get('private'),
-                'password': post_data.get('password'),
-                'isPublished': post_data.get('isPublished'),
-                'isInspectable': post_data.get('isInspectable')}
+        # data = {'name': post_data.get('name'),
+        #         'description': post_data.get('description'),
+        #         'tags': post_data.get('tags'),
+        #         'categories': post_data.get('categories'),
+        #         'license': post_data.get('license')}
 
         file = request.files['file']
         file.save('model.zip')
@@ -59,6 +56,30 @@ def models():
                 os.remove('model.zip')
             return jsonify(response)
 
+
+
+
+    if request.method == 'DELETE':
+        try:
+            uid = get_value(request, 'data', 'uid')
+            SKETCHFAB_DOMAIN = 'sketchfab.com'
+            SKETCHFAB_API_URL = 'https://api.{}/v3'.format(SKETCHFAB_DOMAIN)
+            
+            
+            token = get_value(request, 'config', 'token')
+            headers = {'Authorization': 'Token {}'.format(token)}
+            model_endpoint = SKETCHFAB_API_URL + '/models/{}'.format(uid)
+
+
+            r = requests.delete(model_endpoint, headers=headers)
+            if r.status_code != 204:
+                return jsonify({"msg": "model does not exist", "content": str(r.content)})
+            else:
+                
+                return jsonify({"msg": "model successfully deleted", "content": r.status_code})
+        except Exception as e:
+            return jsonify({'requestException': str(e)})
+
 @app.route('/account', methods=['POST', 'GET', 'DELETE'])
 def account():
     #Gets a published list of models from sketchfab account.
@@ -67,9 +88,7 @@ def account():
         SKETCHFAB_API_URL = 'https://api.{}/v3'.format(SKETCHFAB_DOMAIN)
         MODEL_ENDPOINT = SKETCHFAB_API_URL + '/me/models'
         
-        config = json.loads(request.form.get('config'))
-        auth = config.get('auth')
-        token = auth.get('token')
+        token = get_value(request, 'config', 'token')
         headers = {'Authorization': 'Token {}'.format(token)}
 
         try:
@@ -81,28 +100,6 @@ def account():
             print(response)
             return jsonify(response)
 
-@app.route('/models', methods=['POST', 'GET', 'DELETE'])
-def delete_model(model):
-    #Deletes one of account models.
-    if request.method == 'DELETE':
-        uid = get_value(request, 'data', 'uid')
-        SKETCHFAB_DOMAIN = 'sketchfab.com'
-        SKETCHFAB_API_URL = 'https://api.{}/v3'.format(SKETCHFAB_DOMAIN)
-        
-        post_data = json.loads(request.form.get('data'))
-        token = post_data.get('token')
-        headers = {'Authorization': 'Token {}'.format(token)}
-        model_endpoint = SKETCHFAB_API_URL + '/models/{}'.format(uid)
-
-        try:
-            r = requests.delete(model_endpoint, headers=headers)
-        except requests.exceptions.RequestException as e:
-            return jsonify({'requestException': e})
-        else:
-            response = r.json()
-            print(response)
-            return jsonify(response)
-        
 
 if __name__ == '__main__':
     app.run()

@@ -134,3 +134,16 @@ async def minio_buckets(request):
                     return web.json_response({ 'resp': resp_json, 'req': req })
             except Exception as err:
                 return web.json_response({ 'origin': 'gateway', 'err': str(err) })
+
+
+"""
+Helper function to relay form data with files
+"""
+async def handle_form_with_files(request):
+    req_parts = {}
+    req = await request.multipart()
+    while not req.at_eof():
+        req_next = await req.next()
+        if req_next:
+            req_parts.update({req_next.name: str(await req_next.read())})
+    return web.json_response({"parts": req_parts})

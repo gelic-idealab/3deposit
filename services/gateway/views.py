@@ -139,11 +139,10 @@ async def minio_buckets(request):
 """
 Helper function to relay form data with files
 """
-async def handle_form_with_files(request):
-    req_parts = {}
-    req = await request.multipart()
-    while not req.at_eof():
-        req_next = await req.next()
-        if req_next:
-            req_parts.update({req_next.name: str(await req_next.read())})
-    return web.json_response({"parts": req_parts})
+async def handle(request):
+    fd = FormData()
+    fd.add_field('test_key', 'test_value')
+    fd.add_field('files', open('test.txt', 'rb'), filename='test.txt')
+    async with ClientSession() as session:
+        async with session.post('http://127.0.0.1:5000', data=fd) as resp:
+            return web.json_response({"response": await resp.json() })

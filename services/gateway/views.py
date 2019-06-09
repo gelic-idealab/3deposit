@@ -108,11 +108,10 @@ async def upload_file(request):
 Relay endpoint to make object storage calls
 Endpoints are scoped for objects and buckets
 """
-async def minio_buckets(request):
-    async with ClientSession() as session:
+SERVICE_ENDPOINT = 'http://minio-service:5000/bucket'
 
-        SERVICE_ENDPOINT = 'http://minio-service:5000/bucket'
-            
+async def minio_buckets(request):
+    async with ClientSession() as session:    
         if request.method == 'GET':
             try:
                 # construct form data
@@ -141,9 +140,11 @@ Helper function to relay form data with files
 """
 async def handle(request):
     fd = FormData()
-    auth_json = json.dumps({'auth': {'auth_key': 'auth_value'}})
-    fd.add_field('config', auth_json, content_type='application/json')
+    auth = json.dumps({'auth': {'auth_key': 'auth_value'}})
+    data = json.dumps({'deposit_id': '12345'})
+    fd.add_field('config', auth, content_type='application/json')
+    fd.add_field('data', data, content_type='application/json')
     fd.add_field('files', open('test.txt', 'rb'), filename='test.txt')
     async with ClientSession() as session:
-        async with session.get('http://127.0.0.1:5000', data=fd) as resp:
-            return web.json_response({"response": await resp.json() })
+        async with session.post(SERVICE_ENDPOINT, data=fd) as resp:
+            return web.json_response({"res": await resp.json() })

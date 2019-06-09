@@ -141,8 +141,9 @@ Helper function to relay form data with files
 """
 async def handle(request):
     fd = FormData()
-    fd.add_field('test_key', 'test_value')
+    auth_json = json.dumps({'auth': {'auth_key': 'auth_value'}})
+    fd.add_field('config', auth_json, content_type='application/json')
     fd.add_field('files', open('test.txt', 'rb'), filename='test.txt')
     async with ClientSession() as session:
-        async with session.post('http://127.0.0.1:5000', data=fd) as resp:
+        async with session.get('http://127.0.0.1:5000', data=fd) as resp:
             return web.json_response({"response": await resp.json() })

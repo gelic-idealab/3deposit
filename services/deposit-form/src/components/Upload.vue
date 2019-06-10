@@ -32,7 +32,7 @@ export default {
     let comp = this
     let r = new Resumable({ 
             target:'http://gateway.docker.localhost/deposit_form/upload',
-            chunkSize: 1024*1024, // 1MB
+            chunkSize: 10*1024*1024, // 10MB
             maxFileSize: 1000*10*1024*1024, // 10GB
             testChunks: false
             });

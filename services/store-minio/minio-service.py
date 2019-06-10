@@ -6,11 +6,11 @@ from minio import Minio
 from minio.error import ResponseError, BucketAlreadyExists, NoSuchBucket, NoSuchKey, AccessDenied
 from minio.error import SignatureDoesNotMatch, InvalidBucketError, InvalidAccessKeyId, SignatureDoesNotMatch, BucketAlreadyOwnedByYou
 from werkzeug.exceptions import BadRequestKeyError
-from sys import path
+# from sys import path
 
-path.append("C:\Users\mihirsj2\Desktop\3deposit\libs\python\")
+# path.append("C:\Users\mihirsj2\Desktop\3deposit\libs\python\")
 
-import unpack
+# import unpack
 
 # ACCESS KEY AKIAIOSFODNN7GRAINGER
 # SECRET KEY wJalrXUtnFEMI/K7MDENG/bPxRfiCYGRAINGERKEY
@@ -24,7 +24,8 @@ def minio_keys(request_auth):
     # auth = config.get('auth')
 
     try:
-        config = json.loads(request_auth.form.get('config'))
+        payload = dict(request_auth.json)
+        config = payload.get('config')
         auth = config.get('auth')
         auth_packed = {"access_key":auth.get('access_key'),"secret_key":auth.get('secret_key')}
         return auth_packed
@@ -37,6 +38,10 @@ def minio_keys(request_auth):
     except AttributeError as err:
         return {"err":"Please provide auth keys.",
                         "log":str(err)}
+    except Exception as err:
+        return {"err": "General Exception",
+                "log": str(err),
+                "req_json": request_auth.json}                    
 
 def create_client(request):
     if not request:
@@ -44,7 +49,8 @@ def create_client(request):
 
     #try:
     minioClient = ''
-    config = json.loads(request.form.get('config'))
+    payload = dict(request.json)
+    config = payload.get('config')
     remote = config.get('remote')
     region = None
     server_endpoint = 'err'
@@ -54,8 +60,7 @@ def create_client(request):
         if "err" in auth:
             return auth
     else:
-        return {"err": "No authentication keys provided",
-                        "log":str(err)}
+        return {"err": "No authentication keys provided"}
     if remote:
         provider = config.get('provider').lower()
         if provider == 'aws':
@@ -304,8 +309,7 @@ def create_app():
                 if "err" in auth:
                     return jsonify(auth)
             else:
-                return jsonify({"err":"No authentication keys provided.",
-                                "log":str(err)})
+                return jsonify({"err":"No authentication keys provided."})
 
             try:
                 # select endpoint
@@ -319,8 +323,8 @@ def create_app():
                 missing_ids = []
                 objects_list = []
 
-                config = json.loads(request.form.get('config'))
-
+                payload = dict(request.json)
+                config = payload.get('config')
                 bucket_name = config.get('bucket_name')
                 deposit_id_list = config.get('deposit_id_list')
 
@@ -369,7 +373,7 @@ def create_app():
                 return jsonify({"err":"Incorrect formatting of data field.",
                                 "log":str(err)})
             except ResponseError as err:
-                return jsonify({"err":str(err),
+                return jsonify({"err": "Response Error",
                                 "log":str(err)})
 
 
@@ -397,12 +401,11 @@ def create_app():
 
                 if type(minioClient) == dict and 'err' in minioClient:
                     return jsonify(minioClient)
-
-                if request.form.get('config'):
-                    config = json.loads(request.form.get('config'))
-
-                if request.form.get('data'):
-                    data = json.loads(request.form.get('data'))
+                payload = dict(request.json)
+                if payload:
+                    config = payload.get('config')
+                    data = payload.get('data')
+                if data:
                     new_bucket_name = data.get('new_bucket_name')
                     minioClient.make_bucket(new_bucket_name)
                     return jsonify({"new_bucket_name":new_bucket_name})
@@ -424,6 +427,9 @@ def create_app():
             except (InvalidBucketError, TypeError) as err: #Handle bucket_name related errors
                 return jsonify({"err":"Please enter a valid new_bucket_name.",
                                 "log":str(err)})
+            except Exception as err:
+                return jsonify({"err": "General Exception",
+                                "log": str(err)})
 
 
         elif request.method == 'DELETE':

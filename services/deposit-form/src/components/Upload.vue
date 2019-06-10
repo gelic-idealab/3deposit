@@ -32,16 +32,18 @@ export default {
     let comp = this
     let r = new Resumable({ 
             target:'http://gateway.docker.localhost/deposit_form/upload',
-            chunkSize: 10*1024*1024, // 10MB
-            uploadMethod: 'POST',
-            maxFileSize: 1000*10*1024*1024 // 10GB
+            chunkSize: 1024*1024, // 1MB
+            maxFileSize: 1000*10*1024*1024, // 10GB
+            testChunks: false
             });
     r.assignBrowse(document.getElementById('add-file-btn'));
     r.on('fileAdded', function () {
-        r.upload();
+        r.upload( function () {
+          console.log('uploading chunk')
+        });
         r.on('progress', function () {
           comp.uploadPercentage = r.progress()*100
-          })
+          });
     });
   },
   props: {

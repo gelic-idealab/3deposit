@@ -21,7 +21,7 @@ def setup_routes(app):
     # deposit form routes
     app.router.add_get('/deposit_form/active', active_deposit_form)
     app.router.add_post('/deposit_form/active', active_deposit_form)
-    app.router.add_post('/deposit_form/upload', upload_file)
+    app.router.add_view('/deposit_form/upload', upload_file)
 
     # object storage routes
     app.router.add_get('/minio/buckets', minio_buckets)

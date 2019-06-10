@@ -136,6 +136,32 @@ async def minio_buckets(request):
 
 
 """
+Handler for get and setting service configs
+"""
+async def services_configs(request):
+    if request.method == 'GET':
+        try:
+            req = await request.json()
+            async with request.app['db'].acquire() as conn:
+                service_config = await db.get_service_config(conn, req.get('name'))
+                if service_config:
+                    return web.json_response({ 'service_config': service_config })
+                else:
+                    return web.json_response({ 'err': 'No matching service', 'req': req })
+        except Exception as err:
+            return web.json_response({ 'err': str(err), 'req': req })
+    if request.method == 'POST':
+        try:
+            req = await request.json()
+            async with request.app['db'].acquire() as conn:
+                service = await db.set_service_config(conn, req.get('name'), req.get('config'))
+                if service:
+                    return web.json_response({ 'res': service })
+        except Exception as err:
+            return web.json_response({ 'err': str(err), 'req': req })
+
+
+"""
 Helper function to relay form data with files
 """
 async def handle(request):

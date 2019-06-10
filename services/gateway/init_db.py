@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine, MetaData
 
-from db import forms, deposits, users
+from db import forms, deposits, users, services
 from settings import BASE_DIR, get_config
 from security import generate_password_hash
 
@@ -56,12 +56,12 @@ def teardown_db(config):
 
 def create_tables(engine):
     meta = MetaData()
-    meta.create_all(bind=engine, tables=[forms, deposits, users])
+    meta.create_all(bind=engine, tables=[forms, deposits, users, services])
 
 
 def drop_tables(engine):
     meta = MetaData()
-    meta.drop_all(bind=engine, tables=[forms, deposits, users])
+    meta.drop_all(bind=engine, tables=[forms, deposits, users, services])
 
 def create_admin(engine):
     username = 'admin'

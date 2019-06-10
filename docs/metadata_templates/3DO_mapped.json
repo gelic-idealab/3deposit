@@ -26,7 +26,7 @@
                                 "repeatable": false,
                                 "required": true,
                                 "value": [""],
-                                "placeholder": "Enter creator name",
+                                "placeholder": "Enter creator name"
                             },
                             {
                                 "label":"Creator Status",
@@ -48,7 +48,7 @@
                                 "value": [""],
                                 "placeholder": "Enter creator's department or team affiliation"
                             }
-                        ],
+                        ]
         },
         {
             "id": 2,
@@ -64,7 +64,7 @@
                                 "repeatable": true,
                                 "required": true,
                                 "value": [""],
-                                "placeholder": "Enter funding agency name",
+                                "placeholder": "Enter funding agency name"
                             },
                             {
                                 "label":"Funding Number",
@@ -72,8 +72,8 @@
                                 "repeatable": true,
                                 "required": true,
                                 "value": [""],
-                                "placeholder": "Enter funding identification number",
-                            },
+                                "placeholder": "Enter funding identification number"
+                            }
                         ]
         },
         {
@@ -90,7 +90,7 @@
                                 "repeatable": false,
                                 "required": true,
                                 "value": [""],
-                                "placeholder": "Enter course name",
+                                "placeholder": "Enter course name"
                             },
                             {
                                 "label":"Course Instructor",
@@ -98,7 +98,7 @@
                                 "repeatable": true,
                                 "required": true,
                                 "value": [""],
-                                "placeholder": "Enter instructor name",
+                                "placeholder": "Enter instructor name"
                             },
                             {
                                 "label":"Course Semester",
@@ -106,7 +106,7 @@
                                 "repeatable": false,
                                 "required": true,
                                 "value": [""],
-                                "placeholder": "Enter course semester",
+                                "placeholder": "Enter course semester"
                             },
                             {
                                 "label":"Course Year",
@@ -114,8 +114,8 @@
                                 "repeatable": false,
                                 "required": true,
                                 "value": [""],
-                                "placeholder": "Enter course year",
-                            },
+                                "placeholder": "Enter course year"
+                            }
                         ]
         },
         
@@ -133,7 +133,7 @@
                                 "repeatable": false,
                                 "required": true,
                                 "value": [""],
-                                "placeholder": "Enter object title",
+                                "placeholder": "Enter object title"
                             },
                             {
                                 "label":"Object Identifier",
@@ -141,7 +141,7 @@
                                 "repeatable": true,
                                 "required": true,
                                 "value": [""],
-                                "placeholder": "Enter object ID",
+                                "placeholder": "Enter object ID"
                             },
                             {
                                 "label":"Date Created",
@@ -149,7 +149,7 @@
                                 "repeatable": true,
                                 "required": true,
                                 "value": [""],
-                                "placeholder": "Enter object's date of creation",
+                                "placeholder": "Enter object's date of creation"
                             },
                             {
                                 "label":"Description",
@@ -157,8 +157,8 @@
                                 "repeatable": false,
                                 "required": false,
                                 "value": [""],
-                                "placeholder": "Enter object description",
-                            },  
+                                "placeholder": "Enter object description"
+                            }
                         ]
         },
      
@@ -170,7 +170,7 @@
             "required": true,
             "value": [""],
             "options": [{"value": "derived", "label": "Derived"},
-                        {"value": "real", "label": "Real Object"},],
+                        {"value": "real", "label": "Real Object"}]
         },
         {
             "id": 6,
@@ -188,7 +188,7 @@
                                 "repeatable": true,
                                 "required": true,
                                 "value": [""],
-                                "placeholder": "Enter derived title",
+                                "placeholder": "Enter derived title"
                             },
                             {
                                 "label":"Derived Creator",
@@ -196,8 +196,8 @@
                                 "repeatable": true,
                                 "required": true,
                                 "value": [""],
-                                "placeholder": "Enter derived creator",
-                            },
+                                "placeholder": "Enter derived creator"
+                            }
                         ]
 
         },
@@ -226,7 +226,7 @@
                                 "required": false,
                                 "value": [""],
                                 "placeholder": "Enter name of original work",
-                            },      
+                            }    
                         ]
         },
         

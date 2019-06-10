@@ -137,8 +137,21 @@ async def minio_buckets(request):
 
 
 """
-Handler for get and setting service configs
+Handler for getting and setting services & service configs
 """
+
+async def services(request):
+    if request.method == 'GET':
+        try:
+            async with request.app['db'].acquire() as conn:
+                services = await db.get_services(conn)
+                if services:
+                    return web.json_response({ 'services': services })
+                else:
+                    return web.json_response({ 'res': 'no services'})
+        except Exception as err:
+            return web.json_response({ 'err': str(err) })
+
 async def services_configs(request):
     if request.method == 'GET':
         try:
@@ -146,7 +159,7 @@ async def services_configs(request):
             async with request.app['db'].acquire() as conn:
                 service_config = await db.get_service_config(conn, req.get('name'))
                 if service_config:
-                    return web.json_response({ 'service_config': service_config })
+                    return web.json_response({ service_config })
                 else:
                     return web.json_response({ 'err': 'No matching service', 'req': req })
         except Exception as err:

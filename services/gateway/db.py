@@ -41,7 +41,7 @@ services = Table(
     'services', meta,
 
     Column('id', Integer, primary_key=True),
-    Column('name', String(128), nullable=False, unique=True),
+    Column('name', String(128), nullable=False),
     Column('config', JSON, nullable=True)
 )
 
@@ -125,17 +125,31 @@ async def create_active_form(conn, content, active=False):
 
 
 ### Service config queries
+async def get_services(conn):
+    result = await conn.execute(
+        services
+        .select()
+    )
+    service_list = await result.fetchall()
+    if service_list:
+        service_list_unpacked = [str(s) for s in service_list]
+        return service_list_unpacked
+    else:
+        return False
+
 async def get_service_config(conn, name):
     result = await conn.execute(
         services
         .select()
+        .with_only_columns([services.c.config])
         .where(services.c.name == name)
     )
-    service = result.fetchone()
+    service = await result.fetchone()
     if service:
         return dict(service)
     else:
         return False
+
 async def set_service_config(conn, name, config):
     service = await get_service_config(conn, name)
     if service:

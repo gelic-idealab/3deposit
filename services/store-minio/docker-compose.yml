@@ -14,6 +14,8 @@ services:
       MINIO_ACCESS_KEY: AKIAIOSFODNN7GRAINGER
       MINIO_SECRET_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYGRAINGERKEY
     command: server /data
+    labels:
+      - "traefik.enable=false" 
 
   minio-service:
     build: .

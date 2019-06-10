@@ -117,6 +117,7 @@ async def get_active_form(conn):
         return False
 
 async def create_active_form(conn, content, active=False):
+<<<<<<< HEAD
     await conn.execute(
         forms
         .insert()
@@ -153,3 +154,19 @@ async def set_service_config(conn, name, config):
             .values(name=name, config=config)
         )
         return 'service config created for {}'.format(name)
+=======
+    result = await get_active_form(conn)
+    if result:
+        await conn.execute(
+            forms
+            .update()
+            .where(forms.c.active == True)
+            .values(active=active, content=content)
+        )
+    else:
+        await conn.execute(
+            forms
+            .insert()
+            .values(active=active, content=content)
+        )
+>>>>>>> 59afa0cf0705d962460d16f1679c8acbe9f1159a

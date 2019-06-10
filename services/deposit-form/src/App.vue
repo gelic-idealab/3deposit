@@ -36,10 +36,10 @@ export default {
   },
   mounted () {
     axios
-      .get('https://f1cf68b1-bff4-449e-a0b2-400c5cc37cac.mock.pstmn.io/form')
-      .then(response => (this.form = response.data));
+      .get('http://gateway.docker.localhost/deposit_form/active')
+      .then(response => (this.form = response.data.active_form.content));
     // eslint-disable-next-line
-    console.log(this.id)
+    console.log(this.id);
   },
 }
 </script>

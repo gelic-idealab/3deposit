@@ -1,23 +1,20 @@
 version: '3'
 services:
-  # mock-gateway:
-  #   container_name: mock-gateway
-  #   build: mock-gateway/.
-  #   ports:
-  #    - "5000:5000"
-  #   command: pipenv run python gateway.py
-  
-  vue-app:
+  deposit-form:
     build: .
-    # links: 
-    #   - mock-gateway
-    ports:
-      - "0.0.0.0:8080:8080"
+    # ports:
+    #   - "8080:8080"
     networks:
-      - frontend 
-    container_name: vue-service
+      - proxy 
+    container_name: deposit-form
     command: npm run serve
+    labels:
+      - "traefik.frontend.rule=Host:deposit-form.docker.localhost"
+      - "traefik.backend=deposit-form"
+      - "traefik.port=8080"
+      - "traefik.docker.network=proxy"
 
 networks:
-  frontend:    
+    proxy:
+        external: true
     

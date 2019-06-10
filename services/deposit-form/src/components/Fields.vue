@@ -2,7 +2,8 @@
   <div class="fields">
     <div class="container">
     <div class="form-group">
-      <div class="input-group mb-3" v-for="(field, index) in fields" :key="field.id">
+      <div class="input-group mb-3" v-for="field in fields" :key="field.id">
+        <!-- <div class="input-group mb-3" v-for="(subfield, index) in field.subfields" :key="subfield.index"> -->
         <template v-if="renderField(field)">
 
         <template v-if="field.type === 'text'">
@@ -41,6 +42,7 @@
         </template>
 
       </template>
+      <!-- </div> -->
       </div>
     </div>
     </div>

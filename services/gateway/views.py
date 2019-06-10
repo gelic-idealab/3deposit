@@ -73,9 +73,9 @@ async def active_deposit_form(request):
         async with request.app['db'].acquire() as conn:
             active_form = await db.get_active_form(conn)
         if active_form:
-            return web.json_response({ 'active_form': active_form })
+            return web.json_response({ 'active_form': active_form }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
         else:
-            return web.json_response({ 'err': 'No active form' })
+            return web.json_response({ 'err': 'No active form' }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
 
     if request.method == 'POST':
         try:
@@ -98,11 +98,12 @@ API endpoint for frontend to upload files with support for chunking
 async def upload_file(request):
     if request.method == 'POST':
         try:
-            req = await request.json()
-            return web.json_response({ 'upload succeeded' })
+            req = await request.read()
+            return web.Response(text=str(req), headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
         except Exception as err:
-            return web.json_response({ 'err': str(err) })
-
+            return web.json_response({ 'err': str(err) }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+    else:
+        return web.Response(status=200, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))     
 
 """
 Relay endpoint to make object storage calls

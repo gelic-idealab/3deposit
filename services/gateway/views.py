@@ -73,9 +73,9 @@ async def active_deposit_form(request):
         async with request.app['db'].acquire() as conn:
             active_form = await db.get_active_form(conn)
         if active_form:
-            return web.json_response({ 'active_form': active_form })
+            return web.json_response({ 'active_form': active_form }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
         else:
-            return web.json_response({ 'err': 'No active form' })
+            return web.json_response({ 'err': 'No active form' }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
 
     if request.method == 'POST':
         try:

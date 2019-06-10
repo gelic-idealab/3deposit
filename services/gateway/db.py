@@ -102,8 +102,17 @@ async def get_active_form(conn):
         return False
 
 async def create_active_form(conn, content, active=False):
-    await conn.execute(
-        forms
-        .insert()
-        .values(active=active, content=content)
-    )
+    result = await get_active_form(conn)
+    if result:
+        await conn.execute(
+            forms
+            .update()
+            .where(forms.c.active == True)
+            .values(active=active, content=content)
+        )
+    else:
+        await conn.execute(
+            forms
+            .insert()
+            .values(active=active, content=content)
+        )

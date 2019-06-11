@@ -61,14 +61,66 @@ async def logout(request):
     return response
 
 
-"""
-API endpoint for frontend to request active deposit form
 
-'GET': no params; returns first active form as object { 'active_form': {<form>} }
-'POST': creates new form from raw request body 'request.json()'
+"""
+Helper function to relay form data with files
+"""
+async def form_data_from_request(request):
+    fd = FormData()
+    auth = json.dumps({'auth': {'auth_key': 'auth_value'}})
+    data = json.dumps({'deposit_id': '12345'})
+    fd.add_field('config', auth, content_type='application/json')
+    fd.add_field('data', data, content_type='application/json')
+    fd.add_field('files', open('test.txt', 'rb'), filename='test.txt')
+    async with ClientSession() as session:
+        async with session.post(SERVICE_ENDPOINT, data=fd) as resp:
+            return web.json_response({"res": await resp.json() })
+
+
+"""
+Handlers for getting and setting services & service configs
 """
 
-async def active_deposit_form(request):
+async def services(request):
+    if request.method == 'GET':
+        try:
+            async with request.app['db'].acquire() as conn:
+                services = await db.get_services(conn)
+                if services:
+                    return web.json_response({ 'services': services })
+                else:
+                    return web.json_response({ 'res': 'no services'})
+        except Exception as err:
+            return web.json_response({ 'err': str(err) })
+
+async def services_configs(request):
+    if request.method == 'GET':
+        try:
+            req = await request.json()
+            async with request.app['db'].acquire() as conn:
+                service_config = await db.get_service_config(conn=conn, name=req.get('name'))
+                if service_config:
+                    return web.json_response({ 'service_config': service_config })
+                else:
+                    return web.json_response({ 'err': 'No matching service', 'req': req })
+        except Exception as err:
+            return web.json_response({ 'err': str(err), 'req': req })
+    if request.method == 'POST':
+        try:
+            req = await request.json()
+            async with request.app['db'].acquire() as conn:
+                service = await db.set_service_config(conn=conn, name=req.get('name'), endpoint=req.get('endpoint'), config=req.get('config'))
+                if service:
+                    return web.json_response({ 'res': service })
+        except Exception as err:
+            return web.json_response({ 'err': str(err) })
+
+
+"""
+Handlers for deposit form frontend
+"""
+
+async def deposit_form_active(request):
     if request.method == 'GET':
         async with request.app['db'].acquire() as conn:
             active_form = await db.get_active_form(conn)
@@ -90,12 +142,7 @@ async def active_deposit_form(request):
             return web.json_response({ "err": str(e) })
 
 
-"""
-API endpoint for frontend to upload files with support for chunking
-'POST': only allowed method
-"""
-
-async def upload_file(request):
+async def deposit_form_upload(request):
     if request.method == 'POST':
         try:
             req = await request.read()
@@ -109,7 +156,6 @@ async def upload_file(request):
 Relay endpoint to make object storage calls
 Endpoints are scoped for objects and buckets
 """
-SERVICE_ENDPOINT = 'http://minio-service:5000/bucket'
 
 async def minio_buckets(request):
     async with ClientSession() as session:    
@@ -136,55 +182,5 @@ async def minio_buckets(request):
                 return web.json_response({ 'origin': 'gateway', 'err': str(err) })
 
 
-"""
-Handler for getting and setting services & service configs
-"""
-
-async def services(request):
-    if request.method == 'GET':
-        try:
-            async with request.app['db'].acquire() as conn:
-                services = await db.get_services(conn)
-                if services:
-                    return web.json_response({ 'services': services })
-                else:
-                    return web.json_response({ 'res': 'no services'})
-        except Exception as err:
-            return web.json_response({ 'err': str(err) })
-
-async def services_configs(request):
-    if request.method == 'GET':
-        try:
-            req = await request.json()
-            async with request.app['db'].acquire() as conn:
-                service_config = await db.get_service_config(conn, req.get('name'))
-                if service_config:
-                    return web.json_response({ service_config })
-                else:
-                    return web.json_response({ 'err': 'No matching service', 'req': req })
-        except Exception as err:
-            return web.json_response({ 'err': str(err), 'req': req })
-    if request.method == 'POST':
-        try:
-            req = await request.json()
-            async with request.app['db'].acquire() as conn:
-                service = await db.set_service_config(conn, req.get('name'), req.get('config'))
-                if service:
-                    return web.json_response({ 'res': service })
-        except Exception as err:
-            return web.json_response({ 'err': str(err), 'req': req })
 
 
-"""
-Helper function to relay form data with files
-"""
-async def handle(request):
-    fd = FormData()
-    auth = json.dumps({'auth': {'auth_key': 'auth_value'}})
-    data = json.dumps({'deposit_id': '12345'})
-    fd.add_field('config', auth, content_type='application/json')
-    fd.add_field('data', data, content_type='application/json')
-    fd.add_field('files', open('test.txt', 'rb'), filename='test.txt')
-    async with ClientSession() as session:
-        async with session.post(SERVICE_ENDPOINT, data=fd) as resp:
-            return web.json_response({"res": await resp.json() })

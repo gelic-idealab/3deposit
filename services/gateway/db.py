@@ -42,6 +42,7 @@ services = Table(
 
     Column('id', Integer, primary_key=True),
     Column('name', String(128), nullable=False),
+    Column('endpoint', String(256), nullable=False),
     Column('config', JSON, nullable=True)
 )
 
@@ -85,6 +86,12 @@ async def get_deposit_by_id(conn, deposit_id):
 
 
 ### User queries
+async def get_users(conn):
+    records = await conn.execute(
+        users.select().order_by(users.c.id)
+    )
+    return records
+
 async def get_user_by_name(conn, username):
     result = await conn.execute(
         users
@@ -94,12 +101,6 @@ async def get_user_by_name(conn, username):
     user_record = await result.first()
     return user_record
 
-
-async def get_users(conn):
-    records = await conn.execute(
-        users.select().order_by(users.c.id)
-    )
-    return records
     
 
 
@@ -141,7 +142,7 @@ async def get_service_config(conn, name):
     result = await conn.execute(
         services
         .select()
-        .with_only_columns([services.c.config])
+        # .with_only_columns()
         .where(services.c.name == name)
     )
     service = await result.fetchone()
@@ -150,7 +151,7 @@ async def get_service_config(conn, name):
     else:
         return False
 
-async def set_service_config(conn, name, config):
+async def set_service_config(conn, name, endpoint, config):
     service = await get_service_config(conn, name)
     if service:
         await conn.execute(
@@ -164,6 +165,6 @@ async def set_service_config(conn, name, config):
         await conn.execute(
             services
             .insert()
-            .values(name=name, config=config)
+            .values(name=name, endpoint=endpoint, config=config)
         )
         return 'service config created for {}'.format(name)

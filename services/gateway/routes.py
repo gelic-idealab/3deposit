@@ -1,6 +1,13 @@
-from views import (index, login, logout, 
-                    active_deposit_form, upload_file,
-                    minio_buckets, services, services_configs)
+from views import (
+    index, 
+    login, 
+    logout, 
+    deposit_form_active, 
+    deposit_form_upload,
+    minio_buckets, 
+    services, 
+    services_configs
+)
 
 
 def setup_routes(app):
@@ -25,9 +32,9 @@ def setup_routes(app):
 
 
     # deposit form routes
-    app.router.add_get('/deposit_form/active', active_deposit_form)
-    app.router.add_post('/deposit_form/active', active_deposit_form)
-    app.router.add_view('/deposit_form/upload', upload_file)
+    app.router.add_get('/deposit_form/active', deposit_form_active)
+    app.router.add_post('/deposit_form/active', deposit_form_active)
+    app.router.add_view('/deposit_form/upload', deposit_form_upload)
 
     # object storage routes
     app.router.add_get('/minio/buckets', minio_buckets)

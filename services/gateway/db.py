@@ -131,10 +131,16 @@ async def get_services(conn):
         services
         .select()
     )
+    column_keys = result.keys()
     service_list = await result.fetchall()
     if service_list:
-        service_list_unpacked = [str(s) for s in service_list]
-        return service_list_unpacked
+        service_objects = []
+        for s in service_list:
+            s_obj = {}
+            for (i,k) in enumerate(column_keys):
+                s_obj.update(dict({k:s[i]}))
+            service_objects.append(s_obj)
+        return service_objects
     else:
         return False
 

@@ -87,9 +87,9 @@ async def services(request):
             async with request.app['db'].acquire() as conn:
                 services = await db.get_services(conn)
                 if services:
-                    return web.json_response({ 'services': services })
+                    return web.json_response({ 'services': services }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
                 else:
-                    return web.json_response({ 'res': 'no services'})
+                    return web.json_response({ 'res': 'no services'}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
         except Exception as err:
             return web.json_response({ 'err': str(err) })
 
@@ -100,11 +100,11 @@ async def services_configs(request):
             async with request.app['db'].acquire() as conn:
                 service_config = await db.get_service_config(conn=conn, name=req.get('name'))
                 if service_config:
-                    return web.json_response({ 'service_config': service_config })
+                    return web.json_response({ 'service_config': service_config }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
                 else:
-                    return web.json_response({ 'err': 'No matching service', 'req': req })
+                    return web.json_response({ 'err': 'No matching service', 'req': req }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
         except Exception as err:
-            return web.json_response({ 'err': str(err), 'req': req })
+            return web.json_response({ 'err': str(err), 'req': req }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
     if request.method == 'POST':
         """
         request.json():

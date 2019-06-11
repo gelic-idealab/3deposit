@@ -106,6 +106,19 @@ async def services_configs(request):
         except Exception as err:
             return web.json_response({ 'err': str(err), 'req': req })
     if request.method == 'POST':
+        """
+        request.json():
+        {
+            "name": "minio",
+            "endpoint": "http://minio-service:5000/bucket",
+            "config": {
+                "auth": {
+                    "access_key": "AKIAIOSFODNN7GRAINGER",
+                    "secret_key": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYGRAINGERKEY"
+                }
+            }
+        }
+        """
         try:
             req = await request.json()
             async with request.app['db'].acquire() as conn:
@@ -160,7 +173,6 @@ Endpoints are scoped for objects and buckets
 async def minio_buckets(request):
 
     SERVICE_NAME = 'minio'
-    BUCKET_NAME = '3deposit'
 
     try:
         async with request.app['db'].acquire() as conn:
@@ -175,7 +187,8 @@ async def minio_buckets(request):
 
     if request.method == 'GET':
         try:
-            config.update({'bucket_name': BUCKET_NAME})
+            data = await request.json()
+            config.update({'bucket_name': data.get('bucket_name')})
             payload = dict({'config': config})
             async with new_request(method='GET', url=endpoint, json=payload) as resp:
                 try:

@@ -19,7 +19,7 @@
 
             <div class="col-3">
               <p-button type="success" outline icon>
-                <i class="fa fa-envelope"></i>
+                <i class="fa fa-paper-plane"></i>
               </p-button>
             </div>
           </div>
@@ -28,26 +28,32 @@
     </div>
   </card>
 </template>
+
 <script>
 export default {
   data() {
     return {
-      title: "Team members",
+      title: "Team Westeros",
       members: [
         {
           image: require("@/assets/img/faces/face-0.jpg"),
-          name: "Dj Khaled",
+          name: "Arya",
           status: "Offline"
         },
         {
           image: require("@/assets/img/faces/face-1.jpg"),
-          name: "Creative Tim",
-          status: "Available"
+          name: "Bran",
+          status: "Offline"
         },
         {
           image: require("@/assets/img/faces/face-1.jpg"),
-          name: "Flume",
-          status: "Busy"
+          name: "Khaleesi",
+          status: "Dead"
+        },
+        {
+          image: require("@/assets/img/faces/face-1.jpg"),
+          name: "Sansa",
+          status: "Alive"
         }
       ]
     };
@@ -57,9 +63,9 @@ export default {
       switch (status) {
         case "Offline":
           return "text-muted";
-        case "Available":
+        case "Alive":
           return "text-success";
-        case "Busy":
+        case "Dead":
           return "text-danger";
         default:
           return "text-success";

@@ -4,15 +4,7 @@ from json import JSONDecodeError
 from flask import Flask, request, jsonify
 from pymongo import MongoClient
 from unpack import *
-from bson import ObjectId
 
-class JSONEncoder(json.JSONEncoder):
-    def default(self, o):
-        if isinstance(o, ObjectId):
-            return str(o)
-        return json.JSONEncoder.default(self, o)
-
-# https://api.mongodb.com/python/current/tutorial.html
 
 DATABASE_NAME = '3deposit'
 

@@ -18,6 +18,11 @@ def flatten_json(y):
     return out
 
 def get_value(request, scope, field):
-    request_json = json.loads(request.form.get(scope))
+    if request.form:
+        request_json = json.loads(request.form.get(scope))
+    if request.json:
+        request_json = request.json
+    else:
+        return None
     flat_request = flatten_json(request_json)
     return flat_request.get(field)

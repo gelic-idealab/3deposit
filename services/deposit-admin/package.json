@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "serve": "vue-cli-service serve --port 8888",
     "build": "vue-cli-service build",
     "e2e": "node test/e2e/runner.js",
     "lint": "vue-cli-service lint",

@@ -72,7 +72,7 @@
           </div>
           <div class="col-md-4">
             <fg-input type="number"
-                      label="Postal Code"
+                      label="ZIP Code"
                       placeholder="ZIP Code"
                       v-model="user.postalCode">
             </fg-input>
@@ -109,13 +109,13 @@ export default {
     return {
       user: {
         company: "Paper Dashboard",
-        username: "michael23",
+        username: "jonsnow",
         email: "",
         lastName: "Faker",
         address: "Melbourne, Australia",
         city: "melbourne",
         postalCode: "",
-        aboutMe: `Oh so, your weak rhyme. You doubt I'll bother, reading into it.I'll probably won't, left to my own devicesBut that's the difference in our opinions.`
+        aboutMe: `I don't want it.`
       }
     };
   },

@@ -188,7 +188,8 @@ async def minio_buckets(request):
 
     if request.method == 'POST':
         try:
-            payload = dict({'config': config, 'data': {'new_bucket_name': BUCKET_NAME}})
+            data = await request.json()
+            payload = dict({'config': config, 'data': data})
             async with new_request(method='POST', url=endpoint, json=payload) as resp:
                 resp_json = await resp.json()
                 return web.json_response({ 'resp': resp_json })

@@ -10,17 +10,6 @@
         </card>
       </div>
 
-      <div class="col-12">
-        <card class="card-plain">
-          <div class="table-full-width table-responsive">
-            <paper-table type="hover" :title="table2.title" :sub-title="table2.subTitle" :data="table2.data"
-                         :columns="table2.columns">
-
-            </paper-table>
-          </div>
-        </card>
-      </div>
-
     </div>
 </template>
 <script>
@@ -32,15 +21,16 @@ export default {
     PaperTable
   },
   mounted() {
-    axios.get('http://gateway.docker.localhost/services')
-                .then(response => (this.table1.data))
+    axios
+    .get('http://gateway.docker.localhost/services')
+    .then(response => (this.table1.data = response.data.services));
   },
   data() {
     return {
       table1: {
         title: "Services",
         subTitle: "Currently configured services",
-        columns: ["Id", "Name", "Endpoint", "Config"],
+        columns: ["id", "name", "endpoint", "config"],
         data: []
       }
     };

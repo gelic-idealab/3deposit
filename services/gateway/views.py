@@ -1,7 +1,8 @@
 import json
 
 import aiohttp_jinja2
-from aiohttp import web, ClientSession, FormData
+from aiohttp import web, FormData
+from aiohttp import request as new_request
 from aiohttp_security import remember, forget, authorized_userid
 
 import db
@@ -72,9 +73,8 @@ async def form_data_from_request(request):
     fd.add_field('config', auth, content_type='application/json')
     fd.add_field('data', data, content_type='application/json')
     fd.add_field('files', open('test.txt', 'rb'), filename='test.txt')
-    async with ClientSession() as session:
-        async with session.post(SERVICE_ENDPOINT, data=fd) as resp:
-            return web.json_response({"res": await resp.json() })
+    async with new_request.post(SERVICE_ENDPOINT, data=fd) as resp:
+        return web.json_response({"res": await resp.json() })
 
 
 """
@@ -158,28 +158,42 @@ Endpoints are scoped for objects and buckets
 """
 
 async def minio_buckets(request):
-    async with ClientSession() as session:    
-        if request.method == 'GET':
-            try:
-                # construct form data
-                req = await request.json()
-                async with session.get(SERVICE_ENDPOINT, json=req) as resp:
-                    try:
-                        resp_json = await resp.json()
-                    except Exception as err:
-                        return web.json_response({'err': str(err), 'resp': await resp.text()})
-                    return web.json_response({ 'resp': resp_json, 'req': req })
-            except Exception as err:
-                return web.json_response({ 'origin': 'gateway', 'err': str(err), 'req': req })
 
-        if request.method == 'POST':
-            try:
-                req = await request.json()
-                async with session.post(SERVICE_ENDPOINT, json=req) as resp:
+    SERVICE_NAME = 'minio'
+    BUCKET_NAME = '3deposit'
+
+    try:
+        async with request.app['db'].acquire() as conn:
+            service_config = await db.get_service_config(conn=conn, name=SERVICE_NAME)
+            if service_config:
+                endpoint = service_config.get('endpoint')
+                config = service_config.get('config')
+            else:
+                return web.json_response({ 'err': 'could not retrieve config for service: {}'.format(SERVICE_NAME)})
+    except Exception as err:
+        return web.json_response({ 'err': str(err) })
+
+    if request.method == 'GET':
+        try:
+            config.update({'bucket_name': BUCKET_NAME})
+            payload = dict({'config': config})
+            async with new_request(method='GET', url=endpoint, json=payload) as resp:
+                try:
                     resp_json = await resp.json()
-                    return web.json_response({ 'resp': resp_json, 'req': req })
-            except Exception as err:
-                return web.json_response({ 'origin': 'gateway', 'err': str(err) })
+                except Exception as err:
+                    return web.json_response({'err': str(err), 'resp': await resp.text()})
+                return web.json_response({ 'resp': resp_json, 'payload': payload })
+        except Exception as err:
+            return web.json_response({ 'origin': 'gateway', 'err': str(err) })
+
+    if request.method == 'POST':
+        try:
+            payload = dict({'config': config, 'data': {'new_bucket_name': BUCKET_NAME}})
+            async with new_request(method='POST', url=endpoint, json=payload) as resp:
+                resp_json = await resp.json()
+                return web.json_response({ 'resp': resp_json })
+        except Exception as err:
+            return web.json_response({ 'origin': 'gateway', 'err': str(err) })
 
 
 

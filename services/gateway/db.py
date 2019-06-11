@@ -158,7 +158,7 @@ async def set_service_config(conn, name, endpoint, config):
             services
             .update()
             .where(services.c.name == name)
-            .values(config=config)
+            .values(endpoint=endpoint, config=config)
         )
         return 'service config updated for {}'.format(name)
     else:

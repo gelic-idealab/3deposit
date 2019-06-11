@@ -187,7 +187,7 @@ async def minio_buckets(request):
 
     if request.method == 'GET':
         try:
-            data = await request.json()
+            data = request.query
             config.update({'bucket_name': data.get('bucket_name')})
             payload = dict({'config': config})
             async with new_request(method='GET', url=endpoint, json=payload) as resp:

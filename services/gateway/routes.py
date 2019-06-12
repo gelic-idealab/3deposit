@@ -27,9 +27,7 @@ def setup_routes(app):
 
     # service config routes
     app.router.add_get('/services', services)
-    app.router.add_get('/services/configs', services_configs)
-    app.router.add_post('/services/configs', services_configs)
-
+    app.router.add_view('/services/configs', services_configs)
 
     # deposit form routes
     app.router.add_get('/deposit_form/active', deposit_form_active)

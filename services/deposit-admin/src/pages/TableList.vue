@@ -22,7 +22,7 @@ export default {
   },
   mounted() {
     axios
-    .get('http://gateway.docker.localhost/services')
+    .get('http://localhost:8080/services')
     .then(response => (this.table1.data = response.data.services));
   },
   data() {

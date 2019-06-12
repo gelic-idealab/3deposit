@@ -1,4 +1,5 @@
 import json
+import logging
 
 import aiohttp_jinja2
 from aiohttp import web, FormData
@@ -91,7 +92,7 @@ async def services(request):
                 else:
                     return web.json_response({ 'res': 'no services'}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
         except Exception as err:
-            return web.json_response({ 'err': str(err) })
+            return web.json_response({ 'err': str(err) }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
 
 async def services_configs(request):
     if request.method == 'GET':
@@ -158,8 +159,11 @@ async def deposit_form_active(request):
 async def deposit_form_upload(request):
     if request.method == 'POST':
         try:
-            req = await request.read()
-            return web.Response(text=str(req), headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+            logging.debug(msg='query: {}'.format(request.query))
+            with open('./data/tmp.jpg', 'wb') as f:
+                b = await request.read()
+                f.write(b)
+            return web.Response(status=200, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
         except Exception as err:
             return web.json_response({ 'err': str(err) }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
     else:

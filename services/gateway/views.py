@@ -97,7 +97,7 @@ async def services(request):
 async def services_configs(request):
     if request.method == 'GET':
         try:
-            req = await request.json()
+            req = request.query
             async with request.app['db'].acquire() as conn:
                 service_config = await db.get_service_config(conn=conn, name=req.get('name'))
                 if service_config:

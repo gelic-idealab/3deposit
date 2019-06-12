@@ -44,8 +44,12 @@ export default {
   mounted() {
     axios
     .get('http://localhost:8080/services')
+<<<<<<< HEAD
     .then(response => (this.table1.data = response.data.services))
     .then(() => (this.table1.columns = Object.keys(this.table1.data[0])))
+=======
+    .then(response => (this.table1.data = response.data.services));
+>>>>>>> Vue not using reverse-proxy
   },
   data() {
     return {

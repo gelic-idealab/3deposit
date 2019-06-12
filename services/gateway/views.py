@@ -8,6 +8,8 @@ from aiohttp_security import remember, forget, authorized_userid
 import db
 from forms import validate_login_form
 
+import logging
+
 
 def redirect(router, route_name):
     location = router[route_name].url_for()
@@ -94,17 +96,22 @@ async def services(request):
             return web.json_response({ 'err': str(err) })
 
 async def services_configs(request):
+
+    headers = {
+        'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
+        'Access-Control-Allow-Headers': 'content-type'
+    }
     if request.method == 'GET':
         try:
             req = request.query
             async with request.app['db'].acquire() as conn:
                 service_config = await db.get_service_config(conn=conn, name=req.get('name'))
                 if service_config:
-                    return web.json_response({ 'service_config': service_config }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+                    return web.json_response({ 'service_config': service_config }, headers=headers)
                 else:
-                    return web.json_response({ 'err': 'No matching service', 'req': req }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+                    return web.json_response({ 'err': 'No matching service', 'req': req }, headers=headers)
         except Exception as err:
-            return web.json_response({ 'err': str(err), 'req': req }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+            return web.json_response({ 'err': str(err), 'req': req }, headers=headers)
     if request.method == 'POST':
         """
         request.json():
@@ -124,10 +131,14 @@ async def services_configs(request):
             async with request.app['db'].acquire() as conn:
                 service = await db.set_service_config(conn=conn, name=req.get('name'), endpoint=req.get('endpoint'), config=req.get('config'))
                 if service:
-                    return web.json_response({ 'res': service })
+                    return web.json_response({ 'res': service }, headers=headers)
+                else:
+                    return web.json_response({'req':str(req),'err':'Could not create service.'}, headers=headers)
         except Exception as err:
-            return web.json_response({ 'err': str(err) })
+            return web.json_response({ 'err': str(err) }, headers=headers)
 
+    else:
+        return web.Response(status=200, headers=headers)
 
 """
 Handlers for deposit form frontend
@@ -144,6 +155,8 @@ async def deposit_form_active(request):
 
     if request.method == 'POST':
         try:
+            # logging.debug(msg="Is JSON:".format(request.is_json))
+            # logging.debug(msg=str)
             req = await request.json()
             async with request.app['db'].acquire() as conn:
                 try:
@@ -208,7 +221,3 @@ async def minio_buckets(request):
                 return web.json_response({ 'resp': resp_json })
         except Exception as err:
             return web.json_response({ 'origin': 'gateway', 'err': str(err) })
-
-
-
-

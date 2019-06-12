@@ -377,6 +377,7 @@ async def publish_models(request):
                     return web.json_response({ 'err': 'could not retrieve config for service: {}'.format(service_name)})
         except Exception as err:
             return web.json_response({ 'err': str(err) })
+<<<<<<< HEAD
 
 
 
@@ -388,3 +389,5 @@ async def deposits(request):
             return web.json_response({ 'deposits': deposits })
     except Exception as err:
         return web.json_response({ 'err': str(err) })
+=======
+>>>>>>> AddServiceForm Working

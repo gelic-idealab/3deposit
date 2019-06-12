@@ -28,7 +28,10 @@
         </div>
       <!-- </div> -->
     </div>
+<<<<<<< HEAD
     <add-service-form />
+=======
+>>>>>>> AddServiceForm Working
   </div>   
 </template>
 <script>

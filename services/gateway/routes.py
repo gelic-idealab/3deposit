@@ -8,7 +8,7 @@ from views import (
     store_objects,
     services, 
     services_configs,
-    publish
+    publish_models
 )
 
 
@@ -43,5 +43,5 @@ def setup_routes(app):
     app.router.add_post('/store/objects', store_objects)
 
     # publication routes
-    app.router.add_get('/publish', publish)
-    app.router.add_post('/publish', publish)
+    app.router.add_get('/publish/models', publish_models)
+    app.router.add_post('/publish', publish_models)

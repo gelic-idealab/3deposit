@@ -156,7 +156,7 @@ async def deposit_form_active(request):
             return web.json_response({ "err": str(e) })
 
 
-async def deposit_form_upload(request):
+async def deposit_upload(request):
     if request.method == 'POST':
         try:
             logging.debug(msg='query: {}'.format(request.query))

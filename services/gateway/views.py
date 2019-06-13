@@ -174,7 +174,7 @@ Relay endpoint to make object storage calls
 Endpoints are scoped for objects and buckets
 """
 
-async def minio_buckets(request):
+async def store_buckets(request):
 
     SERVICE_NAME = 'minio'
 
@@ -182,7 +182,47 @@ async def minio_buckets(request):
         async with request.app['db'].acquire() as conn:
             service_config = await db.get_service_config(conn=conn, name=SERVICE_NAME)
             if service_config:
-                endpoint = service_config.get('endpoint')
+                endpoint = service_config.get('endpoint') + '/buckets'
+                config = service_config.get('config')
+            else:
+                return web.json_response({ 'err': 'could not retrieve config for service: {}'.format(SERVICE_NAME)})
+    except Exception as err:
+        return web.json_response({ 'err': str(err) })
+
+    if request.method == 'GET':
+        try:
+            data = request.query
+            config.update({'bucket_name': data.get('bucket_name')})
+            payload = dict({'config': config})
+            async with new_request(method='GET', url=endpoint, json=payload) as resp:
+                try:
+                    resp_json = await resp.json()
+                except Exception as err:
+                    return web.json_response({'err': str(err), 'resp': await resp.text()})
+                return web.json_response({ 'resp': resp_json, 'payload': payload })
+        except Exception as err:
+            return web.json_response({ 'origin': 'gateway', 'err': str(err) })
+
+    if request.method == 'POST':
+        try:
+            data = await request.json()
+            payload = dict({'config': config, 'data': data})
+            async with new_request(method='POST', url=endpoint, json=payload) as resp:
+                resp_json = await resp.json()
+                return web.json_response({ 'resp': resp_json })
+        except Exception as err:
+            return web.json_response({ 'origin': 'gateway', 'err': str(err) })
+
+
+async def store_objects(request):
+
+    SERVICE_NAME = 'minio'
+
+    try:
+        async with request.app['db'].acquire() as conn:
+            service_config = await db.get_service_config(conn=conn, name=SERVICE_NAME)
+            if service_config:
+                endpoint = service_config.get('endpoint') + '/objects'
                 config = service_config.get('config')
             else:
                 return web.json_response({ 'err': 'could not retrieve config for service: {}'.format(SERVICE_NAME)})
@@ -215,4 +255,39 @@ async def minio_buckets(request):
 
 
 
+async def publish(request):
+    SERVICE_NAME = 'sketchfab'
+    try:
+        async with request.app['db'].acquire() as conn:
+            service_config = await db.get_service_config(conn=conn, name=SERVICE_NAME)
+            if service_config:
+                endpoint = service_config.get('endpoint') + '/objects'
+                config = service_config.get('config')
+            else:
+                return web.json_response({ 'err': 'could not retrieve config for service: {}'.format(SERVICE_NAME)})
+    except Exception as err:
+        return web.json_response({ 'err': str(err) })
 
+    if request.method == 'GET':
+        try:
+            data = request.query
+            config.update({'bucket_name': data.get('bucket_name')})
+            payload = dict({'config': config})
+            async with new_request(method='GET', url=endpoint, json=payload) as resp:
+                try:
+                    resp_json = await resp.json()
+                except Exception as err:
+                    return web.json_response({'err': str(err), 'resp': await resp.text()})
+                return web.json_response({ 'resp': resp_json, 'payload': payload })
+        except Exception as err:
+            return web.json_response({ 'origin': 'gateway', 'err': str(err) })
+
+    if request.method == 'POST':
+        try:
+            data = await request.json()
+            payload = dict({'config': config, 'data': data})
+            async with new_request(method='POST', url=endpoint, json=payload) as resp:
+                resp_json = await resp.json()
+                return web.json_response({ 'resp': resp_json })
+        except Exception as err:
+            return web.json_response({ 'origin': 'gateway', 'err': str(err) })

@@ -72,7 +72,7 @@ def create_admin(engine):
 
 
 if __name__ == '__main__':
-    time.sleep(5)
+    # time.sleep(5)
     setup_db(USER_CONFIG['postgres'])
     create_tables(engine=user_engine)
     create_admin(engine=user_engine)

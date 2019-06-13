@@ -5,7 +5,7 @@ from sqlalchemy import (
     Integer, String, Date, Boolean, JSON
 )
 
-__all__ = ['forms', 'deposits', 'users', 'services']
+__all__ = ['forms', 'deposits', 'users', 'services', 'actions']
 
 meta = MetaData()
 
@@ -46,6 +46,14 @@ services = Table(
     Column('config', JSON, nullable=True)
 )
 
+actions = Table(
+    'actions', meta,
+
+    Column('id', Integer, primary_key=True),
+    Column('action', String(128), nullable=False),
+    Column('media_type', String(128), nullable=False),
+    Column('service_name', String(128), nullable=False)
+)
 
 class RecordNotFound(Exception):
     """Requested record in database was not found"""
@@ -115,7 +123,7 @@ async def get_active_form(conn):
     if first_active_form:
         return dict(first_active_form)
     else:
-        return False
+        return None
 
 async def create_active_form(conn, content, active=False):
     await conn.execute(
@@ -142,7 +150,7 @@ async def get_services(conn):
             service_objects.append(s_obj)
         return service_objects
     else:
-        return False
+        return None
 
 async def get_service_config(conn, name):
     result = await conn.execute(
@@ -155,7 +163,7 @@ async def get_service_config(conn, name):
     if service:
         return dict(service)
     else:
-        return False
+        return None
 
 async def set_service_config(conn, name, endpoint, config):
     service = await get_service_config(conn, name)
@@ -174,3 +182,18 @@ async def set_service_config(conn, name, endpoint, config):
             .values(name=name, endpoint=endpoint, config=config)
         )
         return 'service config created for {}'.format(name)
+
+# action config queries
+async def get_action_service_name(conn, action, media_type):
+    result = await conn.execute(
+        actions
+        .select([actions.c.service_name])
+        .where(
+            actions.c.action == action,
+            actions.c.media_type == media_type)
+        )
+    service_name = await result.fetchone()
+    if service_name:
+        return service_name
+    else:
+        return None

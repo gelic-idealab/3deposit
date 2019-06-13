@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine, MetaData
 
-from db import forms, deposits, users, services
+from db import forms, deposits, users, services, actions
 from settings import BASE_DIR, get_config
 from security import generate_password_hash
 
@@ -70,11 +70,19 @@ def create_admin(engine):
     with engine.connect() as conn:
         conn.execute(users.insert().values(username=username, password_hash=password_hash, role=role))
 
+def create_default_store_service(engine):
+    action = 'store'
+    media_type = 'default'
+    service_name = 'minio'
+    with engine.connect() as conn:
+        conn.execute(actions.insert().values(action=action, media_type=media_type, service_name=service_name))
+
 
 if __name__ == '__main__':
     # time.sleep(5)
     setup_db(USER_CONFIG['postgres'])
     create_tables(engine=user_engine)
     create_admin(engine=user_engine)
+    create_default_store_service(engine=user_engine)
     # drop_tables()
     # teardown_db(config)

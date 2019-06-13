@@ -138,9 +138,9 @@ async def deposit_form_active(request):
     if request.method == 'GET':
         async with request.app['db'].acquire() as conn:
             active_form = await db.get_active_form(conn)
-        if active_form:
-            return web.json_response({ 'active_form': active_form }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
-        else:
+        if acervice_config = 
+            rervice_config = ders=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+        else:ervice_config = 
             return web.json_response({ 'err': 'No active form' }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
 
     if request.method == 'POST':
@@ -169,26 +169,33 @@ async def deposit_upload(request):
     else:
         return web.Response(status=200, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))     
 
+
+"""
+Helper function to return service configs for a given action
+"""
+async def get_service_config_by_action(request, action, media_type='default'):
+    try:
+        async with request.app['db'].acquire() as conn:
+            action_service_name = await db.get_action_service_name(conn=conn, action=action, media_type=media_type)
+        async with request.app['db'].acquire() as conn:
+            service_config = await db.get_service_config(conn=conn, name=action_service_name)
+            if service_config:
+                return service_config
+            else:
+                return None
+    except Exception as err:
+        return web.json_response({ 'err': str(err) })
+
+
 """
 Relay endpoint to make object storage calls
 Endpoints are scoped for objects and buckets
 """
 
 async def store_buckets(request):
-
-    SERVICE_NAME = 'minio'
-
-    try:
-        async with request.app['db'].acquire() as conn:
-            service_config = await db.get_service_config(conn=conn, name=SERVICE_NAME)
-            if service_config:
-                endpoint = service_config.get('endpoint') + '/buckets'
-                config = service_config.get('config')
-            else:
-                return web.json_response({ 'err': 'could not retrieve config for service: {}'.format(SERVICE_NAME)})
-    except Exception as err:
-        return web.json_response({ 'err': str(err) })
-
+    service_config = await get_service_config_by_action(request=request, action='store')
+    config = service_config.get('config')
+    endpoint = service_config.get('endpoint')
     if request.method == 'GET':
         try:
             data = request.query
@@ -215,19 +222,9 @@ async def store_buckets(request):
 
 
 async def store_objects(request):
-
-    SERVICE_NAME = 'minio'
-
-    try:
-        async with request.app['db'].acquire() as conn:
-            service_config = await db.get_service_config(conn=conn, name=SERVICE_NAME)
-            if service_config:
-                endpoint = service_config.get('endpoint') + '/objects'
-                config = service_config.get('config')
-            else:
-                return web.json_response({ 'err': 'could not retrieve config for service: {}'.format(SERVICE_NAME)})
-    except Exception as err:
-        return web.json_response({ 'err': str(err) })
+    service_config = await get_service_config_by_action(request=request, action='store')
+    config = service_config.get('config')
+    endpoint = service_config.get('endpoint')
 
     if request.method == 'GET':
         try:
@@ -254,14 +251,18 @@ async def store_objects(request):
             return web.json_response({ 'origin': 'gateway', 'err': str(err) })
 
 
-
-async def publish(request):
-    SERVICE_NAME = 'sketchfab'
+"""
+Relay endpoint to get/post to Model publication service
+"""
+async def publish_models(request):
+    service_config = await get_service_config_by_action(request=request, action='publish', media_type='models')
+    config = service_config.get('config')
+    endpoint = service_config.get('endpoint')
     try:
         async with request.app['db'].acquire() as conn:
             service_config = await db.get_service_config(conn=conn, name=SERVICE_NAME)
             if service_config:
-                endpoint = service_config.get('endpoint') + '/objects'
+                endpoint = service_config.get('endpoint')
                 config = service_config.get('config')
             else:
                 return web.json_response({ 'err': 'could not retrieve config for service: {}'.format(SERVICE_NAME)})

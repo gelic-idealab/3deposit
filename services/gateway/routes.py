@@ -4,9 +4,11 @@ from views import (
     logout, 
     deposit_form_active, 
     deposit_upload,
-    minio_buckets, 
+    store_buckets,
+    store_objects,
     services, 
-    services_configs
+    services_configs,
+    publish
 )
 
 
@@ -34,6 +36,12 @@ def setup_routes(app):
     app.router.add_post('/deposit/forms/active', deposit_form_active)
     app.router.add_view('/deposit/upload', deposit_upload)
 
-    # object storage routes
-    app.router.add_get('/minio/buckets', minio_buckets)
-    app.router.add_post('/minio/buckets', minio_buckets)
+    # storage routes
+    app.router.add_get('/store/buckets', store_buckets)
+    app.router.add_post('/store/buckets', store_buckets)
+    app.router.add_get('/store/objects', store_objects)
+    app.router.add_post('/store/objects', store_objects)
+
+    # publication routes
+    app.router.add_get('/publish', publish)
+    app.router.add_post('/publish', publish)

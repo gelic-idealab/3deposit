@@ -61,7 +61,7 @@ def main(argv):
     logging.basicConfig(level=logging.DEBUG)
     
     # use uvloop instead of asyncio event loop
-    uvloop.install()
+    # uvloop.install()
     
     # init & run app with args & config
     app = init_app(argv)

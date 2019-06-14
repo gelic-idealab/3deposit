@@ -21,7 +21,7 @@ app = Flask(__name__)
 
 @app.route('/models', methods=['POST', 'GET', 'DELETE'])
 def models():
-    #Posts models to sketchfab.
+    #Posts the model to sketchfab.
     if request.method == 'POST':
         SKETCHFAB_DOMAIN = 'sketchfab.com'
         SKETCHFAB_API_URL = 'https://api.{}/v3'.format(SKETCHFAB_DOMAIN)
@@ -58,8 +58,31 @@ def models():
 
 
 
-
+    #Deletes the model from sketchfab.
     if request.method == 'DELETE':
+        try:
+            uid = get_value(request, 'data', 'uid')
+            SKETCHFAB_DOMAIN = 'sketchfab.com'
+            SKETCHFAB_API_URL = 'https://api.{}/v3'.format(SKETCHFAB_DOMAIN)
+            
+
+            token = get_value(request, 'config', 'token')
+            headers = {'Authorization': 'Token {}'.format(token)}
+            model_endpoint = SKETCHFAB_API_URL + '/models/{}'.format(uid)
+
+
+            r = requests.delete(model_endpoint, headers=headers)
+            if r.status_code != 204:
+                return jsonify({"msg": "Model does not exist.", "content": str(r.content)})
+            else:
+                return jsonify({"msg": "Model successfully deleted.", "content": r.status_code})
+        except Exception as e:
+            return jsonify({'requestException': str(e)})
+
+
+
+    #Returns the details of the model.
+    if request.method == 'GET':
         try:
             uid = get_value(request, 'data', 'uid')
             SKETCHFAB_DOMAIN = 'sketchfab.com'
@@ -68,31 +91,10 @@ def models():
             
             token = get_value(request, 'config', 'token')
             headers = {'Authorization': 'Token {}'.format(token)}
-            model_endpoint = SKETCHFAB_API_URL + '/models/{}'.format(uid)
-
-
-            r = requests.delete(model_endpoint, headers=headers)
-            if r.status_code != 204:
-                return jsonify({"msg": "model does not exist", "content": str(r.content)})
-            else:
-                
-                return jsonify({"msg": "model successfully deleted", "content": r.status_code})
-        except Exception as e:
-            return jsonify({'requestException': str(e)})
-
-@app.route('/account', methods=['POST', 'GET', 'DELETE'])
-def account():
-    #Gets a published list of models from sketchfab account.
-    if request.method == 'GET':
-        SKETCHFAB_DOMAIN = 'sketchfab.com'
-        SKETCHFAB_API_URL = 'https://api.{}/v3'.format(SKETCHFAB_DOMAIN)
-        MODEL_ENDPOINT = SKETCHFAB_API_URL + '/me/models'
+            model__endpoint = SKETCHFAB_API_URL + '/models/{}'.format(uid)
         
-        token = get_value(request, 'config', 'token')
-        headers = {'Authorization': 'Token {}'.format(token)}
 
-        try:
-            r = requests.get(MODEL_ENDPOINT, headers=headers)
+            r = requests.get(model__endpoint, headers=headers)
         except requests.exceptions.RequestException as e:
             return jsonify({'requestException': e})
         else:

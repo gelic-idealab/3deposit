@@ -56,7 +56,7 @@ def teardown_db(config):
 
 def create_tables(engine):
     meta = MetaData()
-    meta.create_all(bind=engine, tables=[forms, deposits, users, services])
+    meta.create_all(bind=engine, tables=[forms, deposits, users, services, actions])
 
 
 def drop_tables(engine):

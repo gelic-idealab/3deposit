@@ -10,22 +10,17 @@ from werkzeug.exceptions import BadRequestKeyError
 
 # path.append("C:\Users\mihirsj2\Desktop\3deposit\libs\python\")
 
-# import unpack
+import unpack_001
 
 # ACCESS KEY AKIAIOSFODNN7GRAINGER
 # SECRET KEY wJalrXUtnFEMI/K7MDENG/bPxRfiCYGRAINGERKEY
 
 
-def minio_keys(request_auth):
-    if not request_auth:
+def minio_keys(request):
+    if not request:
         return False
-    
-    # config = json.loads(request_auth.form.get('config'))
-    # auth = config.get('auth')
-
     try:
-        payload = dict(request_auth.json)
-        config = payload.get('config')
+        config = json.loads(request.form.get('config'))
         auth = config.get('auth')
         auth_packed = {"access_key":auth.get('access_key'),"secret_key":auth.get('secret_key')}
         return auth_packed
@@ -41,7 +36,7 @@ def minio_keys(request_auth):
     except Exception as err:
         return {"err": "General Exception",
                 "log": str(err),
-                "req_json": request_auth.json}                    
+                "req_json": request.json}                    
 
 def create_client(request):
     if not request:
@@ -49,8 +44,8 @@ def create_client(request):
 
     #try:
     minioClient = ''
-    payload = dict(request.json)
-    config = payload.get('config')
+    config = json.loads(request.form.get('config'))
+    auth = config.get('auth')
     remote = config.get('remote')
     region = None
     server_endpoint = 'err'
@@ -323,8 +318,7 @@ def create_app():
                 missing_ids = []
                 objects_list = []
 
-                payload = dict(request.json)
-                config = payload.get('config')
+                config = json.loads(request.form.get('config'))
                 bucket_name = config.get('bucket_name')
                 deposit_id_list = config.get('deposit_id_list')
 
@@ -401,10 +395,8 @@ def create_app():
 
                 if type(minioClient) == dict and 'err' in minioClient:
                     return jsonify(minioClient)
-                payload = dict(request.json)
-                if payload:
-                    config = payload.get('config')
-                    data = payload.get('data')
+                config = json.loads(request.form.get('config'))
+                data = json.loads(request.form.get('data'))
                 if data:
                     new_bucket_name = data.get('new_bucket_name')
                     minioClient.make_bucket(new_bucket_name)

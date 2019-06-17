@@ -34,7 +34,10 @@ export default {
             target:'http://gateway.docker.localhost/deposit/upload',
             chunkSize: 10*1024*1024, // 10MB
             maxFileSize: 1000*10*1024*1024, // 10GB
-            testChunks: false
+            testChunks: false,
+            query: {
+              deposit_id: this.id
+            }
             });
     r.assignBrowse(document.getElementById('add-file-btn'));
     r.on('fileAdded', function () {

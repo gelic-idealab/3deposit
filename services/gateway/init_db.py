@@ -77,8 +77,7 @@ def create_default_store_service(engine):
     with engine.connect() as conn:
         conn.execute(actions.insert().values(action=action, media_type=media_type, service_name=service_name))
 
-
-if __name__ == '__main__':
+def main():
     # time.sleep(5)
     setup_db(USER_CONFIG['postgres'])
     create_tables(engine=user_engine)
@@ -86,3 +85,6 @@ if __name__ == '__main__':
     create_default_store_service(engine=user_engine)
     # drop_tables()
     # teardown_db(config)
+
+if __name__ == '__main__':
+    main()

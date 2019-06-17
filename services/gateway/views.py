@@ -1,8 +1,8 @@
 import json
 import logging
-
+import os
 import aiohttp_jinja2
-from aiohttp import web, FormData
+from aiohttp import web, FormData, MultipartReader, hdrs
 from aiohttp import request as new_request
 from aiohttp_security import remember, forget, authorized_userid
 
@@ -69,15 +69,15 @@ async def logout(request):
 """
 Helper function to relay form data with files
 """
-async def form_data_from_request(request):
-    fd = FormData()
-    auth = json.dumps({'auth': {'auth_key': 'auth_value'}})
-    data = json.dumps({'deposit_id': '12345'})
-    fd.add_field('config', auth, content_type='application/json')
-    fd.add_field('data', data, content_type='application/json')
-    fd.add_field('files', open('test.txt', 'rb'), filename='test.txt')
-    async with new_request.post(SERVICE_ENDPOINT, data=fd) as resp:
-        return web.json_response({"res": await resp.json() })
+# async def form_data_from_request(request):
+#     fd = FormData()
+#     auth = json.dumps({'auth': {'auth_key': 'auth_value'}})
+#     data = json.dumps({'deposit_id': '12345'})
+#     fd.add_field('config', auth, content_type='application/json')
+#     fd.add_field('data', data, content_type='application/json')
+#     fd.add_field('files', open('test.txt', 'rb'), filename='test.txt')
+#     async with new_request.post(SERVICE_ENDPOINT, data=fd) as resp:
+#         return web.json_response({"res": await resp.json() })
 
 
 """
@@ -173,11 +173,46 @@ async def deposit_upload(request):
     if request.method == 'POST':
         try:
             logging.debug(msg='query: {}'.format(request.query))
-            with open('./data/tmp.jpg', 'wb') as f:
-                b = await request.read()
-                f.write(b)
-            return web.Response(status=200, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+            reader = await request.multipart()
+            logging.debug(msg=str(reader))
+            did = request.query['deposit_id']
+            logging.debug(str(did))
+            fid = request.query['resumableIdentifier']
+            fch = request.query['resumableChunkNumber']
+            ftc = request.query['resumableTotalChunks']
+            while True:
+                part = await reader.next()
+                if part is None:
+                    break
+                if part.name == 'file':
+                    if int(fch) == 1:
+                        logging.debug('writing first chunk')
+                        with open('./data/{}'.format(did), 'wb') as f:
+                            b = await part.read()
+                            f.write(b)
+                    if int(fch) > 1:
+                        with open('./data/{}'.format(did), 'ab') as f:
+                            logging.debug('writing subsequent chunk')
+                            b = await part.read()
+                            f.write(b)
+                    if int(fch) == int(ftc):
+                        logging.debug('writing last chunk')
+                        fd = FormData()
+                        data = json.dumps({ 'data': { 'bucket_name': '3deposit'} })
+                        fd.add_field('data', data, content_type='application/json')
+                        with open('./data/{}'.format(did), 'rb') as f:
+                            logging.debug('inside with open block')
+                            fd.add_field('files', f, filename=fid)
+                        async with new_request(url='gateway.docker.localhost/store/objects', method='POST', data=fd) as resp:
+                            await resp.json()
+                            # resp_json = await resp.json()
+                            # logging.debug(msg=str(resp_json))
+                            # f.close()
+                            # os.remove('./data/{}'.format(did))
+
+            return web.Response(status=200, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))       
         except Exception as err:
+            logging.debug(str(err))
             return web.json_response({ 'err': str(err) }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
     else:
         return web.Response(status=200, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))     
@@ -206,6 +241,7 @@ Endpoints are scoped for objects and buckets
 """
 
 async def store_buckets(request):
+    PATH = '/bucket'
     service_config = await get_service_config_by_action(request=request, action='store')
     config = service_config.get('config')
     endpoint = service_config.get('endpoint')
@@ -214,7 +250,7 @@ async def store_buckets(request):
             data = request.query
             config.update({'bucket_name': data.get('bucket_name')})
             payload = dict({'config': config})
-            async with new_request(method='GET', url=endpoint, json=payload) as resp:
+            async with new_request(method='GET', url=endpoint+PATH, json=payload) as resp:
                 try:
                     resp_json = await resp.json()
                 except Exception as err:
@@ -227,7 +263,7 @@ async def store_buckets(request):
         try:
             data = await request.json()
             payload = dict({'config': config, 'data': data})
-            async with new_request(method='POST', url=endpoint, json=payload) as resp:
+            async with new_request(method='POST', url=endpoint+PATH, json=payload) as resp:
                 resp_json = await resp.json()
                 return web.json_response({ 'resp': resp_json })
         except Exception as err:
@@ -235,6 +271,7 @@ async def store_buckets(request):
 
 
 async def store_objects(request):
+    PATH = '/object'
     service_config = await get_service_config_by_action(request=request, action='store')
     config = service_config.get('config')
     endpoint = service_config.get('endpoint')
@@ -244,7 +281,7 @@ async def store_objects(request):
             data = request.query
             config.update({'bucket_name': data.get('bucket_name')})
             payload = dict({'config': config})
-            async with new_request(method='GET', url=endpoint, json=payload) as resp:
+            async with new_request(method='GET', url=endpoint+PATH, json=payload) as resp:
                 try:
                     resp_json = await resp.json()
                 except Exception as err:
@@ -255,9 +292,10 @@ async def store_objects(request):
 
     if request.method == 'POST':
         try:
-            data = await request.json()
+            req = await request.multipart()
+            data = req['data']
             payload = dict({'config': config, 'data': data})
-            async with new_request(method='POST', url=endpoint, json=payload) as resp:
+            async with new_request(method='POST', url=endpoint+PATH, json=payload) as resp:
                 resp_json = await resp.json()
                 return web.json_response({ 'resp': resp_json })
         except Exception as err:
@@ -269,16 +307,17 @@ Relay endpoint to get/post to Model publication service
 """
 async def publish_models(request):
     service_config = await get_service_config_by_action(request=request, action='publish', media_type='models')
+    service_name = service_config.get('name')
     config = service_config.get('config')
     endpoint = service_config.get('endpoint')
     try:
         async with request.app['db'].acquire() as conn:
-            service_config = await db.get_service_config(conn=conn, name=SERVICE_NAME)
+            service_config = await db.get_service_config(conn=conn, name=service_name)
             if service_config:
                 endpoint = service_config.get('endpoint')
                 config = service_config.get('config')
             else:
-                return web.json_response({ 'err': 'could not retrieve config for service: {}'.format(SERVICE_NAME)})
+                return web.json_response({ 'err': 'could not retrieve config for service: {}'.format(service_name)})
     except Exception as err:
         return web.json_response({ 'err': str(err) })
 

@@ -1,8 +1,11 @@
+import os
+import time
 import logging
 import sys
 import base64
 import jinja2
 from cryptography import fernet
+from psycopg2 import OperationalError
 
 import uvloop
 from aiohttp import web
@@ -32,8 +35,26 @@ async def init_app(argv=None):
     
     # create db connection on startup, close on exit
     # app.on_startup.append(init_pg)
-    db_pool = await init_pg(app)
-    app.on_cleanup.append(close_pg)
+    try:
+        db_pool = await init_pg(app)
+        app.on_cleanup.append(close_pg)
+    except Exception as err:
+        logging.debug(msg=err)
+        retry = 1
+        max_retry = 5
+        while retry < max_retry:
+            logging.info(msg='Retrying db connection {}'.format(retry))
+            try:
+                import init_db
+                init_db.main()
+                db_pool = await init_pg(app)
+                app.on_cleanup.append(close_pg)
+            except Exception as err:
+                logging.debug(msg=err)
+                retry += 1
+                time.sleep(5)
+            else:
+                break
 
     fernet_key = fernet.Fernet.generate_key()
     secret_key = base64.urlsafe_b64decode(fernet_key)

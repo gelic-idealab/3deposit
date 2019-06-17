@@ -28,6 +28,7 @@
         </div>
       <!-- </div> -->
     </div>
+    <add-service-form />
   </div>   
 </template>
 <script>

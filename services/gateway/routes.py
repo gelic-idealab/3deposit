@@ -44,4 +44,4 @@ def setup_routes(app):
 
     # publication routes
     app.router.add_get('/publish/models', publish_models)
-    app.router.add_post('/publish', publish_models)
+    app.router.add_post('/publish/models', publish_models)

@@ -212,6 +212,22 @@ async def deposit_upload(request):
         return web.Response(status=200, headers=headers)
 
 
+async def deposit_submit(request):
+    headers = {
+    'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
+    'Access-Control-Allow-Headers': 'content-type'
+    }   
+    if request.method == 'POST':
+        try:
+            data = await request.json()
+            deposit_id = data['id']
+            deposit_form = data['form']
+            logging.debug(msg='id: {}, form: {}'.format(deposit_id, deposit_form))
+            return web.Response(status=200, headers=headers)
+        except Exception as err:
+            return web.json_response({ 'err': err }, headers=headers)
+    else:
+        return web.Response(status=200, headers=headers)
 """
 Trigger function to begin storage operation with buffered deposit file
 """

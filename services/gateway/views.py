@@ -193,6 +193,7 @@ async def deposit_upload(request):
                             f.write(b)
                     if rcn == rtc:
                         os.rename('./data/{}'.format(did+'_partial'), './data/{}'.format(did))
+                        await trigger_store(did)
             return web.Response(status=200, headers=headers)       
         except Exception as err:
             logging.debug(msg='err: {}'.format(str(err)))

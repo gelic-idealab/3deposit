@@ -1,0 +1,118 @@
+version: '3'
+
+services:
+
+  deposit-form:
+    build: ./services/deposit-form/
+    networks:
+      - proxy 
+    container_name: deposit-form
+    command: npm run serve
+    labels:
+      - "traefik.frontend.rule=Host:deposit-form.docker.localhost"
+      - "traefik.backend=deposit-form"
+      - "traefik.port=8080"
+      - "traefik.docker.network=proxy"
+
+  postgres:
+      image: postgres:10
+      networks:
+          - gateway_internal    
+      volumes:
+          - pg_data:/var/lib/postgresql
+      labels:
+        - "traefik.enable=false"    
+
+  gateway:
+      build: ./services/gateway/
+      container_name: gateway
+      links:
+          - postgres
+      depends_on: 
+          - postgres
+      networks:
+        - gateway_internal
+        - proxy
+      command: bash -c "pipenv run python init_db.py && pipenv run python gateway.py"
+      # command: bash -c "pipenv run python gateway.py"
+      labels:
+        - "traefik.frontend.rule=Host:gateway.docker.localhost"
+        - "traefik.backend=gateway"
+        - "traefik.port=8080"
+        - "traefik.docker.network=proxy"
+      volumes:
+        - ./services/gateway/data:/gateway/data
+  
+  reverse-proxy:
+      image: traefik # The official Traefik docker image
+      command: --api --docker # Enables the web UI and tells Traefik to listen to docker
+      ports:
+        - "80:80"     # The HTTP port
+        - "8080:8080" # The Web UI (enabled by --api)
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+      networks:
+        - proxy
+
+  minio-server:
+    container_name: minio-server
+    image: minio/minio:latest
+    networks:
+      - minio_internal
+    volumes:
+      - ./services/store-minio/data:/data
+    environment:
+      MINIO_ACCESS_KEY: AKIAIOSFODNN7GRAINGER
+      MINIO_SECRET_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYGRAINGERKEY
+    command: server /data
+    labels:
+      - "traefik.enable=false" 
+
+  minio-service:
+    build: ./services/store-minio/
+    container_name: minio-service
+    environment: 
+      FLASK_ENV: development
+      FLASK_APP: minio-service
+    depends_on:
+      - minio-server
+    links: 
+      - minio-server
+    networks:
+      - minio_internal
+      - proxy
+    command: pipenv run flask run --host=0.0.0.0
+    labels:
+        - "traefik.frontend.rule=Host:minio.docker.localhost"
+        - "traefik.backend=minio-service"
+        - "traefik.port=5000"
+        - "traefik.docker.network=proxy"
+
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+
+networks:
+    proxy:
+        external: true
+    gateway_internal:
+        external: false
+    minio_internal:
+        external: false
+
+volumes: 
+    pg_data:

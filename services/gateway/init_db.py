@@ -78,7 +78,7 @@ def create_default_store_service(engine):
         conn.execute(actions.insert().values(action=action, media_type=media_type, service_name=service_name))
 
 def main():
-    # time.sleep(5)
+    time.sleep(5)
     setup_db(USER_CONFIG['postgres'])
     create_tables(engine=user_engine)
     create_admin(engine=user_engine)

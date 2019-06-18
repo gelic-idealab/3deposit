@@ -2,7 +2,7 @@ import json
 import logging
 import os
 import aiohttp_jinja2
-from aiohttp import web, FormData, MultipartReader, hdrs
+from aiohttp import web, FormData, ClientSession
 from aiohttp import request as new_request
 from aiohttp_security import remember, forget, authorized_userid
 
@@ -161,7 +161,6 @@ async def deposit_upload(request):
         try:
             logging.debug(msg='query: {}'.format(request.query))
             reader = await request.multipart()
-            logging.debug(msg=str(reader))
             did = request.query['deposit_id']
             logging.debug(str(did))
             fid = request.query['resumableIdentifier']
@@ -183,17 +182,16 @@ async def deposit_upload(request):
                             b = await part.read()
                             f.write(b)
                     if int(fch) == int(ftc):
-                        logging.debug('writing last chunk')
+                        logging.debug('wrote last chunk')
                         fd = FormData()
                         data = json.dumps({ 'data': { 'bucket_name': '3deposit'} })
                         fd.add_field('data', data, content_type='application/json')
                         with open('./data/{}'.format(did), 'rb') as f:
-                            logging.debug('inside with open block')
                             fd.add_field('files', f, filename=fid)
-                        async with new_request(url='gateway.docker.localhost/store/objects', method='POST', data=fd) as resp:
-                            await resp.json()
-                            # resp_json = await resp.json()
-                            # logging.debug(msg=str(resp_json))
+                            async with ClientSession() as sess:
+                                async with sess.request(url='http://gateway.docker.localhost/store/objects', method='POST', data=fd) as resp:
+                                    resp_json = await resp.text()
+                                    logging.debug(msg=str(resp_json))
                             # f.close()
                             # os.remove('./data/{}'.format(did))
 
@@ -250,7 +248,7 @@ async def store_buckets(request):
         try:
             data = await request.json()
             payload = dict({'config': config, 'data': data})
-            async with new_request(method='POST', url=endpoint+PATH, json=payload) as resp:
+            async with new_request(method='POST', url=endpoint+PATH, data=payload) as resp:
                 resp_json = await resp.json()
                 return web.json_response({ 'resp': resp_json })
         except Exception as err:
@@ -279,10 +277,8 @@ async def store_objects(request):
 
     if request.method == 'POST':
         try:
-            req = await request.multipart()
-            data = req['data']
-            payload = dict({'config': config, 'data': data})
-            async with new_request(method='POST', url=endpoint+PATH, json=payload) as resp:
+            fd = await request.multipart()
+            async with new_request(method='POST', url=endpoint+PATH, data=fd) as resp:
                 resp_json = await resp.json()
                 return web.json_response({ 'resp': resp_json })
         except Exception as err:

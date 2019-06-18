@@ -8,52 +8,12 @@ from unpack import *
 
 DATABASE_NAME = '3deposit'
 
-def mongo_keys(request_auth):
-    if not request_auth:
-        return False
-
-    # config = json.loads(request_auth.form.get('config'))
-    # auth = config.get('auth')
-
-    # try:
-    # config = json.loads(request_auth.form.get('config'))
-    access_key = get_value(request=request, scope='config', field='access_key')
-    secret_key = get_value(request=request, scope='config', field='secret_key')
-
-    auth_packed = {"access_key":access_key, "secret_key":secret_key}
-    return auth_packed
-
-    # except JSONDecodeError as err:
-    #     return {"err":"Invalid formatting of data.",
-    #                     "log":str(err)}
-    # except (InvalidAccessKeyId,SignatureDoesNotMatch,AccessDenied) as err:
-    #     return {"err":"Invalid Authentication.",
-    #                     "log":str(err)}
-    # except AttributeError as err:
-    #     return {"err":"Please provide auth keys.",
-    #                     "log":str(err)}
-
-
 def create_client(request):
     if not request:
         return False
 
-    #COLLECTION_NAME = 'metadata'
     username = 'root'
     password = 'example'
-
-    # database = client['3deposit']
-    #collection = database.COLLECTION_NAME
-
-    #try:
-
-    if mongo_keys(request):
-        auth = mongo_keys(request)
-        if "err" in auth:
-            return auth
-    else:
-        return {"err": "No authentication keys provided",
-                        "log":str(err)}
 
     client = MongoClient(
         'mongodb://{username}:{password}@localhost:27017/'.format(

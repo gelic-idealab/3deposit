@@ -199,7 +199,7 @@ async def deposit_upload(request):
                         fd = FormData()
                         deposit_id = dict({'deposit_id': did})
                         with open('./data/{}'.format(did), 'rb') as f:
-                            fd.add_field('files', f, filename=rid)
+                            fd.add_field('file', f, filename=rid, content_type='application/octet-stream')
                             async with ClientSession() as sess:
                                 async with sess.request(url='http://gateway:8080/store/objects', method='POST', data=fd, params=deposit_id) as resp:
                                     resp_json = await resp.json()
@@ -272,9 +272,11 @@ async def store_buckets(request):
 
 async def store_objects(request):
     PATH = '/object'
-    service_config = await get_service_config_by_action(request=request, action='store')
+    service_config = await get_service_config_by_action(request=request, action='store', media_type='default')
     config = service_config.get('config')
     endpoint = service_config.get('endpoint')
+    bucket_name = dict({'bucket_name': '3deposit'})
+    config.update(bucket_name)
 
     if request.method == 'GET':
         try:
@@ -292,20 +294,20 @@ async def store_objects(request):
 
     if request.method == 'POST':
         try:
-            q = request.query
-            deposit_id = dict({ 'deposit_id': q['deposit_id'] })
+            q = dict(request.query)
             fd = FormData()
             reader = await request.multipart()
             while True:
                 part = await reader.next()
                 if part is None:
                     break
-                if part.name == 'files':
-                    fd.add_field('files', await part.read())
+                if part.name == 'file':
+                    # logging.debug(msg=str(await part.read()))
+                    fd.add_field(name='file', value=await part.read(), filename=q.get('deposit_id'), content_type='application/octet-stream')
                 else:
                     continue
             fd.add_field('config', json.dumps(config), content_type='application/json')
-            fd.add_field('data', json.dumps(deposit_id), content_type='application/json')
+            fd.add_field('data', json.dumps(q), content_type='application/json')
             logging.debug(msg='fd fields: {}'.format(str(fd._fields)))
             async with new_request(method='POST', url=endpoint+PATH, data=fd) as resp:
                 resp_json = await resp.json()

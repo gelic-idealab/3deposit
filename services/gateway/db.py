@@ -1,4 +1,5 @@
 import json
+import logging
 import aiopg.sa
 from sqlalchemy import (
     MetaData, Table, Column, ForeignKey,
@@ -156,10 +157,10 @@ async def get_service_config(conn, name):
     result = await conn.execute(
         services
         .select()
-        # .with_only_columns()
         .where(services.c.name == name)
     )
     service = await result.fetchone()
+    logging.debug(msg='get_service_config returned: {}'.format(str(service)))
     if service:
         return dict(service)
     else:
@@ -185,15 +186,36 @@ async def set_service_config(conn, name, endpoint, config):
 
 # action config queries
 async def get_action_service_name(conn, action, media_type):
+    logging.debug(msg='get_action_service_name called with: {}, {}'.format(action, media_type))
     result = await conn.execute(
         actions
-        .select([actions.c.service_name])
-        .where(
-            actions.c.action == action,
-            actions.c.media_type == media_type)
+        .select()
+        .where(actions.c.action == action)
+        # .where(actions.c.media_type == media_type)
         )
-    service_name = await result.fetchone()
+    service = await result.fetchone()
+    service_dict = dict(service)
+    service_name = service_dict.get('service_name')
+    logging.debug(msg='service name retrieved: {}'.format(str(service_name)))
     if service_name:
-        return service_name
+        return str(service_name)
+    else:
+        return None
+
+async def get_action_services(conn):
+    result = await conn.execute(
+        actions
+        .select()
+    )
+    column_keys = result.keys()
+    service_list = await result.fetchall()
+    if service_list:
+        service_objects = []
+        for s in service_list:
+            s_obj = {}
+            for (i,k) in enumerate(column_keys):
+                s_obj.update(dict({k:s[i]}))
+            service_objects.append(s_obj)
+        return service_objects
     else:
         return None

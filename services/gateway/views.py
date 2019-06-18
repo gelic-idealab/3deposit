@@ -138,8 +138,18 @@ async def services_configs(request):
         except Exception as err:
             return web.json_response({ 'err': str(err) }, headers=headers)
 
-    else:
-        return web.Response(status=200, headers=headers)
+async def services_actions(request):
+    if request.method == 'GET':
+        try:
+            async with request.app['db'].acquire() as conn:
+                services = await db.get_action_services(conn)
+                if services:
+                    return web.json_response({ 'services': services }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+                else:
+                    return web.json_response({ 'res': 'no action services'}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+        except Exception as err:
+            return web.json_response({ 'err': str(err) }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+
 
 """
 Handlers for deposit form frontend
@@ -198,15 +208,14 @@ async def deposit_upload(request):
                     if rcn == rtc:
                         logging.debug('wrote last chunk')
                         fd = FormData()
-                        data = json.dumps({ 'data': { 'bucket_name': '3deposit'} })
-                        fd.add_field('data', data, content_type='application/json')
+                        deposit_id = dict({'deposit_id': did})
                         with open('./data/{}'.format(did), 'rb') as f:
                             fd.add_field('files', f, filename=rid)
                             async with ClientSession() as sess:
-                                async with sess.request(url='http://gateway:8080/store/objects', method='POST', data=fd) as resp:
-                                    resp_json = await resp.text()
-                                    logging.debug(msg=str(resp_json))
-                                    os.remove('./data/{}'.format(did))
+                                async with sess.request(url='http://gateway:8080/store/objects', method='POST', data=fd, params=deposit_id) as resp:
+                                    resp_json = await resp.json()
+                                    logging.debug(msg='upload forward to /store/objects responded with: {}'.format(str(resp_json)))
+                        os.remove('./data/{}'.format(did))
 
             return web.Response(status=200, headers=headers)       
         except Exception as err:
@@ -224,9 +233,11 @@ async def get_service_config_by_action(request, action, media_type='default'):
     try:
         async with request.app['db'].acquire() as conn:
             action_service_name = await db.get_action_service_name(conn=conn, action=action, media_type=media_type)
+            logging.debug(msg=str(action_service_name))
         async with request.app['db'].acquire() as conn:
             service_config = await db.get_service_config(conn=conn, name=action_service_name)
             if service_config:
+                logging.debug(msg=str(service_config))
                 return service_config
             else:
                 return None
@@ -248,13 +259,14 @@ async def store_buckets(request):
         try:
             data = request.query
             config.update({'bucket_name': data.get('bucket_name')})
-            payload = dict({'config': config})
-            async with new_request(method='GET', url=endpoint+PATH, json=payload) as resp:
+            fd = FormData()
+            fd.add_field('config', json.dumps(config), content_type='application/json')
+            async with new_request(method='GET', url=endpoint+PATH, data=fd) as resp:
                 try:
                     resp_json = await resp.json()
                 except Exception as err:
                     return web.json_response({'err': str(err), 'resp': await resp.text()})
-                return web.json_response({ 'resp': resp_json, 'payload': payload })
+                return web.json_response({ 'resp': resp_json })
         except Exception as err:
             return web.json_response({ 'origin': 'gateway', 'err': str(err) })
 
@@ -291,7 +303,21 @@ async def store_objects(request):
 
     if request.method == 'POST':
         try:
-            fd = await request.multipart()
+            q = request.query
+            deposit_id = dict({ 'deposit_id': q['deposit_id'] })
+            fd = FormData()
+            reader = await request.multipart()
+            while True:
+                part = await reader.next()
+                if part is None:
+                    break
+                if part.name == 'files':
+                    fd.add_field('files', await part.read())
+                else:
+                    continue
+            fd.add_field('config', json.dumps(config), content_type='application/json')
+            fd.add_field('data', json.dumps(deposit_id), content_type='application/json')
+            logging.debug(msg='fd fields: {}'.format(str(fd._fields)))
             async with new_request(method='POST', url=endpoint+PATH, data=fd) as resp:
                 resp_json = await resp.json()
                 return web.json_response({ 'resp': resp_json })

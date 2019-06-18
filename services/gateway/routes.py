@@ -8,6 +8,7 @@ from views import (
     store_objects,
     services, 
     services_configs,
+    services_actions,
     publish_models
 )
 
@@ -31,6 +32,7 @@ def setup_routes(app):
     app.router.add_get('/services', services)
     app.router.add_get('/services/configs', services_configs)
     app.router.add_post('/services/configs', services_configs)
+    app.router.add_get('/services/actions', services_actions)
 
 
     # deposit form routes

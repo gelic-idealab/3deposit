@@ -157,50 +157,51 @@ async def deposit_form_active(request):
 
 
 async def deposit_upload(request):
+    headers = dict({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'})
     if request.method == 'POST':
         try:
             logging.debug(msg='query: {}'.format(request.query))
             reader = await request.multipart()
             did = request.query['deposit_id']
             logging.debug(str(did))
-            fid = request.query['resumableIdentifier']
-            fch = request.query['resumableChunkNumber']
-            ftc = request.query['resumableTotalChunks']
+            rid = request.query['resumableIdentifier']
+            rcn = int(request.query['resumableChunkNumber'])
+            rtc = int(request.query['resumableTotalChunks'])
             while True:
                 part = await reader.next()
                 if part is None:
                     break
                 if part.name == 'file':
-                    if int(fch) == 1:
+                    if rcn == 1:
                         logging.debug('writing first chunk')
                         with open('./data/{}'.format(did), 'wb') as f:
                             b = await part.read()
                             f.write(b)
-                    if int(fch) > 1:
+                    if rcn > 1:
                         with open('./data/{}'.format(did), 'ab') as f:
                             logging.debug('writing subsequent chunk')
                             b = await part.read()
                             f.write(b)
-                    if int(fch) == int(ftc):
+                    if rcn == rtc:
                         logging.debug('wrote last chunk')
                         fd = FormData()
                         data = json.dumps({ 'data': { 'bucket_name': '3deposit'} })
                         fd.add_field('data', data, content_type='application/json')
                         with open('./data/{}'.format(did), 'rb') as f:
-                            fd.add_field('files', f, filename=fid)
+                            fd.add_field('files', f, filename=rid)
                             async with ClientSession() as sess:
-                                async with sess.request(url='http://gateway.docker.localhost/store/objects', method='POST', data=fd) as resp:
+                                async with sess.request(url='http://gateway:8080/store/objects', method='POST', data=fd) as resp:
                                     resp_json = await resp.text()
                                     logging.debug(msg=str(resp_json))
-                            # f.close()
-                            # os.remove('./data/{}'.format(did))
+                                    os.remove('./data/{}'.format(did))
 
-            return web.Response(status=200, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))       
+            return web.Response(status=200, headers=headers)       
         except Exception as err:
             logging.debug(str(err))
-            return web.json_response({ 'err': str(err) }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+            return web.json_response({ 'err': str(err) }, headers=headers)
     else:
-        return web.Response(status=200, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))     
+        return web.Response(status=200, headers=headers)
+
 
 
 """

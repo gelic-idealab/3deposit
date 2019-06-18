@@ -14,6 +14,7 @@ services:
 
   gateway:
       build: .
+      container_name: gateway
     #   ports:
     #       - "8080:8080"
       links:
@@ -23,8 +24,8 @@ services:
       networks:
         - gateway_internal
         - proxy
-      command: bash -c "pipenv run python init_db.py && pipenv run python gateway.py"
-      # command: bash -c "pipenv run python gateway.py"
+      # command: bash -c "pipenv run python init_db.py && pipenv run python gateway.py"
+      command: bash -c "pipenv run python gateway.py"
       labels:
         - "traefik.frontend.rule=Host:gateway.docker.localhost"
         - "traefik.backend=gateway"

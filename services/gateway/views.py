@@ -186,7 +186,7 @@ async def deposit_upload(request):
             logging.debug(msg='query: {}'.format(request.query))
             reader = await request.multipart()
             did = request.query['deposit_id']
-            logging.debug(str(did))
+            logging.debug('uploading {}'.format(str(did)))
             rid = request.query['resumableIdentifier']
             rcn = int(request.query['resumableChunkNumber'])
             rtc = int(request.query['resumableTotalChunks'])
@@ -196,17 +196,14 @@ async def deposit_upload(request):
                     break
                 if part.name == 'file':
                     if rcn == 1:
-                        logging.debug('writing first chunk')
                         with open('./data/{}'.format(did), 'wb') as f:
                             b = await part.read()
                             f.write(b)
                     if rcn > 1:
                         with open('./data/{}'.format(did), 'ab') as f:
-                            logging.debug('writing subsequent chunk')
                             b = await part.read()
                             f.write(b)
                     if rcn == rtc:
-                        logging.debug('wrote last chunk')
                         fd = FormData()
                         deposit_id = dict({'deposit_id': did})
                         with open('./data/{}'.format(did), 'rb') as f:
@@ -214,12 +211,11 @@ async def deposit_upload(request):
                             async with ClientSession() as sess:
                                 async with sess.request(url='http://gateway:8080/store/objects', method='POST', data=fd, params=deposit_id) as resp:
                                     resp_json = await resp.json()
-                                    logging.debug(msg='upload forward to /store/objects responded with: {}'.format(str(resp_json)))
                         os.remove('./data/{}'.format(did))
 
             return web.Response(status=200, headers=headers)       
         except Exception as err:
-            logging.debug(str(err))
+            logging.debug(msg='err: {}'.format(str(err)))
             return web.json_response({ 'err': str(err) }, headers=headers)
     else:
         return web.Response(status=200, headers=headers)
@@ -233,11 +229,9 @@ async def get_service_config_by_action(request, action, media_type='default'):
     try:
         async with request.app['db'].acquire() as conn:
             action_service_name = await db.get_action_service_name(conn=conn, action=action, media_type=media_type)
-            logging.debug(msg=str(action_service_name))
         async with request.app['db'].acquire() as conn:
             service_config = await db.get_service_config(conn=conn, name=action_service_name)
             if service_config:
-                logging.debug(msg=str(service_config))
                 return service_config
             else:
                 return None
@@ -313,13 +307,11 @@ async def store_objects(request):
                 if part is None:
                     break
                 if part.name == 'file':
-                    # logging.debug(msg=str(await part.read()))
                     fd.add_field(name='file', value=await part.read(), filename=q.get('deposit_id'), content_type='application/octet-stream')
                 else:
                     continue
             fd.add_field('config', json.dumps(config), content_type='application/json')
             fd.add_field('data', json.dumps(q), content_type='application/json')
-            logging.debug(msg='fd fields: {}'.format(str(fd._fields)))
             async with new_request(method='POST', url=endpoint+PATH, data=fd) as resp:
                 resp_json = await resp.json()
                 return web.json_response({ 'resp': resp_json })

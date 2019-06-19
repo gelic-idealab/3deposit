@@ -4,6 +4,7 @@ from views import (
     logout, 
     deposit_form_active, 
     deposit_upload,
+    deposit_submit,
     store_buckets,
     store_objects,
     services, 
@@ -39,6 +40,7 @@ def setup_routes(app):
     app.router.add_get('/deposit/forms/active', deposit_form_active)
     app.router.add_post('/deposit/forms/active', deposit_form_active)
     app.router.add_view('/deposit/upload', deposit_upload)
+    app.router.add_view('/deposit/submit', deposit_submit)
 
     # storage routes
     app.router.add_get('/store/buckets', store_buckets)

@@ -44,6 +44,7 @@
       </template>
       <!-- </div> -->
       </div>
+      <button type="button" class="btn btn-primary btn-lg btn-block" v-on:click="submitDeposit">Submit</button>
     </div>
     </div>
   </div>
@@ -51,6 +52,9 @@
 
 
 <script>
+import axios from 'axios';
+
+
 export default {
   name: 'Fields',
   props: {
@@ -84,6 +88,18 @@ export default {
           return false
         }
       }
+    },
+    submitDeposit: function () {
+      axios({
+        url: 'http://gateway.docker.localhost/deposit/submit',
+        data: { 
+          'form': this.fields, 
+          'id': this.id 
+          },
+        method: 'post',
+        config: { headers: {'Content-Type': 'application/json' }}
+        })
+      .then(response => (console.log(response)))
     }
   },
 }

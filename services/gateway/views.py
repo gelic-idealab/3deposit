@@ -176,7 +176,6 @@ async def deposit_upload(request):
             reader = await request.multipart()
             did = request.query['deposit_id']
             logging.debug('uploading {}'.format(str(did)))
-            rid = request.query['resumableIdentifier']
             rcn = int(request.query['resumableChunkNumber'])
             rtc = int(request.query['resumableTotalChunks'])
             while True:
@@ -185,23 +184,16 @@ async def deposit_upload(request):
                     break
                 if part.name == 'file':
                     if rcn == 1:
-                        with open('./data/{}'.format(did), 'wb') as f:
+                        with open('./data/{}'.format(did+'_partial'), 'wb') as f:
                             b = await part.read()
                             f.write(b)
-                    if rcn > 1:
-                        with open('./data/{}'.format(did), 'ab') as f:
+                    elif rcn > 1:
+                        with open('./data/{}'.format(did+'_partial'), 'ab') as f:
                             b = await part.read()
                             f.write(b)
                     if rcn == rtc:
-                        fd = FormData()
-                        deposit_id = dict({'deposit_id': did})
-                        with open('./data/{}'.format(did), 'rb') as f:
-                            fd.add_field('file', f, filename=rid, content_type='application/octet-stream')
-                            async with ClientSession() as sess:
-                                async with sess.request(url='http://gateway:8080/store/objects', method='POST', data=fd, params=deposit_id) as resp:
-                                    resp_json = await resp.json()
-                        os.remove('./data/{}'.format(did))
-
+                        os.rename('./data/{}'.format(did+'_partial'), './data/{}'.format(did))
+                        await trigger_store(did)
             return web.Response(status=200, headers=headers)       
         except Exception as err:
             logging.debug(msg='err: {}'.format(str(err)))
@@ -209,6 +201,73 @@ async def deposit_upload(request):
     else:
         return web.Response(status=200, headers=headers)
 
+
+async def deposit_submit(request):
+    COLLECTION_NAME = 'deposit_metadata'
+    headers = {
+    'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
+    'Access-Control-Allow-Headers': 'content-type'
+    }   
+    if request.method == 'POST':
+        try:
+            data = await request.json()
+            deposit_id = data['id']
+            deposit_metadata = data['form']
+            logging.debug(msg='id: {}, form: {}'.format(deposit_id, deposit_metadata))
+            await trigger_mongo(deposit_id, deposit_metadata, COLLECTION_NAME)
+            return web.Response(status=200, headers=headers)
+        except Exception as err:
+            return web.json_response({ 'err': err }, headers=headers)
+    else:
+        return web.Response(status=200, headers=headers)
+"""
+Trigger function to begin storage operation with buffered deposit file
+"""
+
+async def trigger_store(did):
+    fd = FormData()
+    deposit_id = dict({'deposit_id': did})
+    with open('./data/{}'.format(did), 'rb') as f:
+        fd.add_field('file', f, filename=did, content_type='application/octet-stream')
+        async with ClientSession() as sess:
+            async with sess.request(url='http://gateway:8080/store/objects', method='POST', data=fd, params=deposit_id) as resp:
+                resp_json = await resp.json()
+                logging.debug(msg=str(resp_json))
+    os.remove('./data/{}'.format(did))
+
+async def trigger_publish(did, metadata):
+    deposit_id = dict({ 'deposit_id': did })
+    fd = FormData()
+    fd.add_field('data', metadata, content_type='application/json')
+    with open('./data/{}'.format(did), 'rb') as f:
+        fd.add_field('file', f, filename=did, content_type='application/octet-stream')
+    if metadata.get('media_type') == 'model':
+        async with new_request.post(url='http://gateway:8080/publish/models', data=fd, params=deposit_id) as resp:
+            resp_json = await resp.json()
+            logging.debug(msg=str(resp_json))
+    elif metadata.get('media_type') == 'video':
+        async with new_request.post(url='http://gateway:8080/publish/videos', data=fd, params=deposit_id) as resp:
+            resp_json = await resp.json()
+            logging.debug(msg=str(resp_json))
+    elif metadata.get('media_type') == 'vr':
+        async with new_request.post(url='http://gateway:8080/publish/vr', data=fd, params=deposit_id) as resp:
+            resp_json = await resp.json()
+            logging.debug(msg=str(resp_json))
+
+async def trigger_mongo(deposit_id, deposit_metadata, collection_name):
+    data = {}
+    deposit_metadata = dict({ 'deposit_metadata': deposit_metadata })
+    deposit_id = dict({ 'deposit_id': deposit_id })
+    data.update(deposit_id)
+    data.update(deposit_metadata)
+    config = {}
+    collection_name = dict({ 'collection_name': collection_name })
+    config.update(collection_name)
+    fd = FormData()
+    fd.add_field('data', json.dumps(data), content_type='application/json')
+    fd.add_field('config', json.dumps(config), content_type='application/json')
+    async with new_request(method='POST', url='http://mongo-service:5000/objects', data=fd) as resp:
+        logging.debug(msg=str(await resp.json()))
 
 
 """
@@ -314,8 +373,6 @@ Relay endpoint to get/post to Model publication service
 async def publish_models(request):
     service_config = await get_service_config_by_action(request=request, action='publish', media_type='models')
     service_name = service_config.get('name')
-    config = service_config.get('config')
-    endpoint = service_config.get('endpoint')
     try:
         async with request.app['db'].acquire() as conn:
             service_config = await db.get_service_config(conn=conn, name=service_name)
@@ -343,6 +400,24 @@ async def publish_models(request):
 
     if request.method == 'POST':
         try:
+            q = request.query
+            fd = FormData()
+            reader = await request.multipart()
+            while True:
+                part = await reader.next()
+                if part is None:
+                    break
+                if part.name == 'data':
+                    fd.add_field('data', await part.json(), content_type='application/json')
+                if part.name == 'file':
+                    fd.add_field(name='file', value=await part.read(), filename=q.get('deposit_id'), content_type='application/octet-stream')
+                else:
+                    continue
+            fd.add_field('config', json.dumps(config), content_type='application/json')
+            fd.add_field('data', json.dumps(q), content_type='application/json')
+            async with new_request(method='POST', url=endpoint, data=fd) as resp:
+                resp_json = await resp.json()
+                return web.json_response({ 'resp': resp_json })
             data = await request.json()
             payload = dict({'config': config, 'data': data})
             async with new_request(method='POST', url=endpoint, json=payload) as resp:

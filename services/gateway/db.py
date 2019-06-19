@@ -160,7 +160,7 @@ async def get_service_config(conn, name):
         .where(services.c.name == name)
     )
     service = await result.fetchone()
-    logging.debug(msg='get_service_config returned: {}'.format(str(service)))
+    logging.debug(msg='get_service_config returned: {}'.format(str(dict(service))))
     if service:
         return dict(service)
     else:
@@ -194,13 +194,33 @@ async def get_action_service_name(conn, action, media_type):
         # .where(actions.c.media_type == media_type)
         )
     service = await result.fetchone()
-    service_dict = dict(service)
-    service_name = service_dict.get('service_name')
-    logging.debug(msg='service name retrieved: {}'.format(str(service_name)))
-    if service_name:
+    if service:
+        logging.debug(msg='service name retrieved: {}'.format(str(dict(service))))
+        service_name = service.get('service_name')
         return str(service_name)
     else:
         return None
+
+# action config queries
+async def set_action_service_name(conn, action, media_type, service_name):
+    logging.debug(msg='set_action_service_name called with: {}, {}: {}'.format(action, media_type, service_name))
+    current_service = await get_action_service_name(conn, action, media_type)
+    if current_service:
+        await conn.execute(
+            actions
+            .update()
+            .where(actions.c.action == action)
+            # .where(actions.c.media_type == media_type)
+            .values(service_name=service_name)
+        )
+        return 'action config updated for {}, {}: {}'.format(action, media_type, service_name)
+    else:
+        await conn.execute(
+            actions
+            .insert()
+            .values(action=action, media_type=media_type, service_name=service_name)
+        )
+        return 'action config created for {}, {}: {}'.format(action, media_type, service_name)
 
 async def get_action_services(conn):
     result = await conn.execute(
@@ -219,3 +239,4 @@ async def get_action_services(conn):
         return service_objects
     else:
         return None
+

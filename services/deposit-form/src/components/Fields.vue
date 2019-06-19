@@ -30,7 +30,7 @@
               <select class="form-control ml-3 mb-3"
               v-model="field.value" 
               >
-                <option v-for="option in field.options" :key="option.value">
+                <option v-for="option in field.options" :value="option.value" :key="option.value">
                 {{ option.label }} 
                 </option> 
               </select>
@@ -92,9 +92,10 @@ export default {
     submitDeposit: function () {
       axios({
         url: 'http://gateway.docker.localhost/deposit/submit',
-        data: { 
+        data: {
+          'media_type': this.fields[0].value,
           'form': this.fields, 
-          'id': this.id 
+          'id': this.id
           },
         method: 'post',
         config: { headers: {'Content-Type': 'application/json' }}

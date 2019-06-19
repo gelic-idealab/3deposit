@@ -3,7 +3,7 @@ import json
 import requests
 from flask import Flask, request, jsonify
 
-from unpack import get_value
+from unpack_001 import get_value
 
 '''
 Flask app that takes in zipped 3d model file, JSON data, and Sketchfab API token
@@ -29,7 +29,7 @@ def models():
         
         token = get_value(request, 'config', 'token')
         headers = {'Authorization': 'Token {}'.format(token)}
-        name = get_value(request, 'data', 'name')
+        name = get_value(request, 'data', 'Creator Name')
         data = {'name': name}
         
         # data = {'name': post_data.get('name'),

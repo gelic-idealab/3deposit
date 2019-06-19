@@ -403,7 +403,7 @@ async def publish_models(request):
                     with open('./data/{}'.format(did), 'rb') as f:
                         fd.add_field('file', f, filename=did, content_type='application/octet-stream')
                         async with new_request(method='POST', url=endpoint+PATH, data=fd) as resp:
-                            logging.debug(msg=str(resp))
+                            return web.json_response({ 'res': await resp.text() })
                 else:
                     return web.json_response({ 'err': 'could not retrieve config for service: {}'.format(service_name)})
         except Exception as err:

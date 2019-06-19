@@ -88,23 +88,62 @@ services:
         - "traefik.port=5000"
         - "traefik.docker.network=proxy"
 
-  mongo:
+  mongo-server:
     image: mongo
+    container_name: mongo-server
     restart: always
-    ports:
-      - 27017:27017
+    # ports:
+    #   - 27017:27017
+    networks:
+      - mongo_internal
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - ./services/store-mongo/data:/data
+    labels:
+      - "traefik.enable=false" 
 
   mongo-express:
     image: mongo-express
     restart: always
-    ports:
-      - 8081:8081
+    # ports:
+    #   - 8081:8081
+    networks:
+      - mongo_internal
+      - proxy
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_SERVER: mongo-server
+    labels:
+      - "traefik.frontend.rule=Host:mongo-express.docker.localhost"
+      - "traefik.backend=mongo-express"
+      - "traefik.port=8081"
+      - "traefik.docker.network=proxy"
+
+  mongo-service:
+    build: ./services/store-mongo/
+    container_name: mongo-service
+    # ports: 
+    #   - "5000:5000"
+    depends_on:
+      - mongo-server
+    links: 
+      - mongo-server
+    networks:
+      - mongo_internal
+      - proxy
+    environment: 
+      FLASK_ENV: development
+      FLASK_APP: mongo-service
+    command: pipenv run flask run --host=0.0.0.0
+    labels:
+        - "traefik.frontend.rule=Host:mongo.docker.localhost"
+        - "traefik.backend=mongo-service"
+        - "traefik.port=5000"
+        - "traefik.docker.network=proxy"
+
 
 networks:
     proxy:
@@ -112,6 +151,8 @@ networks:
     gateway_internal:
         external: false
     minio_internal:
+        external: false
+    mongo_internal:
         external: false
 
 volumes: 

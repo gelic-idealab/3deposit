@@ -3,8 +3,8 @@ import json
 from json import JSONDecodeError
 from flask import Flask, request, jsonify
 from pymongo import MongoClient
-from unpack import *
-
+from unpack_001 import get_value
+import logging
 
 DATABASE_NAME = '3deposit'
 
@@ -16,7 +16,7 @@ def create_client(request):
     password = 'example'
 
     client = MongoClient(
-        'mongodb://{username}:{password}@localhost:27017/'.format(
+        'mongodb://{username}:{password}@mongo-server:27017/'.format(
         username=username,
         password=password
         )
@@ -45,14 +45,20 @@ def create_app():
 
             database = client['3deposit']
 
-            collection_name = get_value(request=request, scope='config', field='collection_name')
-            deposit_id = get_value(request=request, scope='data', field='deposit_id')
-            
+            # collection_name = get_value(request=request, scope='config', field='collection_name')
+            # deposit_id = get_value(request=request, scope='data', field='deposit_id')
+
+            logging.debug(msg=str(request.form))
+
+            config = json.loads(request.form.get('config'))
+            logging.debug(msg=str(config))
+            collection_name = config.get('collection_name')
             data = json.loads(request.form.get('data'))
+            deposit_id = data.get('deposit_id')
             deposit_metadata = data.get('deposit_metadata')
 
             if not collection_name:
-                return jsonify({"err":"Please enter a valid collection."})
+                return jsonify({"err":"No collection_name."})
 
             if not deposit_id:
                 return jsonify({"err":"Please enter a valid deposit_id."})

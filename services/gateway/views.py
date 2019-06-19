@@ -214,7 +214,7 @@ async def deposit_upload(request):
 
 
 async def deposit_submit(request):
-    COLLECTION_NAME = 'deposit_metadata'
+    COLLECTION_NAME = 'deposits'
     headers = {
     'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
     'Access-Control-Allow-Headers': 'content-type'
@@ -223,9 +223,8 @@ async def deposit_submit(request):
         try:
             data = await request.json()
             deposit_id = data['id']
-            deposit_metadata = data['form']
-            logging.debug(msg='id: {}, form: {}'.format(deposit_id, deposit_metadata))
-            await trigger_mongo(deposit_id, deposit_metadata, COLLECTION_NAME)
+            # logging.debug(msg='id: {}, form: {}'.format(deposit_id, deposit_metadata))
+            await trigger_mongo(deposit_id, data, COLLECTION_NAME)
             return web.Response(status=200, headers=headers)
         except Exception as err:
             return web.json_response({ 'err': err }, headers=headers)
@@ -278,7 +277,7 @@ async def trigger_mongo(deposit_id, deposit_metadata, collection_name):
     fd.add_field('data', json.dumps(data), content_type='application/json')
     fd.add_field('config', json.dumps(config), content_type='application/json')
     async with new_request(method='POST', url='http://mongo-service:5000/objects', data=fd) as resp:
-        logging.debug(msg=str(await resp.json()))
+        logging.debug(msg=str(await resp.text()))
 
 
 """

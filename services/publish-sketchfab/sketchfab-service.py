@@ -37,6 +37,7 @@ def models():
         headers = {'Authorization': 'Token {}'.format(token)}
         # name = get_value(request, 'data', 'Creator Name')
         data = json.loads(request.form.get('data'))
+        logging.debug(msg='sf metadata: {}'.format(str(metadata)))
         metadata = data.get('metadata')
         name = metadata.get('Object Title')
         logging.debug(msg='sketchfab name: {}'.format(name))

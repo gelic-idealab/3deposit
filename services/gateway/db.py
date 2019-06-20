@@ -160,8 +160,8 @@ async def get_service_config(conn, name):
         .where(services.c.name == name)
     )
     service = await result.fetchone()
-    logging.debug(msg='get_service_config returned: {}'.format(str(dict(service))))
     if service:
+        logging.debug(msg='get_service_config returned: {}'.format(str(dict(service))))
         return dict(service)
     else:
         return None

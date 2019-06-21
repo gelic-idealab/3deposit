@@ -6,10 +6,6 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-pyvimeo = "*"
-flask = "*"
-requests = "*"
-unpack = "*"
 
 [requires]
-python_version = "3.5"
+python_version = "3.7"

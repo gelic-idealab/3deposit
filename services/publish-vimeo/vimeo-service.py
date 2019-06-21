@@ -3,7 +3,7 @@ import json
 import requests
 import vimeo
 from flask import Flask, request, jsonify
-import unpack
+from unpack import get_value
 
 '''
 Flask app that takes in 360 video file, JSON data, and credentials 
@@ -18,9 +18,9 @@ app = Flask(__name__)
 def post_to_vimeo():
     if request.method == 'POST':
         try:
-            access_token = get_value(request, 'config', 'access_token')
-            client_id = get_value(request, 'config', 'client_id')
-            client_secret = get_value(request, 'config', 'client_secret')
+            access_token = unpack.get_value(request, 'config', 'access_token')
+            client_id = unpack.get_value(request, 'config', 'client_id')
+            client_secret = unpack.get_value(request, 'config', 'client_secret')
         except Exception as err:
             return jsonify({'err': str(err)})
 
@@ -33,11 +33,11 @@ def post_to_vimeo():
 
         try:
             # unpack payload
-            name = get_value(request, 'data', 'name')
-            description = get_value(request, 'data', 'description')
-            filename = get_value(request, 'data', 'filename')
-            projection = get_value(request, 'data', 'projection')
-            stereo_format = get_value(request, 'data', 'stereo_format')
+            name = unpack.get_value(request, 'data', 'name')
+            description = unpack.get_value(request, 'data', 'description')
+            filename = unpack.get_value(request, 'data', 'filename')
+            projection = unpack.get_value(request, 'data', 'projection')
+            stereo_format = unpack.get_value(request, 'data', 'stereo_format')
 
             file = request.files.get('file')
             if file and filename:
@@ -51,7 +51,7 @@ def post_to_vimeo():
                 })
 
                 os.remove(filename)
-                return jsonify({'uri': uri})
+                return jsonify({'res': {'uri': uri}})
             else:
                 return jsonify({'err': 'No file provided'})
         except Exception as err:
@@ -72,11 +72,20 @@ def post_to_vimeo():
             secret=client_secret
         )
 
-        # try:
-
-        #         return jsonify({'err': 'No data retrieved'})
-        # except Exception as err:
-        #     return jsonify({'err': str(err)})
+        try:
+            if:
+                videos = client.get('https://api.vimeo.com/channels/{channel_id}/videos')
+                followers = client.get('https://api.vimeo.com/channels/{channel_id}/users')
+                comments = client.get('https://api.vimeo.com/videos/{video_id}/comments')
+                return jsonify({'res': {
+                                    'all_videos': videos,
+                                    'all_followers': followers,
+                                    'all_comments': comments
+                        })
+            else:
+                return jsonify({'err': 'No data provided'})
+        except Exception as err:
+            return jsonify({'err': str(err)})
 
 if __name__ == '__main__':
     app.run(debug=True)

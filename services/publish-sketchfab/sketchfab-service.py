@@ -2,7 +2,7 @@ import os
 import json
 import requests
 from flask import Flask, request, jsonify
-
+import logging
 from unpack_001 import get_value
 
 '''
@@ -23,15 +23,27 @@ app = Flask(__name__)
 def models():
     #Posts the model to sketchfab.
     if request.method == 'POST':
+        logging.debug(msg='sketchfab req: {}'.format(request.form))
+
         SKETCHFAB_DOMAIN = 'sketchfab.com'
         SKETCHFAB_API_URL = 'https://api.{}/v3'.format(SKETCHFAB_DOMAIN)
         MODEL_ENDPOINT = SKETCHFAB_API_URL + '/models'
         
-        token = get_value(request, 'config', 'token')
+        logging.debug(msg='sketchfab req: {}'.format(request.form))
+        # token = get_value(request, 'config', 'token')
+        config = json.loads(request.form.get('config'))
+        auth = config.get('auth')
+        token = auth.get('token')
         headers = {'Authorization': 'Token {}'.format(token)}
-        name = get_value(request, 'data', 'Creator Name')
+        # name = get_value(request, 'data', 'Creator Name')
+        data = json.loads(request.form.get('data'))
+        logging.debug(msg='sf metadata: {}'.format(str(metadata)))
+        metadata = data.get('metadata')
+        name = metadata.get('Object Title')
+        logging.debug(msg='sketchfab name: {}'.format(name))
         data = {'name': name}
-        
+        logging.debug('sketchfab values: {}, {}'.format(token, name))
+
         # data = {'name': post_data.get('name'),
         #         'description': post_data.get('description'),
         #         'tags': post_data.get('tags'),

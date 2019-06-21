@@ -125,7 +125,7 @@ async def services_configs(request):
             async with request.app['db'].acquire() as conn:
                 service = await db.set_service_config(conn=conn, name=req.get('name'), endpoint=req.get('endpoint'), config=req.get('config'))
                 if service:
-                    return web.json_response({ 'res': service })
+                    return web.json_response({ 'res': str(service) })
         except Exception as err:
             return web.json_response({ 'err': str(err) })
 
@@ -220,9 +220,11 @@ async def deposit_submit(request):
     if request.method == 'POST':
         try:
             data = await request.json()
-            deposit_id = data['id']
+            did = data.get('id')
             # logging.debug(msg='id: {}, form: {}'.format(deposit_id, deposit_metadata))
-            await trigger_metadata(deposit_id, data, COLLECTION_NAME)
+            await trigger_metadata(data, COLLECTION_NAME)
+            await trigger_publish(data)
+            os.remove('./data/{}'.format(did))
             return web.Response(status=200, headers=headers)
         except Exception as err:
             return web.json_response({ 'err': str(err) }, headers=headers)
@@ -242,22 +244,27 @@ async def trigger_store(did):
                 resp_json = await resp.json()
                 logging.debug(msg=str(resp_json))
 
-async def trigger_publish(did, media_type, metadata):
-    deposit_id = dict({ 'deposit_id': did })
+async def trigger_publish(data):
+    deposit_id = dict({ 'deposit_id': data.get('id') })
+    media_type = data.get('media_type')
+    metadata = {}
+    for field in data.get('form'):
+        metadata.update({ field.get('label'): field.get('value') })
     if media_type == 'model':
         async with new_request(method='POST', url='http://gateway:8080/publish/models', json=metadata, params=deposit_id) as resp:
             resp_json = await resp.json()
             logging.debug(msg=str(resp_json))
     elif media_type == 'video':
-        async with new_request.post(url='http://gateway:8080/publish/videos', data=fd, params=deposit_id) as resp:
+        async with new_request(method='POST', url='http://gateway:8080/publish/videos', json=metadata, params=deposit_id) as resp:
             resp_json = await resp.json()
             logging.debug(msg=str(resp_json))
     elif media_type == 'vr':
-        async with new_request.post(url='http://gateway:8080/publish/vr', data=fd, params=deposit_id) as resp:
+        async with new_request(method='POST', url='http://gateway:8080/publish/vr', json=metadata, params=deposit_id) as resp:
             resp_json = await resp.json()
             logging.debug(msg=str(resp_json))
 
-async def trigger_metadata(did, metadata, collection_name):
+async def trigger_metadata(metadata, collection_name):
+    did = metadata.get('id')
     data = {}
     form_data = {}
     media_type = metadata.get('media_type')
@@ -275,8 +282,6 @@ async def trigger_metadata(did, metadata, collection_name):
     fd.add_field('config', json.dumps(config), content_type='application/json')
     async with new_request(method='POST', url='http://mongo-service:5000/objects', data=fd) as resp:
         logging.debug(msg=str(await resp.text()))
-    await trigger_publish(did, media_type, form_data)
-    os.remove('./data/{}'.format(did))
 
 
 """
@@ -324,8 +329,11 @@ async def store_buckets(request):
     if request.method == 'POST':
         try:
             data = await request.json()
-            payload = dict({'config': config, 'data': data})
-            async with new_request(method='POST', url=endpoint+PATH, data=payload) as resp:
+            fd = FormData()
+            fd.add_field('config', json.dumps(config), content_type='application/json')
+            fd.add_field('data', json.dumps(data), content_type='application/json')
+            # payload = dict({'config': config, 'data': data})
+            async with new_request(method='POST', url=endpoint+PATH, data=fd) as resp:
                 resp_json = await resp.json()
                 return web.json_response({ 'resp': resp_json })
         except Exception as err:
@@ -403,7 +411,7 @@ async def publish_models(request):
                     with open('./data/{}'.format(did), 'rb') as f:
                         fd.add_field('file', f, filename=did, content_type='application/octet-stream')
                         async with new_request(method='POST', url=endpoint+PATH, data=fd) as resp:
-                            logging.debug(msg=str(resp))
+                            return web.json_response({ 'res': await resp.text() })
                 else:
                     return web.json_response({ 'err': 'could not retrieve config for service: {}'.format(service_name)})
         except Exception as err:

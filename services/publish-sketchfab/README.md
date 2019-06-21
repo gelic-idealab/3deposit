@@ -18,11 +18,11 @@ pipenv run python sketchfab-service.py
 Download and open Postman. Then enter request URL localhost:5000/models
 
 ## Upload 3D model file
-![3deposit](./docs/Post)
+![3deposit](./Post.png)
 
 ## Get 3D model file information
-![3deposit](./docs/Get)
+![3deposit](./Get.png)
 
 ## Delete 3D model file
-![3deposit](./docs/Delete)
+![3deposit](./Delete.png)
 

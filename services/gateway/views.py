@@ -138,7 +138,6 @@ async def services_configs(request):
                     return web.json_response({ 'res': service }, headers=headers)
                 else:
                     return web.json_response({'req':str(req),'err':'Could not create service.'}, headers=headers)
-<<<<<<< HEAD
         except Exception as err:
             return web.json_response({ 'err': str(err) }, headers=headers)
 
@@ -173,17 +172,9 @@ async def services_actions(request):
                 service = await db.set_action_service_name(conn=conn, action=req.get('action'), media_type=req.get('media_type'), service_name=req.get('service_name'))
                 if service:
                     return web.json_response({ 'res': service })
-=======
->>>>>>> AddServiceForm Working
         except Exception as err:
             return web.json_response({ 'err': str(err) }, headers=headers)
 
-<<<<<<< HEAD
-=======
-    else:
-        return web.Response(status=200, headers=headers)
-
->>>>>>> AddServiceForm Working
 """
 Handlers for deposit form frontend
 """
@@ -387,8 +378,6 @@ async def publish_models(request):
         except Exception as err:
             return web.json_response({ 'err': str(err) })
 
-
-
 async def deposits(request):
     try:
         async with request.app['db'].acquire() as conn:
@@ -397,4 +386,3 @@ async def deposits(request):
             return web.json_response({ 'deposits': deposits })
     except Exception as err:
         return web.json_response({ 'err': str(err) })
->>>>>>> AddServiceForm Working

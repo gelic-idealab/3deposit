@@ -32,15 +32,11 @@ def setup_routes(app):
 
     # service config routes
     app.router.add_get('/services', services)
-<<<<<<< HEAD
     app.router.add_get('/services/configs', services_configs)
     app.router.add_post('/services/configs', services_configs)
     app.router.add_get('/services/actions', services_actions)
     app.router.add_post('/services/actions', services_actions)
 
-=======
-    app.router.add_view('/services/configs', services_configs)
->>>>>>> AddServiceForm Working
 
     # form routes
     app.router.add_get('/form/active', deposit_form_active)

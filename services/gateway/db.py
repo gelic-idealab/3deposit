@@ -1,4 +1,5 @@
 import json
+import datetime
 import logging
 import aiopg.sa
 from sqlalchemy import (
@@ -13,11 +14,11 @@ meta = MetaData()
 deposits = Table(
     'deposits', meta,
 
-    Column('id', Integer, primary_key=True),
+    Column('id', String(256), primary_key=True),
     Column('deposit_date', Date, nullable=False),
-    Column('etag', String(256), nullable=False),
-    Column('mongo_id', String(256), nullable=False),
-    Column('location', String(256), nullable=True)
+    Column('etag', String(256)),
+    Column('mongo_id', String(256)),
+    Column('location', String(256))
 )
 
 forms = Table(
@@ -82,6 +83,46 @@ async def close_pg(app):
 
 
 ### Deposit queries
+async def add_deposit_by_id(conn, deposit_id):
+    logging.debug(msg=f'add_deposit_by_id id: {deposit_id}')
+    # Column('id', Integer, primary_key=True),
+    # Column('deposit_date', Date, nullable=False),
+    # Column('etag', String(256), nullable=False),
+    # Column('mongo_id', String(256), nullable=False),
+    # Column('location', String(256), nullable=True)
+    conn.execute(
+        deposits
+        .insert()
+        .values(id=deposit_id, deposit_date=datetime.datetime.now())
+    )
+
+async def update_deposit_by_id(conn, deposit_id, **kwargs):
+    logging.debug(f'kwargs passed to update_deposit_id: {kwargs}')
+    conn.execute(
+        deposits
+        .update()
+        .where(deposits.c.id == deposit_id)
+        .values(kwargs)
+    )
+
+async def get_deposits(conn):
+    result = await conn.execute(
+        deposits
+        .select()
+    )
+    deposit_list = await result.fetchall()
+    if deposit_list:
+        column_keys = result.keys()
+        deposit_objects = []
+        for d in deposit_list:
+            d_obj = {}
+            for (i,k) in enumerate(column_keys):
+                d_obj.update(dict({k:str(d[i])}))
+            deposit_objects.append(d_obj)
+        return deposit_objects
+    else:
+        return None
+
 async def get_deposit_by_id(conn, deposit_id):
     result = await conn.execute(
         deposits

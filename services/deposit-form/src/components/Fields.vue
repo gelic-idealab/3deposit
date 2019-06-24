@@ -6,6 +6,8 @@
         <!-- <div class="input-group mb-3" v-for="(subfield, index) in field.subfields" :key="subfield.index"> -->
         <template v-if="renderField(field)">
 
+          
+
         <template v-if="field.type === 'text'">
           <h4>{{ field.label }}</h4>
           <button v-if="field.repeatable === true" type="button" class="btn btn-info btn-sm ml-3 mb-3" v-on:click="addValue(field.value)">Add</button>

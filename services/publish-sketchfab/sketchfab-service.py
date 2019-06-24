@@ -21,75 +21,77 @@ app = Flask(__name__)
 
 @app.route('/models', methods=['POST', 'GET', 'DELETE'])
 def models():
-    #Posts the model to sketchfab.
-    if request.method == 'POST':
-        logging.debug(msg='sketchfab req: {}'.format(request.form))
+    try:
+        #Posts the model to sketchfab.
+        if request.method == 'POST':
+            logging.debug(msg='sketchfab req: {}'.format(request.form))
 
-        SKETCHFAB_DOMAIN = 'sketchfab.com'
-        SKETCHFAB_API_URL = 'https://api.{}/v3'.format(SKETCHFAB_DOMAIN)
-        MODEL_ENDPOINT = SKETCHFAB_API_URL + '/models'
-        
-        logging.debug(msg='sketchfab req: {}'.format(request.form))
-        # token = get_value(request, 'config', 'token')
-        config = json.loads(request.form.get('config'))
-        auth = config.get('auth')
-        token = auth.get('token')
-        headers = {'Authorization': 'Token {}'.format(token)}
-        # name = get_value(request, 'data', 'Creator Name')
-        data = json.loads(request.form.get('data'))
-        logging.debug(msg='sf metadata: {}'.format(str(metadata)))
-        metadata = data.get('metadata')
-        name = metadata.get('Object Title')
-        logging.debug(msg='sketchfab name: {}'.format(name))
-        data = {'name': name}
-        logging.debug('sketchfab values: {}, {}'.format(token, name))
-
-        # data = {'name': post_data.get('name'),
-        #         'description': post_data.get('description'),
-        #         'tags': post_data.get('tags'),
-        #         'categories': post_data.get('categories'),
-        #         'license': post_data.get('license')}
-
-        file = request.files['file']
-        file.save('model.zip')
-        f = open('model.zip', 'rb')
-        files = {'modelFile': f}
-
-
-        try:
-            r = requests.post(MODEL_ENDPOINT, data=data, files=files, headers=headers)
-            f.close()
-        except requests.exceptions.RequestException as e:
-            return jsonify({'requestException': e})
-        else:
-            response = r.json()
-            print(response)
-            if os.path.exists('model.zip'):
-                os.remove('model.zip')
-            return jsonify(response)
-
-
-
-    #Deletes the model from sketchfab.
-    if request.method == 'DELETE':
-        try:
-            uid = get_value(request, 'data', 'uid')
             SKETCHFAB_DOMAIN = 'sketchfab.com'
             SKETCHFAB_API_URL = 'https://api.{}/v3'.format(SKETCHFAB_DOMAIN)
+            MODEL_ENDPOINT = SKETCHFAB_API_URL + '/models'
             
-
-            token = get_value(request, 'config', 'token')
+            logging.debug(msg='sketchfab req: {}'.format(request.form))
+            # token = get_value(request, 'config', 'token')
+            config = json.loads(request.form.get('config'))
+            auth = config.get('auth')
+            token = auth.get('token')
             headers = {'Authorization': 'Token {}'.format(token)}
-            model_endpoint = SKETCHFAB_API_URL + '/models/{}'.format(uid)
+            # name = get_value(request, 'data', 'Creator Name')
+            data = json.loads(request.form.get('data'))
+            metadata = data.get('metadata')
+            name = metadata.get('Object Title')
+            logging.debug(msg='sketchfab name: {}'.format(name))
+            data = {'name': name}
+            logging.debug('sketchfab values: {}, {}'.format(token, name))
+
+            # data = {'name': post_data.get('name'),
+            #         'description': post_data.get('description'),
+            #         'tags': post_data.get('tags'),
+            #         'categories': post_data.get('categories'),
+            #         'license': post_data.get('license')}
+
+            file = request.files['file']
+            file.save('model.zip')
+            f = open('model.zip', 'rb')
+            files = {'modelFile': f}
 
 
-            r = requests.delete(model_endpoint, headers=headers)
-            if r.status_code != 204:
-                return jsonify({"msg": "Model does not exist.", "content": str(r.content)})
+            try:
+                r = requests.post(MODEL_ENDPOINT, data=data, files=files, headers=headers)
+                f.close()
+            except requests.exceptions.RequestException as e:
+                return jsonify({'requestException': e})
             else:
-                return jsonify({"msg": "Model successfully deleted.", "content": r.status_code})
-        except Exception as e:
-            return jsonify({'requestException': str(e)})
+                response = r.json()
+                print(response)
+                if os.path.exists('model.zip'):
+                    os.remove('model.zip')
+                return jsonify(response)
+
+
+
+        #Deletes the model from sketchfab.
+        if request.method == 'DELETE':
+            try:
+                uid = get_value(request, 'data', 'uid')
+                SKETCHFAB_DOMAIN = 'sketchfab.com'
+                SKETCHFAB_API_URL = 'https://api.{}/v3'.format(SKETCHFAB_DOMAIN)
+                
+
+                token = get_value(request, 'config', 'token')
+                headers = {'Authorization': 'Token {}'.format(token)}
+                model_endpoint = SKETCHFAB_API_URL + '/models/{}'.format(uid)
+
+
+                r = requests.delete(model_endpoint, headers=headers)
+                if r.status_code != 204:
+                    return jsonify({"msg": "Model does not exist.", "content": str(r.content)})
+                else:
+                    return jsonify({"msg": "Model successfully deleted.", "content": r.status_code})
+            except Exception as e:
+                return jsonify({'requestException': str(e)})
+    except Exception as err:
+        return jsonify({ 'err': str(err) })
 
 
 

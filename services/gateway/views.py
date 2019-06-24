@@ -1,6 +1,9 @@
 import json
 import logging
 import os
+
+import db
+from init_db import user_engine
 import aiohttp_jinja2
 from aiohttp import web, FormData, ClientSession
 from aiohttp import request as new_request
@@ -213,7 +216,6 @@ async def deposit_upload(request):
                             f.write(b)
                     if rcn == rtc:
                         os.rename('./data/{}'.format(did+'_partial'), './data/{}'.format(did))
-                        await trigger_store(did)
             return web.Response(status=200, headers=headers)       
         except Exception as err:
             logging.debug(msg='err: {}'.format(str(err)))
@@ -223,7 +225,6 @@ async def deposit_upload(request):
 
 
 async def deposit_submit(request):
-    COLLECTION_NAME = 'deposits'
     headers = {
     'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
     'Access-Control-Allow-Headers': 'content-type'
@@ -231,12 +232,12 @@ async def deposit_submit(request):
     if request.method == 'POST':
         try:
             data = await request.json()
-            did = data.get('id')
-            # logging.debug(msg='id: {}, form: {}'.format(deposit_id, deposit_metadata))
-            await trigger_metadata(data, COLLECTION_NAME)
-            await trigger_publish(data)
-            os.remove('./data/{}'.format(did))
-            return web.Response(status=200, headers=headers)
+            # logging.debug(msg=f'deposit_submit data: {data}')
+            deposit_processed = await start_deposit_processing_task(data)
+            if deposit_processed:
+                return web.Response(status=200, headers=headers)
+            else:
+                return web.Response(status=418, headers=headers)
         except Exception as err:
             return web.json_response({ 'err': str(err) }, headers=headers)
     else:
@@ -244,6 +245,32 @@ async def deposit_submit(request):
 """
 Trigger function to begin storage operation with buffered deposit file
 """
+
+async def start_deposit_processing_task(data):
+
+    COLLECTION_NAME = 'deposits'
+    
+    try:
+        deposit_id = data.get('id')
+        logging.debug(msg=f'start_deposit_processing_task id: {str(deposit_id)}')
+    
+        if deposit_id:
+            with user_engine.connect() as conn:
+                await db.add_deposit_by_id(conn, deposit_id)
+                etag = await trigger_store(deposit_id)
+                mongo_id = await trigger_metadata(data, COLLECTION_NAME)
+                location = await trigger_publish(data)
+
+                await db.update_deposit_by_id(conn, deposit_id=deposit_id, etag=etag, mongo_id=mongo_id, location=location)
+
+            os.remove('./data/{}'.format(deposit_id))
+            return True
+        else:
+            return False
+    except Exception as err:
+        logging.debug(msg=str(err))
+        return False
+
 
 async def trigger_store(did):
     fd = FormData()
@@ -253,7 +280,9 @@ async def trigger_store(did):
         async with ClientSession() as sess:
             async with sess.request(url='http://gateway:8080/store/objects', method='POST', data=fd, params=deposit_id) as resp:
                 resp_json = await resp.json()
-                logging.debug(msg=str(resp_json))
+                etag = resp_json.get('etag')
+                logging.debug(msg=f'trigger_store resp: {str(resp_json)}, {etag}')
+                return etag
 
 async def trigger_publish(data):
     deposit_id = dict({ 'deposit_id': data.get('id') })
@@ -265,6 +294,8 @@ async def trigger_publish(data):
         async with new_request(method='POST', url='http://gateway:8080/publish/models', json=metadata, params=deposit_id) as resp:
             resp_json = await resp.json()
             logging.debug(msg=str(resp_json))
+            location = resp_json.get('uri')
+            return location
     elif media_type == 'video':
         async with new_request(method='POST', url='http://gateway:8080/publish/videos', json=metadata, params=deposit_id) as resp:
             resp_json = await resp.json()
@@ -292,7 +323,9 @@ async def trigger_metadata(metadata, collection_name):
     fd.add_field('data', json.dumps(data), content_type='application/json')
     fd.add_field('config', json.dumps(config), content_type='application/json')
     async with new_request(method='POST', url='http://mongo-service:5000/objects', data=fd) as resp:
-        logging.debug(msg=str(await resp.text()))
+        resp_json = await resp.json()
+        mongo_id = resp_json.get('post_id')
+        return mongo_id
 
 
 """
@@ -390,7 +423,7 @@ async def store_objects(request):
             fd.add_field('data', json.dumps(q), content_type='application/json')
             async with new_request(method='POST', url=endpoint+PATH, data=fd) as resp:
                 resp_json = await resp.json()
-                return web.json_response({ 'resp': resp_json })
+                return web.json_response(resp_json)
         except Exception as err:
             return web.json_response({ 'origin': 'gateway', 'err': str(err) })
 
@@ -422,8 +455,20 @@ async def publish_models(request):
                     with open('./data/{}'.format(did), 'rb') as f:
                         fd.add_field('file', f, filename=did, content_type='application/octet-stream')
                         async with new_request(method='POST', url=endpoint+PATH, data=fd) as resp:
-                            return web.json_response({ 'res': await resp.text() })
+                            resp_json = await resp.json()
+                            return web.json_response(resp_json)
                 else:
                     return web.json_response({ 'err': 'could not retrieve config for service: {}'.format(service_name)})
         except Exception as err:
             return web.json_response({ 'err': str(err) })
+
+
+
+async def deposits(request):
+    try:
+        async with request.app['db'].acquire() as conn:
+            deposits = await db.get_deposits(conn=conn)
+            logging.debug(msg=f'deposits: {str(deposits)}')
+            return web.json_response({ 'deposits': deposits })
+    except Exception as err:
+        return web.json_response({ 'err': str(err) })

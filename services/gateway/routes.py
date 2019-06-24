@@ -10,7 +10,8 @@ from views import (
     services, 
     services_configs,
     services_actions,
-    publish_models
+    publish_models,
+    deposits
 )
 
 
@@ -37,11 +38,11 @@ def setup_routes(app):
     app.router.add_post('/services/actions', services_actions)
 
 
-    # deposit form routes
-    app.router.add_get('/deposit/forms/active', deposit_form_active)
-    app.router.add_post('/deposit/forms/active', deposit_form_active)
-    app.router.add_view('/deposit/upload', deposit_upload)
-    app.router.add_view('/deposit/submit', deposit_submit)
+    # form routes
+    app.router.add_get('/form/active', deposit_form_active)
+    app.router.add_post('/form/active', deposit_form_active)
+    app.router.add_view('/form/upload', deposit_upload)
+    app.router.add_view('/form/submit', deposit_submit)
 
     # storage routes
     app.router.add_get('/store/buckets', store_buckets)
@@ -52,3 +53,6 @@ def setup_routes(app):
     # publication routes
     app.router.add_get('/publish/models', publish_models)
     app.router.add_post('/publish/models', publish_models)
+
+    # deposit routes
+    app.router.add_get('/deposits', deposits)

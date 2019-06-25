@@ -2,17 +2,17 @@ version: '3'
 
 services:
 
-  deposit-form:
-    build: ./services/deposit-form/
-    networks:
-      - proxy 
-    container_name: deposit-form
-    command: npm run serve
-    labels:
-      - "traefik.frontend.rule=Host:deposit-form.docker.localhost"
-      - "traefik.backend=deposit-form"
-      - "traefik.port=8080"
-      - "traefik.docker.network=proxy"
+  # deposit-form:
+  #   build: ./services/deposit-form/
+  #   networks:
+  #     - proxy 
+  #   container_name: deposit-form
+  #   command: npm run serve
+  #   labels:
+  #     - "traefik.frontend.rule=Host:deposit-form.docker.localhost"
+  #     - "traefik.backend=deposit-form"
+  #     - "traefik.port=8080"
+  #     - "traefik.docker.network=proxy"
 
   postgres:
       image: postgres:10
@@ -26,13 +26,15 @@ services:
   gateway:
       build: ./services/gateway/
       container_name: gateway
+      ports:
+        - 8080:8080
       links:
           - postgres
       depends_on: 
           - postgres
       networks:
         - gateway_internal
-        - proxy
+        # - proxy
       # command: bash -c "pipenv run python init_db.py && pipenv run python gateway.py"
       command: bash -c "pipenv run python gateway.py"
       labels:
@@ -43,16 +45,16 @@ services:
       volumes:
         - ./services/gateway/data:/gateway/data
   
-  reverse-proxy:
-      image: traefik # The official Traefik docker image
-      command: --api --docker # Enables the web UI and tells Traefik to listen to docker
-      ports:
-        - "80:80"     # The HTTP port
-        - "8080:8080" # The Web UI (enabled by --api)
-      volumes:
-        - /var/run/docker.sock:/var/run/docker.sock
-      networks:
-        - proxy
+  # reverse-proxy:
+  #     image: traefik # The official Traefik docker image
+  #     command: --api --docker # Enables the web UI and tells Traefik to listen to docker
+  #     ports:
+  #       - "80:80"     # The HTTP port
+  #       - "8080:8080" # The Web UI (enabled by --api)
+  #     volumes:
+  #       - /var/run/docker.sock:/var/run/docker.sock
+  #     networks:
+  #       - proxy
 
   minio-server:
     container_name: minio-server
@@ -80,7 +82,7 @@ services:
       - minio-server
     networks:
       - minio_internal
-      - proxy
+      # - proxy
     command: pipenv run flask run --host=0.0.0.0
     labels:
         - "traefik.frontend.rule=Host:minio.docker.localhost"
@@ -111,7 +113,7 @@ services:
     #   - 8081:8081
     networks:
       - mongo_internal
-      - proxy
+      # - proxy
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
@@ -133,7 +135,7 @@ services:
       - mongo-server
     networks:
       - mongo_internal
-      - proxy
+      # - proxy
     environment: 
       FLASK_ENV: development
       FLASK_APP: mongo-service
@@ -157,8 +159,8 @@ services:
       - "traefik.enable=false"
 
 networks:
-    proxy:
-        external: true
+    # proxy:
+    #     external: true
     gateway_internal:
         external: false
     minio_internal:

@@ -98,6 +98,8 @@ async def services(request):
                     return web.json_response({ 'res': 'no services'}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
         except Exception as err:
             return web.json_response({ 'err': str(err) }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+    else:
+        return web.Response(headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
 
 async def services_configs(request):
 
@@ -116,7 +118,7 @@ async def services_configs(request):
                     return web.json_response({ 'err': 'No matching service', 'req': req }, headers=headers)
         except Exception as err:
             return web.json_response({ 'err': str(err), 'req': req }, headers=headers)
-    if request.method == 'POST':
+    elif request.method == 'POST':
         """
         request.json():
         {
@@ -140,6 +142,9 @@ async def services_configs(request):
                     return web.json_response({'req':str(req),'err':'Could not create service.'}, headers=headers)
         except Exception as err:
             return web.json_response({ 'err': str(err) }, headers=headers)
+    
+    else:
+        return web.Response(headers=headers)        
 
 async def services_actions(request):
     if request.method == 'GET':

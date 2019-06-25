@@ -91,12 +91,7 @@ async def close_pg(app):
 ### Deposit queries
 async def add_deposit_by_id(conn, deposit_id):
     logging.debug(msg=f'add_deposit_by_id id: {deposit_id}')
-    # Column('id', Integer, primary_key=True),
-    # Column('deposit_date', Date, nullable=False),
-    # Column('etag', String(256), nullable=False),
-    # Column('mongo_id', String(256), nullable=False),
-    # Column('location', String(256), nullable=True)
-    conn.execute(
+    await conn.execute(
         deposits
         .insert()
         .values(id=deposit_id, deposit_date=datetime.datetime.now())
@@ -104,7 +99,7 @@ async def add_deposit_by_id(conn, deposit_id):
 
 async def update_deposit_by_id(conn, deposit_id, **kwargs):
     logging.debug(f'kwargs passed to update_deposit_id {deposit_id}: {kwargs}')
-    conn.execute(
+    await conn.execute(
         deposits
         .update()
         .where(deposits.c.id == deposit_id)

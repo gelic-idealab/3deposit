@@ -3,7 +3,6 @@ import logging
 import os
 
 import db
-from init_db import user_engine
 import aiohttp_jinja2
 from aiohttp import web, FormData, ClientSession
 from aiohttp import request as new_request
@@ -11,6 +10,7 @@ from aiohttp_security import remember, forget, authorized_userid
 
 import db
 from forms import validate_login_form
+from process import get_service_config_by_action, start_deposit_processing_task
 
 import logging
 
@@ -144,6 +144,18 @@ async def services_configs(request):
 async def services_actions(request):
     if request.method == 'GET':
         try:
+            q = request.query
+            action = q.get('action')
+            media_type = q.get('media_type')
+            if q:
+                async with request.app['db'].acquire() as conn:
+                    service_name = await db.get_action_service_name(conn, action=action, media_type=media_type)
+                    if service_name:
+                        return web.json_response({ 'service_name': service_name }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+                    else:
+                        return web.json_response({ 'res': 'no service configured for {}, {}'.format(action, media_type)}, 
+                        headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+
             async with request.app['db'].acquire() as conn:
                 services = await db.get_action_services(conn)
                 if services:
@@ -242,108 +254,7 @@ async def deposit_submit(request):
             return web.json_response({ 'err': str(err) }, headers=headers)
     else:
         return web.Response(status=200, headers=headers)
-"""
-Trigger function to begin storage operation with buffered deposit file
-"""
 
-async def start_deposit_processing_task(data):
-
-    COLLECTION_NAME = 'deposits'
-    
-    try:
-        deposit_id = data.get('id')
-        logging.debug(msg=f'start_deposit_processing_task id: {str(deposit_id)}')
-    
-        if deposit_id:
-            with user_engine.connect() as conn:
-                await db.add_deposit_by_id(conn, deposit_id)
-                etag = await trigger_store(deposit_id)
-                mongo_id = await trigger_metadata(data, COLLECTION_NAME)
-                location = await trigger_publish(data)
-
-                await db.update_deposit_by_id(conn, deposit_id=deposit_id, etag=etag, mongo_id=mongo_id, location=location)
-
-            os.remove('./data/{}'.format(deposit_id))
-            return True
-        else:
-            return False
-    except Exception as err:
-        logging.debug(msg=str(err))
-        return False
-
-
-async def trigger_store(did):
-    fd = FormData()
-    deposit_id = dict({'deposit_id': did})
-    with open('./data/{}'.format(did), 'rb') as f:
-        fd.add_field('file', f, filename=did, content_type='application/octet-stream')
-        async with ClientSession() as sess:
-            async with sess.request(url='http://gateway:8080/store/objects', method='POST', data=fd, params=deposit_id) as resp:
-                resp_json = await resp.json()
-                etag = resp_json.get('etag')
-                logging.debug(msg=f'trigger_store resp: {str(resp_json)}, {etag}')
-                return etag
-
-async def trigger_publish(data):
-    deposit_id = dict({ 'deposit_id': data.get('id') })
-    media_type = data.get('media_type')
-    metadata = {}
-    for field in data.get('form'):
-        metadata.update({ field.get('label'): field.get('value') })
-    if media_type == 'model':
-        async with new_request(method='POST', url='http://gateway:8080/publish/models', json=metadata, params=deposit_id) as resp:
-            resp_json = await resp.json()
-            logging.debug(msg=str(resp_json))
-            location = resp_json.get('uri')
-            return location
-    elif media_type == 'video':
-        async with new_request(method='POST', url='http://gateway:8080/publish/videos', json=metadata, params=deposit_id) as resp:
-            resp_json = await resp.json()
-            logging.debug(msg=str(resp_json))
-    elif media_type == 'vr':
-        async with new_request(method='POST', url='http://gateway:8080/publish/vr', json=metadata, params=deposit_id) as resp:
-            resp_json = await resp.json()
-            logging.debug(msg=str(resp_json))
-
-async def trigger_metadata(metadata, collection_name):
-    did = metadata.get('id')
-    data = {}
-    form_data = {}
-    media_type = metadata.get('media_type')
-    for field in metadata.get('form'):
-        form_data.update({ field.get('label'): field.get('value') })
-    deposit_metadata = dict({ 'deposit_metadata': form_data })
-    deposit_id = dict({ 'deposit_id': did })
-    data.update(deposit_id)
-    data.update(deposit_metadata)
-    config = {}
-    collection_name = dict({ 'collection_name': collection_name })
-    config.update(collection_name)
-    fd = FormData()
-    fd.add_field('data', json.dumps(data), content_type='application/json')
-    fd.add_field('config', json.dumps(config), content_type='application/json')
-    async with new_request(method='POST', url='http://mongo-service:5000/objects', data=fd) as resp:
-        resp_json = await resp.json()
-        mongo_id = resp_json.get('post_id')
-        return mongo_id
-
-
-"""
-Helper function to return service configs for a given action
-"""
-async def get_service_config_by_action(request, action, media_type='default'):
-    try:
-        async with request.app['db'].acquire() as conn:
-            action_service_name = await db.get_action_service_name(conn=conn, action=action, media_type=media_type)
-            logging.debug(msg='action_service_name: {}'.format(action_service_name))
-        async with request.app['db'].acquire() as conn:
-            service_config = await db.get_service_config(conn=conn, name=action_service_name)
-            if service_config:
-                return service_config
-            else:
-                return None
-    except Exception as err:
-        return web.json_response({ 'err': str(err) })
 
 """
 Relay endpoint to make object storage calls
@@ -352,7 +263,8 @@ Endpoints are scoped for objects and buckets
 
 async def store_buckets(request):
     PATH = '/bucket'
-    service_config = await get_service_config_by_action(request=request, action='store')
+    async with request.app['db'].acquire() as conn:
+        service_config = await get_service_config_by_action(conn=conn, action='store', media_type='default')
     config = service_config.get('config')
     endpoint = service_config.get('endpoint')
     if request.method == 'GET':
@@ -386,7 +298,9 @@ async def store_buckets(request):
 
 async def store_objects(request):
     PATH = '/object'
-    service_config = await get_service_config_by_action(request=request, action='store', media_type='default')
+    async with request.app['db'].acquire() as conn:
+        service_config = await get_service_config_by_action(conn=conn, action='store', media_type='default')
+    logging.debug(msg='store_objects service_config: {}'.format(str(service_config)))
     config = service_config.get('config')
     endpoint = service_config.get('endpoint')
     bucket_name = dict({'bucket_name': '3deposit'})
@@ -433,7 +347,8 @@ Relay endpoint to get/post to Model publication service
 """
 async def publish_models(request):
     PATH = '/models'
-    service_config = await get_service_config_by_action(request=request, action='publish', media_type='models')
+    async with request.app['db'].acquire() as conn:
+        service_config = await get_service_config_by_action(conn=conn, action='publish', media_type='model')
     logging.debug(msg='service_config: {}'.format(str(service_config)))
     service_name = service_config.get('name')
     
@@ -456,7 +371,8 @@ async def publish_models(request):
                         fd.add_field('file', f, filename=did, content_type='application/octet-stream')
                         async with new_request(method='POST', url=endpoint+PATH, data=fd) as resp:
                             resp_json = await resp.json()
-                            return web.json_response(resp_json)
+                            uri = resp_json.get('uri')
+                            return web.json_response(uri)
                 else:
                     return web.json_response({ 'err': 'could not retrieve config for service: {}'.format(service_name)})
         except Exception as err:

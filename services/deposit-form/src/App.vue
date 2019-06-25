@@ -36,7 +36,7 @@ export default {
   },
   mounted () {
     axios
-      .get('http://gateway.docker.localhost/deposit/forms/active')
+      .get('http://gateway.docker.localhost/form/active')
       .then(response => (this.form = response.data.active_form.content));
     // eslint-disable-next-line
     console.log(this.id);

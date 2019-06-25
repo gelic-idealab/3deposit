@@ -6,7 +6,7 @@
         <!-- <div class="input-group mb-3" v-for="(subfield, index) in field.subfields" :key="subfield.index"> -->
         <template v-if="renderField(field)">
 
-          
+
 
         <template v-if="field.type === 'text'">
           <h4>{{ field.label }}</h4>
@@ -93,7 +93,7 @@ export default {
     },
     submitDeposit: function () {
       axios({
-        url: 'http://gateway.docker.localhost/deposit/submit',
+        url: 'http://gateway.docker.localhost/form/submit',
         data: {
           'media_type': this.fields[0].value,
           'form': this.fields, 

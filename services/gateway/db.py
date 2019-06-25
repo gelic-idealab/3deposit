@@ -4,7 +4,8 @@ import logging
 import aiopg.sa
 from sqlalchemy import (
     MetaData, Table, Column, ForeignKey,
-    Integer, String, Date, Boolean, JSON
+    Integer, String, Date, Boolean, JSON,
+    and_
 )
 
 __all__ = ['forms', 'deposits', 'users', 'services', 'actions']
@@ -231,8 +232,12 @@ async def get_action_service_name(conn, action, media_type):
     result = await conn.execute(
         actions
         .select()
-        .where(actions.c.action == action)
-        # .where(actions.c.media_type == media_type)
+        .where(
+            and_(
+                actions.c.action == action,
+                actions.c.media_type == media_type
+                )
+            )
         )
     service = await result.fetchone()
     if service:

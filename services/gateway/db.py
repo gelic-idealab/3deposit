@@ -8,6 +8,10 @@ from sqlalchemy import (
     and_
 )
 
+from settings import BASE_DIR, get_config
+
+
+
 __all__ = ['forms', 'deposits', 'users', 'services', 'actions']
 
 meta = MetaData()
@@ -62,7 +66,8 @@ class RecordNotFound(Exception):
     """Requested record in database was not found"""
 
 
-### Database init & teardown
+
+### Application database init & teardown
 async def init_pg(app):
     conf = app['config']['postgres']
     engine = await aiopg.sa.create_engine(
@@ -86,20 +91,15 @@ async def close_pg(app):
 ### Deposit queries
 async def add_deposit_by_id(conn, deposit_id):
     logging.debug(msg=f'add_deposit_by_id id: {deposit_id}')
-    # Column('id', Integer, primary_key=True),
-    # Column('deposit_date', Date, nullable=False),
-    # Column('etag', String(256), nullable=False),
-    # Column('mongo_id', String(256), nullable=False),
-    # Column('location', String(256), nullable=True)
-    conn.execute(
+    await conn.execute(
         deposits
         .insert()
         .values(id=deposit_id, deposit_date=datetime.datetime.now())
     )
 
 async def update_deposit_by_id(conn, deposit_id, **kwargs):
-    logging.debug(f'kwargs passed to update_deposit_id: {kwargs}')
-    conn.execute(
+    logging.debug(f'kwargs passed to update_deposit_id {deposit_id}: {kwargs}')
+    await conn.execute(
         deposits
         .update()
         .where(deposits.c.id == deposit_id)
@@ -227,7 +227,7 @@ async def set_service_config(conn, name, endpoint, config):
         return 'service config created for {}'.format(name)
 
 # action config queries
-async def get_action_service_name(conn, action, media_type):
+async def get_action_service_name(conn, action, media_type='default'):
     logging.debug(msg='get_action_service_name called with: {}, {}'.format(action, media_type))
     result = await conn.execute(
         actions
@@ -240,6 +240,7 @@ async def get_action_service_name(conn, action, media_type):
             )
         )
     service = await result.fetchone()
+    logging.debug(msg='service fetchone: {}'.format(str(service)))
     if service:
         logging.debug(msg='service name retrieved: {}'.format(str(dict(service))))
         service_name = service.get('service_name')

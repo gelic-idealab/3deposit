@@ -7,40 +7,54 @@
             <fg-input type="text"
                       label="Service Name"
                       placeholder="Paper dashboard"
-                      v-model="user.name">
+                      v-model="service_config.name">
             </fg-input>
           </div>
           <div class="col-md-6">
             <fg-input type="text"
                       label="Endpoint URL"
                       placeholder="URL"
-                      v-model="user.endpoint">
+                      v-model="service_config.endpoint">
             </fg-input>
           </div>
         </div>
-
-        <div class="row">
-          <div class="col-md-6">
+<!-- 
+        <div v-for="(value,key) in this.service_config.config" :key="key" class="row">
+          <div class="col-md-12">
             <fg-input type="text"
-                      label="Access Key"
-                      placeholder="Access Key"
-                      v-model="user.config.auth.access_key">
+                      :label="key"
+                      :placeholder="value"
+                      v-model="service_config.config[key]">
             </fg-input>
           </div>
-          <div class="col-md-6">
+        </div> -->
+
+        <textarea class="form-control" rows="5" v-model="config_text"></textarea>
+
+        <!-- <div class="row">
+          <div class="col-md-5">
             <fg-input type="text"
-                      label="Secret Key"
-                      placeholder="Secret Key"
-                      v-model="user.config.auth.secret_key">
-            </fg-input>     
+                      label="Add New Key"
+                      placeholder="Key"
+                      v-model="new_key">
+            </fg-input>
           </div>
+          <div class="col-md-5">
+            <fg-input type="text"
+                      label="Add New Value"
+                      placeholder="Value"
+                      v-model="new_value">
+            </fg-input>
+          </div> -->
+        <div>
+
         </div>
 
         <div class="text-center">
           <p-button type="info"
-                    round
-                    @click.native.prevent="updateProfile">
-            Update Profile
+                    
+                    @click.native.prevent="configureService">
+            Configure Service
           </p-button>
         </div>
         <div class="clearfix"></div>
@@ -50,29 +64,35 @@
 </template>
 <script>
 import axios from 'axios'
-// import AddServiceFormVue from '../pages/UserProfile/AddServiceForm.vue';
 
 export default {
   // name: AddServiceForm,
   data() {
     return {
-      user: {
+      service_config: {
         name: '',
         endpoint: '',
         config: {
-          auth: {
-            access_key: "AKIAIOSFODNN7GRAINGER",
-            secret_key: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYGRAINGERKEY"
-          }
+          // auth: ''
         }
-      }
+      },
+      config_text: ''
     };
   },
   methods: {
-    updateProfile() {
+    configureService() {
+      this.parseConfigText();
       axios
-      .post('http://localhost:8080/services/configs',this.user)
+      .post('http://localhost:8080/services/configs',this.service_config)
       .then(response => (console.log(response)));
+    },
+    addConfigKey() {
+      this.service_config.config[new_key] = this.new_value;
+      this.new_key='';
+      this.new_value='';
+    },
+    parseConfigText() {
+      this.service_config.config = JSON.parse(this.config_text);
     }
   }
 };

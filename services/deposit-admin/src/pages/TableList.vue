@@ -5,9 +5,9 @@
     </button> -->
     <div class="row">
       <div class="col-12">
-        <card :title="table1.title" :subTitle="table1.subTitle">
+        <card :title="tables.services.title" :subTitle="tables.services.subTitle">
           <div slot="raw-content" class="table-responsive">
-            <paper-table :data="table1.data" :columns="table1.columns">
+            <paper-table :data="tables.services.data" :columns="tables.services.columns">
 
             </paper-table>
           </div>
@@ -28,14 +28,19 @@
         </div>
       <!-- </div> -->
     </div>
-<<<<<<< HEAD
     <add-service-form />
-<<<<<<< HEAD
-=======
->>>>>>> AddServiceForm Working
-=======
+    <div class="row">
+      <div class="col-12">
+        <card :title="tables.actions.title" :subTitle="tables.actions.subTitle">
+          <div slot="raw-content" class="table-responsive">
+            <paper-table :data="tables.actions.data" :columns="tables.actions.columns">
+
+            </paper-table>
+          </div>
+        </card>
+      </div>
+    </div>  
     <add-action-form />
->>>>>>> Action form added
   </div>   
 </template>
 <script>
@@ -53,25 +58,41 @@ export default {
   mounted() {
     axios
     .get('http://localhost:8080/services')
-    .then(response => (this.table1.data = response.data.services))
-    .then(() => (this.table1.columns = Object.keys(this.table1.data[0])))
+    .then(response => (this.tables.services.data = response.data.services))
+    .then(() => (this.tables.services.columns = Object.keys(this.tables.services.data[0])));
+
+    axios
+    .get('http://localhost:8080/services/actions')
+    // .then(response => console.log(response))
+    .then(response => (this.tables.actions.data = response.data.services))
+    .then(() => (this.tables.actions.columns = Object.keys(this.tables.actions.data[0])));
+
+    
     // .then(response => (this.table2.data = response.data.actions))
     // .then(() => (this.table1.columns = Object.keys(this.table1.data[0])))
   },
   data() {
     return {
-      table1: {
-        title: "Services",
-        subTitle: "Currently configured services",
-        columns: [],
-        data: []
-      },
-      table2:{
-        title: "Actions",
-        subTitle: "Currently configured actions",
-        columns: [],
-        data: []
+      tables: {
+        services: {
+          title: "Services",
+          subTitle: "Currently configured services",
+          columns: [],
+          data: []
+        },
+        actions:{
+          title: "Actions",
+          subTitle: "Currently configured actions",
+          columns: [],
+          data: []
+        }
       }
+      // get table1() {
+      //   return this._table1;
+      // },
+      // set table1(value) {
+      //   this._table1=value;
+      // },
     };
   }
 };

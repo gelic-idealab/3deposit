@@ -7,14 +7,14 @@
             <fg-input type="text"
                       label="Action Name"
                       placeholder="Paper dashboard"
-                      v-model="list.name">
+                      v-model="action_config.name">
             </fg-input>
           </div>
           <div class="col-md-6">
             <fg-input type="text"
                       label="Media Type"
                       placeholder="Media Type"
-                      v-model="list.media_type">
+                      v-model="action_config.media_type">
             </fg-input>
           </div>
         </div>
@@ -24,15 +24,15 @@
             <fg-input type="text"
                       label="Service Name"
                       placeholder="Service Name"
-                      v-model="list.service_name">
+                      v-model="action_config.service_name">
             </fg-input>
           </div>
         </div>
         <div class="text-center">
           <p-button type="info"
                     round
-                    @click.native.prevent="updateProfile">
-            Update Profile
+                    @click.native.prevent="configureServiceForAction">
+            Update Action
           </p-button>
         </div>
         <div class="clearfix"></div>
@@ -42,13 +42,12 @@
 </template>
 <script>
 import axios from 'axios'
-// import AddServiceFormVue from '../pages/UserProfile/AddServiceForm.vue';
 
 export default {
   // name: AddServiceForm,
   data() {
     return {
-      list: {
+      action_config: {
         action: '',
         media_type: '',
         service_name:''
@@ -56,9 +55,9 @@ export default {
     };
   },
   methods: {
-    updateProfile() {
+    configureServiceForAction() {
       axios
-      .post('http://localhost:8080/services/actions',this.list)
+      .post('http://localhost:8080/services/actions',this.action_config)
       .then(response => (console.log(response)));
     }
   }

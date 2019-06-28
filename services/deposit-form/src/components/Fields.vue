@@ -2,24 +2,32 @@
   <div class="fields">
     <div class="container">
     <div class="form-group">
+      
       <div class="input-group mb-3" v-for="field in fields" :key="field.id">
-        <!-- <div class="input-group mb-3" v-for="(subfield, index) in field.subfields" :key="subfield.index"> -->
         <template v-if="renderField(field)">
 
-
-
         <template v-if="field.type === 'text'">
+          <div class="col-12">
+          <div>
           <h4>{{ field.label }}</h4>
-          <button v-if="field.repeatable === true" type="button" class="btn btn-info btn-sm ml-3 mb-3" v-on:click="addValue(field.value)">Add</button>
-            <div class="input-group mb-3" v-for="(value, index) in field.value" :key="index">
-              <input :type="field.type" class="form-control"
-              v-model="field.value[index]" 
-              >
-                <div class="input-group-append" v-if="index > 0">
-                    <button type="button" class="btn btn-danger btn-sm" 
-                    v-on:click="removeValue(field.value, index)">Remove</button>
-                </div>
+          <button v-if="field.repeatable === true" type="button" class="btn btn-info ml-3 mb-3" v-on:click="addValue(field.value)">Add</button>
+          </div>
+          </div>
+          <div class="col-12">
+          <div>
+            <transition-group name="fade" tag="ul">
+              <div class="input-group mb-3" v-for="(value, index) in field.value" :key="index">
+                  <input :type="field.type" class="form-control"
+                  v-model="field.value[index]" 
+                  >
+                  <div class="input-group-append" v-if="index > 0">
+                      <button type="button" class="btn btn-danger btn-sm" 
+                      v-on:click="removeValue(field.value, index)">Remove</button>
+                  </div>
+              </div>
+              </transition-group>
             </div>
+          </div>
         </template>
 
         <template v-else-if="field.type === 'date'">
@@ -38,13 +46,15 @@
               </select>
         </template>
 
-        <template v-else-if="field.type === 'checkbox'">
-          <h4>{{ field.label }}</h4>
-            <input class="ml-3" type="checkbox" v-on:change.native="toggleCheckbox(field, index)" v-model="field.value">
-        </template>
+        
+        <!-- <template v-else-if="field.type === 'container'">
+          <div class="input-group mb-3" v-for="(subfield, index) in field.subfields" :key="subfield.index">
+            <h4>{{ field.label }}</h4>
+              <input class="ml-3" type="checkbox" v-on:change.native="toggleCheckbox(field, index)" v-model="field.value">
+          </div>
+        </template> -->
 
       </template>
-      <!-- </div> -->
       </div>
       <button type="button" class="btn btn-primary btn-lg btn-block" v-on:click="submitDeposit">Submit</button>
     </div>
@@ -109,4 +119,10 @@ export default {
 </script>
 
 <style>
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
 </style>

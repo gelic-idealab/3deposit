@@ -112,10 +112,17 @@ export default {
         method: 'post',
         config: { headers: {'Content-Type': 'application/json' }}
         })
-      .then(response => (console.log(response)))
+      .then(function(response) {
+        if (response.status === 200) {
+          window.location.href = "http://deposit-form.docker.localhost";
+        } else {
+          (console.log(response));
+        }
+      });
     }
-  },
+  }
 }
+
 </script>
 
 <style>

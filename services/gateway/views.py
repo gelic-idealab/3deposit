@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+from asyncio import create_task
 
 import db
 import aiohttp_jinja2
@@ -234,7 +235,7 @@ async def deposit_submit(request):
         try:
             data = await request.json()
             # logging.debug(msg=f'deposit_submit data: {data}')
-            deposit_processed = await start_deposit_processing_task(data)
+            deposit_processed = create_task(start_deposit_processing_task(data))
             if deposit_processed:
                 return web.Response(status=200, headers=headers)
             else:

@@ -75,7 +75,7 @@
 <script>
 import { StatsCard, ChartCard } from "@/components/index";
 import Chartist from 'chartist';
-import 'axios';
+import axios from 'axios';
 
 export default {
   components: {

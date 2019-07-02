@@ -103,28 +103,4 @@
     </div>
   </card>
 </template>
-<script>
-export default {
-  data() {
-    return {
-      user: {
-        company: "Paper Dashboard",
-        username: "jonsnow",
-        email: "",
-        lastName: "Faker",
-        address: "Melbourne, Australia",
-        city: "melbourne",
-        postalCode: "",
-        aboutMe: `I don't want it.`
-      }
-    };
-  },
-  methods: {
-    updateProfile() {
-      alert("Your data: " + JSON.stringify(this.user));
-    }
-  }
-};
-</script>
-<style>
-</style>
+

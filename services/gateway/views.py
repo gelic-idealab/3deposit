@@ -12,6 +12,8 @@ from aiohttp_security import remember, forget, authorized_userid
 import db
 from forms import validate_login_form
 from process import get_service_config_by_action, start_deposit_processing_task
+import logging
+
 
 
 def redirect(router, route_name):
@@ -97,20 +99,27 @@ async def services(request):
                     return web.json_response({ 'res': 'no services'}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
         except Exception as err:
             return web.json_response({ 'err': str(err) }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+    else:
+        return web.Response(headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
 
 async def services_configs(request):
+
+    headers = {
+        'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
+        'Access-Control-Allow-Headers': 'content-type'
+    }
     if request.method == 'GET':
         try:
-            req = await request.json()
+            req = request.query
             async with request.app['db'].acquire() as conn:
                 service_config = await db.get_service_config(conn=conn, name=req.get('name'))
                 if service_config:
-                    return web.json_response({ 'service_config': service_config }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+                    return web.json_response({ 'service_config': service_config }, headers=headers)
                 else:
-                    return web.json_response({ 'err': 'No matching service', 'req': req }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+                    return web.json_response({ 'err': 'No matching service', 'req': req }, headers=headers)
         except Exception as err:
-            return web.json_response({ 'err': str(err), 'req': req }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
-    if request.method == 'POST':
+            return web.json_response({ 'err': str(err), 'req': req }, headers=headers)
+    elif request.method == 'POST':
         """
         request.json():
         {
@@ -129,10 +138,40 @@ async def services_configs(request):
             async with request.app['db'].acquire() as conn:
                 service = await db.set_service_config(conn=conn, name=req.get('name'), endpoint=req.get('endpoint'), config=req.get('config'))
                 if service:
-                    return web.json_response({ 'res': str(service) })
+                    return web.json_response({ 'res': service }, headers=headers)
+                else:
+                    return web.json_response({'req':str(req),'err':'Could not create service.'}, headers=headers)
         except Exception as err:
-            return web.json_response({ 'err': str(err) })
+            return web.json_response({ 'err': str(err) }, headers=headers)
+    
+    else:
+        return web.Response(headers=headers)        
 
+async def services_actions(request):
+    if request.method == 'GET':
+        try:
+            q = request.query
+            action = q.get('action')
+            media_type = q.get('media_type')
+            if q:
+                async with request.app['db'].acquire() as conn:
+                    service_name = await db.get_action_service_name(conn, action=action, media_type=media_type)
+                    if service_name:
+                        return web.json_response({ 'service_name': service_name }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+                    else:
+                        return web.json_response({ 'res': 'no service configured for {}, {}'.format(action, media_type)}, 
+                        headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+
+            async with request.app['db'].acquire() as conn:
+                services = await db.get_action_services(conn)
+                if services:
+                    return web.json_response({ 'services': services }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+                else:
+                    return web.json_response({ 'res': 'no action services'}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+        except Exception as err:
+            return web.json_response({ 'err': str(err) }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+
+          
 async def services_actions(request):
     if request.method == 'GET':
         try:
@@ -163,9 +202,15 @@ async def services_actions(request):
             async with request.app['db'].acquire() as conn:
                 service = await db.set_action_service_name(conn=conn, action=req.get('action'), media_type=req.get('media_type'), service_name=req.get('service_name'))
                 if service:
-                    return web.json_response({ 'res': service })
+                    return web.json_response({ 'res': service }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
         except Exception as err:
-            return web.json_response({ 'err': str(err) })
+            return web.json_response({ 'err': str(err) }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+
+    else:
+        return web.Response(headers={
+        'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
+        'Access-Control-Allow-Headers': 'content-type'
+    })
 
 """
 Handlers for deposit form frontend
@@ -182,6 +227,8 @@ async def deposit_form_active(request):
 
     if request.method == 'POST':
         try:
+            # logging.debug(msg="Is JSON:".format(request.is_json))
+            # logging.debug(msg=str)
             req = await request.json()
             async with request.app['db'].acquire() as conn:
                 try:
@@ -367,7 +414,6 @@ async def publish_models(request):
                     return web.json_response({ 'err': 'could not retrieve config for service: {}'.format(service_name)})
         except Exception as err:
             return web.json_response({ 'err': str(err) })
-
 
 
 async def deposits(request):

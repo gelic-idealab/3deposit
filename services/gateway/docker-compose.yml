@@ -15,8 +15,8 @@ services:
   gateway:
       build: .
       container_name: gateway
-    #   ports:
-    #       - "8080:8080"
+      ports:
+          - "8080:8080"
       links:
           - postgres
       depends_on: 

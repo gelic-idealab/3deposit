@@ -1,10 +1,11 @@
+import time
+import logging
+
 from sqlalchemy import create_engine, MetaData
 
 from db import forms, deposits, users, services, actions
 from settings import BASE_DIR, get_config
 from security import generate_password_hash
-
-import time
 
 
 DSN = "postgresql://{user}:{password}@{host}:{port}/{database}"
@@ -78,6 +79,7 @@ def create_default_store_service(engine):
         conn.execute(actions.insert().values(action=action, media_type=media_type, service_name=service_name))
 
 def main():
+    logging.debug(msg='running init_db, waiting for db container to become available')
     time.sleep(5)
     setup_db(USER_CONFIG['postgres'])
     create_tables(engine=user_engine)

@@ -40,21 +40,7 @@ async def init_app(argv=None):
         app.on_cleanup.append(close_pg)
     except Exception as err:
         logging.debug(msg=err)
-        # retry = 1
-        # max_retry = 5
-        # while retry < max_retry:
-        #     logging.info(msg='Retrying db connection {}'.format(retry))
-        #     try:
-        #         import init_db
-        #         init_db.main()
-        #         db_pool = await init_pg(app)
-        #         app.on_cleanup.append(close_pg)
-        #     except Exception as err:
-        #         logging.debug(msg=err)
-        #         retry += 1
-        #         time.sleep(5)
-        #     else:
-        #         break
+        raise
 
     fernet_key = fernet.Fernet.generate_key()
     secret_key = base64.urlsafe_b64decode(fernet_key)

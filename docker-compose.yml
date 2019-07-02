@@ -15,6 +15,7 @@ services:
       - "traefik.docker.network=proxy"
 
   postgres:
+      container_name: postgres
       image: postgres:10
       networks:
           - gateway_internal    
@@ -33,8 +34,8 @@ services:
       networks:
         - gateway_internal
         - proxy
-      # command: bash -c "pipenv run python init_db.py && pipenv run python gateway.py"
-      command: bash -c "pipenv run python gateway.py"
+      command: bash -c "pipenv run python init_db.py && pipenv run python gateway.py"
+      # command: bash -c "pipenv run python gateway.py"
       labels:
         - "traefik.frontend.rule=Host:gateway.docker.localhost"
         - "traefik.backend=gateway"

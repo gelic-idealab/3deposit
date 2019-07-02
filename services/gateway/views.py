@@ -147,29 +147,29 @@ async def services_configs(request):
     else:
         return web.Response(headers=headers)        
 
-async def services_actions(request):
-    if request.method == 'GET':
-        try:
-            q = request.query
-            action = q.get('action')
-            media_type = q.get('media_type')
-            if q:
-                async with request.app['db'].acquire() as conn:
-                    service_name = await db.get_action_service_name(conn, action=action, media_type=media_type)
-                    if service_name:
-                        return web.json_response({ 'service_name': service_name }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
-                    else:
-                        return web.json_response({ 'res': 'no service configured for {}, {}'.format(action, media_type)}, 
-                        headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+# async def services_actions(request):
+#     if request.method == 'GET':
+#         try:
+#             q = request.query
+#             action = q.get('action')
+#             media_type = q.get('media_type')
+#             if q:
+#                 async with request.app['db'].acquire() as conn:
+#                     service_name = await db.get_action_service_name(conn, action=action, media_type=media_type)
+#                     if service_name:
+#                         return web.json_response({ 'service_name': service_name }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+#                     else:
+#                         return web.json_response({ 'res': 'no service configured for {}, {}'.format(action, media_type)}, 
+#                         headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
 
-            async with request.app['db'].acquire() as conn:
-                services = await db.get_action_services(conn)
-                if services:
-                    return web.json_response({ 'services': services }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
-                else:
-                    return web.json_response({ 'res': 'no action services'}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
-        except Exception as err:
-            return web.json_response({ 'err': str(err) }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+#             async with request.app['db'].acquire() as conn:
+#                 services = await db.get_action_services(conn)
+#                 if services:
+#                     return web.json_response({ 'services': services }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+#                 else:
+#                     return web.json_response({ 'res': 'no action services'}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+#         except Exception as err:
+#             return web.json_response({ 'err': str(err) }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
 
           
 async def services_actions(request):
@@ -219,6 +219,8 @@ Handlers for deposit form frontend
 async def deposit_form(request):
     if request.method == 'GET':
         form_id = request.query.get('id')
+        if form_id is None:
+            form_id = 1
         async with request.app['db'].acquire() as conn:
             form = await db.get_form_by_id(conn, id=form_id)
         if form:
@@ -228,21 +230,27 @@ async def deposit_form(request):
 
     if request.method == 'POST':
         try:
-            # logging.debug(msg="Is JSON:".format(request.is_json))
-            # logging.debug(msg=str)
             req = await request.json()
-            async with request.app['db'].acquire() as conn:
-                if req.get('id')
-                    try:
-                        await db.update_form_by_id(conn, req.get('id'), req.get('content'))
-                        return web.json_reponse({ "msg": f'Update content for form {form_id}'})
+            content = req.get('content')
+            id = req.get('id')
+            if content:
                 try:
-                    await db.create_form(conn, req.get('content'))
-                    return web.json_response({ "msg": "New form created" })
+                    async with request.app['db'].acquire() as conn:
+                        if id:
+                            try:
+                                await db.update_form_by_id(conn, req.get('id'), req.get('content'))
+                                return web.json_reponse({ 'msg': f'Updated content for form {form_id}'})
+                            except Exception as e:
+                                return web.json_response({ 'err': f'Error updating form id {id}: ' + str(e) })
+                        try:
+                            created = await db.create_form(conn, content)
+                            return web.json_response({ 'msg': str(created) })
+                        except Exception as e:
+                            return web.json_response({ 'err': 'Error creating form: ' + str(e) })
                 except Exception as e:
-                    return web.json_response({ "err": str(e) })
+                    return web.json_response({ 'err': str(e) })
         except Exception as e:
-            return web.json_response({ "err": str(e) })
+            return web.json_response({ 'err': 'Error handling request: ' + str(e) })
 
 
 async def deposit_upload(request):

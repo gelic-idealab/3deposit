@@ -47,12 +47,12 @@
         </template>
 
         
-        <!-- <template v-else-if="field.type === 'container'">
+        <template v-else-if="field.type === 'container'">
           <div class="input-group mb-3" v-for="(subfield, index) in field.subfields" :key="subfield.index">
             <h4>{{ field.label }}</h4>
               <input class="ml-3" type="checkbox" v-on:change.native="toggleCheckbox(field, index)" v-model="field.value">
           </div>
-        </template> -->
+        </template>
 
       </template>
       </div>

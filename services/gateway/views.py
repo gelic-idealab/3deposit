@@ -170,15 +170,21 @@ async def services_actions(request):
         except Exception as err:
             return web.json_response({ 'err': str(err) }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
 
-    if request.method == 'POST':
+    elif request.method == 'POST':
         try:
             req = await request.json()
             async with request.app['db'].acquire() as conn:
                 service = await db.set_action_service_name(conn=conn, action=req.get('action'), media_type=req.get('media_type'), service_name=req.get('service_name'))
                 if service:
-                    return web.json_response({ 'res': service })
+                    return web.json_response({ 'res': service }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
         except Exception as err:
-            return web.json_response({ 'err': str(err) }, headers=headers)
+            return web.json_response({ 'err': str(err) }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+
+    else:
+        return web.Response(headers={
+        'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
+        'Access-Control-Allow-Headers': 'content-type'
+    })
 
 """
 Handlers for deposit form frontend

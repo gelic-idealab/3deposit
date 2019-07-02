@@ -7,7 +7,7 @@
             <fg-input type="text"
                       label="Action Name"
                       placeholder="Paper dashboard"
-                      v-model="action_config.name">
+                      v-model="action_config.action">
             </fg-input>
           </div>
           <div class="col-md-6">

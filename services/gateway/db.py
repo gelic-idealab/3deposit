@@ -256,7 +256,12 @@ async def set_action_service_name(conn, action, media_type, service_name):
         await conn.execute(
             actions
             .update()
-            .where(actions.c.action == action)
+            .where(
+                    and_(
+                    actions.c.action == action,
+                    actions.c.media_type == media_type
+                    )
+                )
             # .where(actions.c.media_type == media_type)
             .values(service_name=service_name)
         )

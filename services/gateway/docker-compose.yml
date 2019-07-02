@@ -14,10 +14,7 @@ services:
 
   gateway:
       build: .
-<<<<<<< HEAD
-=======
       container_name: gateway
->>>>>>> Action form added
       ports:
           - "8080:8080"
       links:

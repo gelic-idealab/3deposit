@@ -130,5 +130,3 @@ async def get_service_config_by_action(conn, action, media_type):
             return None
     except Exception as err:
         logging.debug(msg='get_service_config_by_action err: {}'.format(str(err)))
-
-

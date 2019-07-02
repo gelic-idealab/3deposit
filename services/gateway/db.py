@@ -30,7 +30,6 @@ forms = Table(
     'forms', meta,
 
     Column('id', Integer, primary_key=True),
-    Column('active', Boolean, nullable=False, default=False),
     Column('content', JSON, nullable=True)
 )
 
@@ -156,23 +155,31 @@ async def get_user_by_name(conn, username):
 
 
 ### Deposit form queries
-async def get_active_form(conn):
+async def get_form_by_id(conn, id):
     result = await conn.execute(
         forms
         .select()
-        .where(forms.c.active == True)
+        .where(forms.c.id == id)
     )
-    first_active_form = await result.fetchone()
-    if first_active_form:
-        return dict(first_active_form)
+    form = await result.fetchone()
+    if form:
+        return dict(form)
     else:
         return None
 
-async def create_active_form(conn, content, active=False):
+async def create_form(conn, content):
     await conn.execute(
         forms
         .insert()
-        .values(active=active, content=content)
+        .values(content=content)
+    )
+
+async def update_form_by_id(conn, id, content):
+    await conn.execute(
+        forms
+        .update()
+        .where(forms.c.id == id)
+        .values(content=content)
     )
 
 

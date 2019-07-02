@@ -17,11 +17,11 @@
           <div>
             <transition-group name="fade" tag="ul">
               <div class="input-group mb-3" v-for="(value, index) in field.value" :key="index">
-                  <input :type="field.type" class="form-control"
+                  <input :type="field.type" class="form-control input-lg"
                   v-model="field.value[index]" 
                   >
                   <div class="input-group-append" v-if="index > 0">
-                      <button type="button" class="btn btn-danger btn-sm" 
+                      <button type="button" class="btn btn-danger btn-lg" 
                       v-on:click="removeValue(field.value, index)">Remove</button>
                   </div>
               </div>
@@ -37,7 +37,7 @@
 
         <template v-else-if="field.type === 'select'">
           <h4>{{ field.label }}</h4>
-              <select class="form-control ml-3 mb-3"
+              <select class="form-control ml-3 mb-3 input-lg"
               v-model="field.value" 
               >
                 <option v-for="option in field.options" :value="option.value" :key="option.value">
@@ -48,7 +48,7 @@
 
         
         <template v-else-if="field.type === 'container'">
-          <div class="input-group mb-3" v-for="(subfield, index) in field.subfields" :key="subfield.index">
+          <div class="input-group mb-3 input-lg" v-for="(subfield, index) in field.subfields" :key="subfield.index">
             <h4>{{ field.label }}</h4>
               <input class="ml-3" type="checkbox" v-on:change.native="toggleCheckbox(field, index)" v-model="field.value">
           </div>

@@ -27,6 +27,7 @@ services:
   gateway:
       build: ./services/gateway/
       container_name: gateway
+
       links:
           - postgres
       depends_on: 

@@ -6,6 +6,8 @@
       <div class="input-group mb-3" v-for="field in fields" :key="field.id">
         <template v-if="renderField(field)">
 
+
+
         <template v-if="field.type === 'text'">
           <div class="col-12">
           <div>

@@ -69,7 +69,6 @@ def models():
                 return jsonify(response)
 
 
-
         #Deletes the model from sketchfab.
         if request.method == 'DELETE':
             try:
@@ -81,7 +80,6 @@ def models():
                 token = get_value(request, 'config', 'token')
                 headers = {'Authorization': 'Token {}'.format(token)}
                 model_endpoint = SKETCHFAB_API_URL + '/models/{}'.format(uid)
-
 
                 r = requests.delete(model_endpoint, headers=headers)
                 if r.status_code != 204:

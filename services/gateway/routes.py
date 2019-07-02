@@ -31,11 +31,9 @@ def setup_routes(app):
     app.router.add_get('/logout', logout, name='logout')
 
     # service config routes
-    app.router.add_get('/services', services)
-    app.router.add_get('/services/configs', services_configs)
-    app.router.add_post('/services/configs', services_configs)
-    app.router.add_get('/services/actions', services_actions)
-    app.router.add_post('/services/actions', services_actions)
+    app.router.add_view('/services', services)
+    app.router.add_view('/services/configs', services_configs)
+    app.router.add_view('/services/actions', services_actions)
 
 
     # form routes

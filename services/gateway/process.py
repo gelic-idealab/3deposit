@@ -56,7 +56,7 @@ async def trigger_store(conn, did):
     with open(TMP_FILE_LOCATION.format(did), 'rb') as f:
         fd.add_field('file', f, filename=did, content_type='application/octet-stream')
         async with ClientSession() as sess:
-            async with sess.request(url='http://gateway:8080/store/objects', method='POST', data=fd, params=deposit_id) as resp:
+            async with sess.request(url='http://localhost:8080/store/objects', method='POST', data=fd, params=deposit_id) as resp:
                 resp_json = await resp.json()
                 etag = resp_json.get('etag')
                 logging.debug(msg=f'trigger_store resp: {str(resp_json)}, {etag}')
@@ -76,6 +76,7 @@ async def trigger_publish(conn, data):
     did = data.get('id')
     form = data.get('form')
     metadata = extract_data_from_form(form)
+    logging.debug(msg="PUBLISH METADATA "+str(metadata))
     data = {}
     data.update({'metadata': metadata})
     fd = FormData()
@@ -87,8 +88,10 @@ async def trigger_publish(conn, data):
         fd.add_field('config', json.dumps(config), content_type='application/json')
         with open(TMP_FILE_LOCATION.format(did), 'rb') as f:
             fd.add_field('file', f, filename=did, content_type='application/octet-stream')
+            logging.debug(msg="ENDPOINT: "+endpoint+"FORM DATA: "+str(data))
             async with new_request(method='POST', url=endpoint, data=fd) as resp:
                 resp_json = await resp.json()
+                logging.debug(msg="DEBUG: "+str(resp_json))
                 location = resp_json.get('uri')
                 return location
 

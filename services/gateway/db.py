@@ -299,3 +299,13 @@ async def get_action_services(conn):
     else:
         return None
 
+
+# deposits = Table(
+#     'deposits', meta,
+
+#     Column('id', String(256), primary_key=True),
+#     Column('deposit_date', Date, nullable=False),
+#     Column('etag', String(256)),
+#     Column('mongo_id', String(256)),
+#     Column('location', String(256))
+# )

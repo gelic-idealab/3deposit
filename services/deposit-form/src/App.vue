@@ -36,8 +36,8 @@ export default {
   },
   mounted () {
     axios
-      .get('http://gateway.docker.localhost/form/active')
-      .then(response => (this.form = response.data.active_form.content));
+      .get('http://gateway.docker.localhost/form')
+      .then(response => (this.form = response.data.form.content));
     // eslint-disable-next-line
     console.log(this.id);
   },

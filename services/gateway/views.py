@@ -171,22 +171,27 @@ async def services_actions(request):
 Handlers for deposit form frontend
 """
 
-async def deposit_form_active(request):
+async def deposit_form(request):
     if request.method == 'GET':
+        form_id = request.query.get('id')
         async with request.app['db'].acquire() as conn:
-            active_form = await db.get_active_form(conn)
-        if active_form:
-            return web.json_response({ 'active_form': active_form }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+            form = await db.get_form_by_id(conn, id=form_id)
+        if form:
+            return web.json_response({ 'form': form }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
         else:
-            return web.json_response({ 'err': 'No active form' }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+            return web.json_response({ 'err': f'No form with id {form_id}' }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
 
     if request.method == 'POST':
         try:
             req = await request.json()
             async with request.app['db'].acquire() as conn:
+                if req.get('id')
+                    try:
+                        await db.update_form_by_id(conn, req.get('id'), req.get('content'))
+                        return web.json_reponse({ "msg": f'Update content for form {form_id}'})
                 try:
-                    await db.create_active_form(conn, req['content'], req['active'])
-                    return web.json_response({ "succeeded": True, "msg": "New active form created" })
+                    await db.create_form(conn, req.get('content'))
+                    return web.json_response({ "msg": "New form created" })
                 except Exception as e:
                     return web.json_response({ "err": str(e) })
         except Exception as e:

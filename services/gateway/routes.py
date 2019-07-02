@@ -2,7 +2,7 @@ from views import (
     index, 
     login, 
     logout, 
-    deposit_form_active, 
+    deposit_form, 
     deposit_upload,
     deposit_submit,
     store_buckets,
@@ -39,8 +39,8 @@ def setup_routes(app):
 
 
     # form routes
-    app.router.add_get('/form/active', deposit_form_active)
-    app.router.add_post('/form/active', deposit_form_active)
+    app.router.add_get('/form', deposit_form)
+    app.router.add_post('/form', deposit_form)
     app.router.add_view('/form/upload', deposit_upload)
     app.router.add_view('/form/submit', deposit_submit)
 

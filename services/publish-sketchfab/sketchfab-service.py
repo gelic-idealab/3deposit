@@ -69,7 +69,6 @@ def models():
                 return jsonify(response)
 
 
-
         #Deletes the model from sketchfab.
         if request.method == 'DELETE':
             try:
@@ -81,7 +80,6 @@ def models():
                 token = get_value(request, 'config', 'token')
                 headers = {'Authorization': 'Token {}'.format(token)}
                 model_endpoint = SKETCHFAB_API_URL + '/models/{}'.format(uid)
-
 
                 r = requests.delete(model_endpoint, headers=headers)
                 if r.status_code != 204:
@@ -109,6 +107,29 @@ def models():
         
 
             r = requests.get(model__endpoint, headers=headers)
+        except requests.exceptions.RequestException as e:
+            return jsonify({'requestException': e})
+        else:
+            response = r.json()
+            print(response)
+            return jsonify(response)
+
+@app.route('/users', methods=['POST', 'GET', 'DELETE'])
+def users():
+    #Get the user information 
+    if request.method == 'GET':
+        try:
+            uid = get_value(request, 'data', 'uid')
+            SKETCHFAB_DOMAIN = 'sketchfab.com'
+            SKETCHFAB_API_URL = 'https://api.{}/v3'.format(SKETCHFAB_DOMAIN)
+            
+            
+            token = get_value(request, 'config', 'token')
+            headers = {'Authorization': 'Token {}'.format(token)}
+            users_endpoint = SKETCHFAB_API_URL + '/users/{}'.format(uid)
+        
+
+            r = requests.get(users_endpoint, headers=headers)
         except requests.exceptions.RequestException as e:
             return jsonify({'requestException': e})
         else:

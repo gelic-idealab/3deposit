@@ -5,7 +5,7 @@
 3deposit uses object storage. Instances can be configured to store objects locally or in a remote bucket. Remote buckets can be self-hosted with a MinIO server or with S3-compatbile providers, such as AWS. 
 
 ## Publication ##
-3deposit natively supports three media types:
+3deposit natively supports three media types::
 * 3D models 
 * 360 videos
 * Virtual Reality applications

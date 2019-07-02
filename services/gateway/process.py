@@ -32,8 +32,8 @@ async def start_deposit_processing_task(data):
         engine = await get_service_engine()
 
         deposit_id = data.get('id')
-        logging.debug(msg=f'start_deposit_processing_task id: {str(deposit_id)}')
         if deposit_id:
+            logging.debug(msg=f'start_deposit_processing_task id: {str(deposit_id)}')
             async with engine.acquire() as conn:
                 await db.add_deposit_by_id(conn, deposit_id)
                 etag = await trigger_store(conn, deposit_id)
@@ -130,3 +130,4 @@ async def get_service_config_by_action(conn, action, media_type):
             return None
     except Exception as err:
         logging.debug(msg='get_service_config_by_action err: {}'.format(str(err)))
+

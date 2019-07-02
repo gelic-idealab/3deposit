@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+from asyncio import create_task
 
 import db
 import aiohttp_jinja2
@@ -11,8 +12,8 @@ from aiohttp_security import remember, forget, authorized_userid
 import db
 from forms import validate_login_form
 from process import get_service_config_by_action, start_deposit_processing_task
-
 import logging
+
 
 
 def redirect(router, route_name):
@@ -170,7 +171,32 @@ async def services_actions(request):
         except Exception as err:
             return web.json_response({ 'err': str(err) }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
 
-    elif request.method == 'POST':
+          
+async def services_actions(request):
+    if request.method == 'GET':
+        try:
+            q = request.query
+            action = q.get('action')
+            media_type = q.get('media_type')
+            if q:
+                async with request.app['db'].acquire() as conn:
+                    service_name = await db.get_action_service_name(conn, action=action, media_type=media_type)
+                    if service_name:
+                        return web.json_response({ 'service_name': service_name }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+                    else:
+                        return web.json_response({ 'res': 'no service configured for {}, {}'.format(action, media_type)}, 
+                        headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+
+            async with request.app['db'].acquire() as conn:
+                services = await db.get_action_services(conn)
+                if services:
+                    return web.json_response({ 'services': services }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+                else:
+                    return web.json_response({ 'res': 'no action services'}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+        except Exception as err:
+            return web.json_response({ 'err': str(err) }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+
+    if request.method == 'POST':
         try:
             req = await request.json()
             async with request.app['db'].acquire() as conn:
@@ -256,7 +282,7 @@ async def deposit_submit(request):
         try:
             data = await request.json()
             # logging.debug(msg=f'deposit_submit data: {data}')
-            deposit_processed = await start_deposit_processing_task(data)
+            deposit_processed = create_task(start_deposit_processing_task(data))
             if deposit_processed:
                 return web.Response(status=200, headers=headers)
             else:
@@ -388,6 +414,7 @@ async def publish_models(request):
                     return web.json_response({ 'err': 'could not retrieve config for service: {}'.format(service_name)})
         except Exception as err:
             return web.json_response({ 'err': str(err) })
+
 
 async def deposits(request):
     try:

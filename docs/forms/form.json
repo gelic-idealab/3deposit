@@ -44,6 +44,16 @@
         { "value": "o", "label": "Other" }
       ],
       "dependsOn": {}
+    },
+    {
+        "id": "object_title",
+        "label":"Object Title",
+        "type": "text",
+        "repeatable": false,
+        "required": true,
+        "value": ["Pikachu"],
+        "placeholder": "Enter object title",
+        "dependsOn": {}
     }
   ]
 }

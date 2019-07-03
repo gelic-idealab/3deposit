@@ -11,7 +11,11 @@
         <td v-for="(column, index) in columns"
             :key="index"
             v-if="hasValue(item, column)">
-            {{itemValue(item, column)}}
+            <a v-if="isLink(column)" :href="makeHref(itemValue(item,column))">{{ itemValue(item,column) }}
+            </a>
+            <a v-else>
+              {{itemValue(item, column)}}
+            </a>
         </td>
       </slot>
     </tr>
@@ -48,6 +52,14 @@ export default {
     },
     itemValue(item, column) {
       return item[column.toLowerCase()];
+    },
+    isLink(column) {
+      if(column == 'id') {
+        return true
+      }
+    },
+    makeHref(itemValue) {
+      return "http://localhost:8080/deposits/"+itemValue.toString()
     }
   }
 };

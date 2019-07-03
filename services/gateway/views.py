@@ -430,10 +430,14 @@ async def publish_models(request):
 
 
 async def deposits(request):
+    headers = {
+    'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
+    'Access-Control-Allow-Headers': 'content-type'
+    }
     try:
         async with request.app['db'].acquire() as conn:
             deposits = await db.get_deposits(conn=conn)
             logging.debug(msg=f'deposits: {str(deposits)}')
-            return web.json_response({ 'deposits': deposits })
+            return web.json_response({ 'deposits': deposits }, headers=headers)
     except Exception as err:
-        return web.json_response({ 'err': str(err) })
+        return web.json_response({ 'err': str(err) }, headers=headers)

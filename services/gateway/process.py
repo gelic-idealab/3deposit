@@ -92,7 +92,7 @@ async def trigger_publish(conn, data):
             async with new_request(method='POST', url=endpoint, data=fd) as resp:
                 resp_json = await resp.json()
                 logging.debug(msg="DEBUG: "+str(resp_json))
-                location = resp_json.get('uri')
+                location = resp_json.get('location')
                 return location
 
 async def trigger_metadata(data):

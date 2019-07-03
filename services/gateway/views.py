@@ -70,18 +70,6 @@ async def logout(request):
 
 
 
-"""
-Helper function to relay form data with files
-"""
-# async def form_data_from_request(request):
-#     fd = FormData()
-#     auth = json.dumps({'auth': {'auth_key': 'auth_value'}})
-#     data = json.dumps({'deposit_id': '12345'})
-#     fd.add_field('config', auth, content_type='application/json')
-#     fd.add_field('data', data, content_type='application/json')
-#     fd.add_field('files', open('test.txt', 'rb'), filename='test.txt')
-#     async with new_request.post(SERVICE_ENDPOINT, data=fd) as resp:
-#         return web.json_response({"res": await resp.json() })
 
 
 """
@@ -89,6 +77,9 @@ Handlers for getting and setting services & service configs
 """
 
 async def services(request):
+    username = await authorized_userid(request)
+    if not username:
+        raise redirect(request.app.router, 'login')
     if request.method == 'GET':
         try:
             async with request.app['db'].acquire() as conn:
@@ -103,7 +94,9 @@ async def services(request):
         return web.Response(headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
 
 async def services_configs(request):
-
+    username = await authorized_userid(request)
+    if not username:
+        raise redirect(request.app.router, 'login')
     headers = {
         'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
         'Access-Control-Allow-Headers': 'content-type'
@@ -147,32 +140,11 @@ async def services_configs(request):
     else:
         return web.Response(headers=headers)        
 
-# async def services_actions(request):
-#     if request.method == 'GET':
-#         try:
-#             q = request.query
-#             action = q.get('action')
-#             media_type = q.get('media_type')
-#             if q:
-#                 async with request.app['db'].acquire() as conn:
-#                     service_name = await db.get_action_service_name(conn, action=action, media_type=media_type)
-#                     if service_name:
-#                         return web.json_response({ 'service_name': service_name }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
-#                     else:
-#                         return web.json_response({ 'res': 'no service configured for {}, {}'.format(action, media_type)}, 
-#                         headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
-
-#             async with request.app['db'].acquire() as conn:
-#                 services = await db.get_action_services(conn)
-#                 if services:
-#                     return web.json_response({ 'services': services }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
-#                 else:
-#                     return web.json_response({ 'res': 'no action services'}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
-#         except Exception as err:
-#             return web.json_response({ 'err': str(err) }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
-
           
 async def services_actions(request):
+    username = await authorized_userid(request)
+    if not username:
+        raise redirect(request.app.router, 'login')
     if request.method == 'GET':
         try:
             q = request.query
@@ -430,6 +402,9 @@ async def publish_models(request):
 
 
 async def deposits(request):
+    username = await authorized_userid(request)
+    if not username:
+        raise redirect(request.app.router, 'login')
     try:
         async with request.app['db'].acquire() as conn:
             deposits = await db.get_deposits(conn=conn)

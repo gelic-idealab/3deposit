@@ -63,10 +63,12 @@ def models():
                 return jsonify({'requestException': e})
             else:
                 response = r.json()
-                print(response)
+                uid = response.get('uid')
+                location = f"https://sketchfab.com/models/{uid}/embed"
+                logging.debug(msg="LOCATION: "+location)
                 if os.path.exists('model.zip'):
                     os.remove('model.zip')
-                return jsonify(response)
+                return jsonify({"location": location})
 
 
         #Deletes the model from sketchfab.
@@ -111,7 +113,6 @@ def models():
             return jsonify({'requestException': e})
         else:
             response = r.json()
-            print(response)
             return jsonify(response)
 
 @app.route('/users', methods=['POST', 'GET', 'DELETE'])
@@ -134,7 +135,6 @@ def users():
             return jsonify({'requestException': e})
         else:
             response = r.json()
-            print(response)
             return jsonify(response)
 
 

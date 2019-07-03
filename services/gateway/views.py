@@ -77,9 +77,9 @@ Handlers for getting and setting services & service configs
 """
 
 async def services(request):
-    username = await authorized_userid(request)
-    if not username:
-        raise redirect(request.app.router, 'login')
+    # username = await authorized_userid(request)
+    # if not username:
+    #     raise redirect(request.app.router, 'login')
     if request.method == 'GET':
         try:
             async with request.app['db'].acquire() as conn:
@@ -94,9 +94,9 @@ async def services(request):
         return web.Response(headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
 
 async def services_configs(request):
-    username = await authorized_userid(request)
-    if not username:
-        raise redirect(request.app.router, 'login')
+    # username = await authorized_userid(request)
+    # if not username:
+    #     raise redirect(request.app.router, 'login')
     headers = {
         'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
         'Access-Control-Allow-Headers': 'content-type'
@@ -112,7 +112,7 @@ async def services_configs(request):
                     return web.json_response({ 'err': 'No matching service', 'req': req }, headers=headers)
         except Exception as err:
             return web.json_response({ 'err': str(err), 'req': req }, headers=headers)
-            
+
     elif request.method == 'POST':
         try:
             req = await request.json()
@@ -130,9 +130,9 @@ async def services_configs(request):
 
           
 async def services_actions(request):
-    username = await authorized_userid(request)
-    if not username:
-        raise redirect(request.app.router, 'login')
+    # username = await authorized_userid(request)
+    # if not username:
+        # raise redirect(request.app.router, 'login')
     if request.method == 'GET':
         try:
             q = request.query

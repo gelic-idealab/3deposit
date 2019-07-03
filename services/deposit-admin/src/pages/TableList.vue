@@ -57,12 +57,12 @@ export default {
   },
   mounted() {
     axios
-    .get('http://localhost:8080/services')
+    .get('http://gateway.docker.localhost/services')
     .then(response => (this.tables.services.data = response.data.services))
     .then(() => (this.tables.services.columns = Object.keys(this.tables.services.data[0])));
 
     axios
-    .get('http://localhost:8080/services/actions')
+    .get('http://gateway.docker.localhost/services/actions')
     // .then(response => console.log(response))
     .then(response => (this.tables.actions.data = response.data.services))
     .then(() => (this.tables.actions.columns = Object.keys(this.tables.actions.data[0])));

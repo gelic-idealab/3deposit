@@ -57,7 +57,7 @@ export default {
   methods: {
     configureServiceForAction() {
       axios
-      .post('http://localhost:8080/services/actions',this.action_config)
+      .post('http://gateway.docker.localhost/services/actions',this.action_config)
       .then(response => (console.log(response)));
     }
   }

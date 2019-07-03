@@ -24,6 +24,18 @@ services:
       labels:
         - "traefik.enable=false"    
 
+  admin:
+    build: ./services/deposit-admin/
+    networks:
+      - proxy
+    container_name: admin
+    command: npm run serve
+    labels:
+      - "traefik.frontend.rule=Host:admin.docker.localhost"
+      - "traefik.backend=admin"
+      - "traefik.port=8080"
+      - "traefik.docker.network=proxy"
+
   gateway:
       build: ./services/gateway/
       container_name: gateway

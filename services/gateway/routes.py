@@ -48,9 +48,9 @@ def setup_routes(app):
     app.router.add_get('/store/objects', store_objects)
     app.router.add_post('/store/objects', store_objects)
 
-    # publication routes
-    app.router.add_get('/publish/models', publish_models)
-    app.router.add_post('/publish/models', publish_models)
+    # # publication routes
+    # app.router.add_get('/publish/models', publish_models)
+    # app.router.add_post('/publish/models', publish_models)
 
     # deposit routes
     app.router.add_get('/deposits', deposits)

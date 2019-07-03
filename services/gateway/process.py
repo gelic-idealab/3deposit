@@ -9,7 +9,7 @@ from aiohttp import web, FormData, ClientSession
 from aiohttp import request as new_request
 
 
-TMP_FILE_LOCATION = './data/{}'
+TMP_FILE_LOCATION = './data/tmp/{}'
 
 async def get_service_engine():
     engine = await create_engine(

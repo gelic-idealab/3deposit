@@ -112,20 +112,8 @@ async def services_configs(request):
                     return web.json_response({ 'err': 'No matching service', 'req': req }, headers=headers)
         except Exception as err:
             return web.json_response({ 'err': str(err), 'req': req }, headers=headers)
+            
     elif request.method == 'POST':
-        """
-        request.json():
-        {
-            "name": "minio",
-            "endpoint": "http://minio-service:5000/bucket",
-            "config": {
-                "auth": {
-                    "access_key": "AKIAIOSFODNN7GRAINGER",
-                    "secret_key": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYGRAINGERKEY"
-                }
-            }
-        }
-        """
         try:
             req = await request.json()
             async with request.app['db'].acquire() as conn:
@@ -367,38 +355,40 @@ async def store_objects(request):
 """
 Relay endpoint to get/post to Model publication service
 """
-async def publish_models(request):
-    PATH = '/models'
-    async with request.app['db'].acquire() as conn:
-        service_config = await get_service_config_by_action(conn=conn, action='publish', media_type='model')
-    logging.debug(msg='service_config: {}'.format(str(service_config)))
-    service_name = service_config.get('name')
+# async def publish_models(request):
+#     PATH = '/models'
+#     async with request.app['db'].acquire() as conn:
+#         service_config = await get_service_config_by_action(conn=conn, action='publish', media_type='model')
+#     logging.debug(msg='service_config: {}'.format(str(service_config)))
+#     service_name = service_config.get('name')
     
-    if request.method == 'POST':
-        try:
-            q = request.query
-            did = q.get('deposit_id')
-            metadata = await request.json()
-            data = {}
-            data.update({'metadata': metadata})
-            fd = FormData()
-            fd.add_field('data', json.dumps(data), content_type='application/json')
-            async with request.app['db'].acquire() as conn:
-                service_config = await db.get_service_config(conn=conn, name=service_name)
-                if service_config:
-                    endpoint = service_config.get('endpoint')
-                    config = service_config.get('config')
-                    fd.add_field('config', json.dumps(config), content_type='application/json')
-                    with open('./data/{}'.format(did), 'rb') as f:
-                        fd.add_field('file', f, filename=did, content_type='application/octet-stream')
-                        async with new_request(method='POST', url=endpoint+PATH, data=fd) as resp:
-                            resp_json = await resp.json()
-                            uri = resp_json.get('uri')
-                            return web.json_response(uri)
-                else:
-                    return web.json_response({ 'err': 'could not retrieve config for service: {}'.format(service_name)})
-        except Exception as err:
-            return web.json_response({ 'err': str(err) })
+#     if request.method == 'POST':
+#         try:
+#             q = request.query
+#             did = q.get('deposit_id')
+#             metadata = await request.json()
+#             data = {}
+#             data.update({'metadata': metadata})
+#             fd = FormData()
+#             fd.add_field('data', json.dumps(data), content_type='application/json')
+#             async with request.app['db'].acquire() as conn:
+#                 service_config = await db.get_service_config(conn=conn, name=service_name)
+#                 if service_config:
+#                     endpoint = service_config.get('endpoint')
+#                     config = service_config.get('config')
+#                     fd.add_field('config', json.dumps(config), content_type='application/json')
+#                     with open('./data/{}'.format(did), 'rb') as f:
+#                         fd.add_field('file', f, filename=did, content_type='application/octet-stream')
+#                         async with new_request(me    username = await authorized_userid(request)
+#     if not username:
+#         raise redirect(request.app.router, 'login')thod='POST', url=endpoint+PATH, data=fd) as resp:
+#                             resp_json = await resp.json()
+#                             uri = resp_json.get('uri')
+#                             return web.json_response(uri)
+#                 else:
+#                     return web.json_response({ 'err': 'could not retrieve config for service: {}'.format(service_name)})
+#         except Exception as err:
+#             return web.json_response({ 'err': str(err) })
 
 
 async def deposits(request):

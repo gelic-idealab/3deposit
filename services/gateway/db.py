@@ -129,10 +129,13 @@ async def get_deposit_by_id(conn, deposit_id):
         .select()
         .where(deposits.c.id == deposit_id))
     deposit_record = await result.first()
+    d_obj = {}
+    for (i,k) in enumerate(deposit_record.keys()):
+        d_obj.update(dict({k:str(deposit_record[i])}))
     if not deposit_record:
         msg = "Deposit with id: {} not found"
         raise RecordNotFound(msg.format(deposit_id))
-    return deposit_record
+    return d_obj
 
 
 ### User queries

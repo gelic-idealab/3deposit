@@ -434,10 +434,19 @@ async def deposits(request):
     'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
     'Access-Control-Allow-Headers': 'content-type'
     }
-    try:
-        async with request.app['db'].acquire() as conn:
-            deposits = await db.get_deposits(conn=conn)
-            logging.debug(msg=f'deposits: {str(deposits)}')
-            return web.json_response({ 'deposits': deposits }, headers=headers)
-    except Exception as err:
-        return web.json_response({ 'err': str(err) }, headers=headers)
+
+    if request.method == 'GET':
+        id = request.query.get('id')
+        try:
+            if id:
+                async with request.app['db'].acquire() as conn:
+                    deposits = await db.get_deposit_by_id(conn=conn,deposit_id=id)
+                    logging.debug(msg=f'deposits: {str(deposits)}')
+                    return web.json_response(deposits, headers=headers)
+            else:
+                async with request.app['db'].acquire() as conn:
+                    deposits = await db.get_deposits(conn=conn)
+                    logging.debug(msg=f'deposits: {str(deposits)}')
+                    return web.json_response({ 'deposits': deposits }, headers=headers)
+        except Exception as err:
+            return web.json_response({ 'err': str(err) }, headers=headers)

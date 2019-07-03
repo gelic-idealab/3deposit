@@ -9,12 +9,12 @@ import Notifications from "@/pages/Notifications.vue";
 import Icons from "@/pages/Icons.vue";
 import Deposits from "@/pages/Deposits.vue";
 import Services from "@/pages/Services.vue";
+import DepositProfile from "@/pages/DepositProfile.vue";
 
 const routes = [
   {
     path: "/",
     component: DashboardLayout,
-    redirect: "/dashboard",
     children: [
       {
         path: "dashboard",
@@ -39,7 +39,10 @@ const routes = [
       {
         path: "deposits",
         name: "deposits",
-        component: Deposits
+        component: Deposits,
+        children: [
+          { path: "/:id", name: "deposit-profile", component: DepositProfile }
+        ]
       },
       {
         path: "services",
@@ -48,7 +51,6 @@ const routes = [
       }
     ]
   },
-  // { path: '/deposits/:id', component: DepositProfile },
   { path: "*", component: NotFound }
 ];
 

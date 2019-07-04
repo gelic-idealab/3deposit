@@ -1,7 +1,7 @@
 <template>
-  <container-fluid>
+  <div>
       <embed :src="location">
-  </container-fluid>
+  </div>
 </template>
 <script>
 export default {

@@ -37,17 +37,19 @@ const routes = [
         component: Icons
       },
       {
-        path: "deposits",
-        name: "deposits",
-        component: Deposits,
-        children: [
-          { path: "/:id", name: "deposit-profile", component: DepositProfile }
-        ]
-      },
-      {
         path: "services",
         name: "services",
         component: Services
+      },
+      {
+        path: "deposits",
+        name: "deposits",
+        component: Deposits
+      },
+      {
+        path: "/:id", 
+        name: "deposit-profile", 
+        component: DepositProfile
       }
     ]
   },

@@ -11,7 +11,7 @@
         <td v-for="(column, index) in columns"
             :key="index"
             v-if="hasValue(item, column)">
-            <router-link v-if="isLink(column)" :to="{ name: 'deposit-profile', params: { id: '1daf345f-c7f6-4491-9565-1f4c358fdf1e' }}"> {{ itemValue(item,column) }}
+            <router-link v-if="isLink(column)" :to="{ name: 'deposit-profile', params: { id: itemValue(item,column) }}"> {{ itemValue(item,column) }}
             </router-link>
             <a v-else>
               {{itemValue(item, column)}}
@@ -20,8 +20,6 @@
       </slot>
     </tr>
     </tbody>
-  <router-view></router-view>
-
   </table>
 </template>
 <script>

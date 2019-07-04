@@ -11,7 +11,6 @@
 import axios from 'axios';
 import EmbedCard from "./DepositProfile/EmbedCard.vue";
 export default {
-    name: 'DepositProfile',
     data() {
         return{
             deposit: {},

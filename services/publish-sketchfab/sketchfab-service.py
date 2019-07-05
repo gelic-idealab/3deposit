@@ -133,22 +133,22 @@ def me():
                 MODEL_ENDPOINT7 = SKETCHFAB_API_URL + '/me/models'
                 MODEL_ENDPOINT8 = SKETCHFAB_API_URL + '/me/likes'
                 MODEL_ENDPOINT9 = SKETCHFAB_API_URL + '/me/environments'
-                ALL_ENDPOINT = [MODEL_ENDPOINT1, MODEL_ENDPOINT2, MODEL_ENDPOINT3, MODEL_ENDPOINT4, MODEL_ENDPOINT5
-                MODEL_ENDPOINT6, MODEL_ENDPOINT7, MODEL_ENDPOINT8, MODEL_ENDPOINT9]
+                ALL_ENDPOINT = [MODEL_ENDPOINT1, MODEL_ENDPOINT2, MODEL_ENDPOINT3, MODEL_ENDPOINT4, MODEL_ENDPOINT5, MODEL_ENDPOINT6, MODEL_ENDPOINT7, MODEL_ENDPOINT8, MODEL_ENDPOINT9]
                 
                 config = json.loads(request.form.get('config'))
                 auth = config.get('auth')
                 token = auth.get('token')
                 headers = {'Authorization': 'Token {}'.format(token)}
+                resp_obj = {}
             
             for x in ALL_ENDPOINT:
                     r = requests.get(x, headers=headers)
                 except requests.exceptions.RequestException as e:
                     return jsonify({'requestException': e})
                 else:
-                    response = r.json()
-                    print(response)
-                    return jsonify(response)
+                    resp_obj.update({x: r.json()})
+                    print(resp_obj)
+                    return jsonify(resp_obj)
             else:
                 print("All information retrieved")
 

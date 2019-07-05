@@ -54,7 +54,7 @@ export default {
       return item[column.toLowerCase()];
     },
     isLink(column) {
-      if(column == 'id') {
+      if(column == 'deposit_id') {
         return true
       }
     },

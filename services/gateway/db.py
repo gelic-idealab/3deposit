@@ -19,7 +19,7 @@ meta = MetaData()
 deposits = Table(
     'deposits', meta,
 
-    Column('id', String(256), primary_key=True),
+    Column('deposit_id', String(256), primary_key=True),
     Column('deposit_date', Date, nullable=False),
     Column('etag', String(256)),
     Column('mongo_id', String(256)),
@@ -93,7 +93,7 @@ async def add_deposit_by_id(conn, deposit_id):
     await conn.execute(
         deposits
         .insert()
-        .values(id=deposit_id, deposit_date=datetime.datetime.now())
+        .values(deposit_id=deposit_id, deposit_date=datetime.datetime.now())
     )
 
 async def update_deposit_by_id(conn, deposit_id, **kwargs):
@@ -101,7 +101,7 @@ async def update_deposit_by_id(conn, deposit_id, **kwargs):
     await conn.execute(
         deposits
         .update()
-        .where(deposits.c.id == deposit_id)
+        .where(deposits.c.deposit_id == deposit_id)
         .values(kwargs)
     )
 
@@ -127,7 +127,7 @@ async def get_deposit_by_id(conn, deposit_id):
     result = await conn.execute(
         deposits
         .select()
-        .where(deposits.c.id == deposit_id))
+        .where(deposits.c.deposit_id == deposit_id))
     deposit_record = await result.first()
     d_obj = {}
     for (i,k) in enumerate(deposit_record.keys()):

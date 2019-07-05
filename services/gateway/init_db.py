@@ -1,11 +1,15 @@
 import time
 import logging
 
+import json
+
 from sqlalchemy import create_engine, MetaData
 
 from db import forms, deposits, users, services, actions
 from settings import BASE_DIR, get_config
 from security import generate_password_hash
+
+import keys
 
 
 DSN = "postgresql://{user}:{password}@{host}:{port}/{database}"
@@ -71,12 +75,63 @@ def create_admin(engine):
     with engine.connect() as conn:
         conn.execute(users.insert().values(username=username, password_hash=password_hash, role=role))
 
-def create_default_store_service(engine):
-    action = 'store'
-    media_type = 'default'
-    service_name = 'minio'
+def create_default_actions(engine):
     with engine.connect() as conn:
-        conn.execute(actions.insert().values(action=action, media_type=media_type, service_name=service_name))
+        objects = [
+            {
+                'action': 'publish',
+                "media_type": 'video',
+                'service_name': 'vimeo'
+            },
+            {
+                'action': 'publish',
+                "media_type": 'model',
+                'service_name': 'sketchfab'
+            },
+            {
+                'action': 'store',
+                "media_type": 'default',
+                'service_name': 'minio'
+            },
+            {
+                'action': 'publish',
+                "media_type": 'vr',
+                'service_name': 'aws'
+            }
+        ]
+
+        for obj in objects:
+            conn.execute(actions.insert().values(action=obj.get('action'), media_type=obj.get('media_type'), service_name=obj.get('service_name')))
+
+
+def create_default_services(engine):
+    with engine.connect() as conn:
+        objects = [
+            {
+                'name': 'minio',
+                "endpoint": 'http://minio-service:5000',
+                'config': {"auth": {"access_key": keys.MINIO_ACCESS_KEY, "secret_key": keys.MINIO_SECRET_KEY}}
+            },
+            {
+                'name': 'sketchfab',
+                "endpoint": 'http://sketchfab-service:5000/models',
+                'config': {"auth": {"token": keys.SKETCHFAB_TOKEN}}
+            },
+            {
+                'name': 'vimeo',
+                "endpoint": 'http://vimeo-service:5000/vimeo',
+                'config': {"auth": {"client_id": keys.VIMEO_CLIENT_ID, "access_token": keys.VIMEO_ACCESS_TOKEN, "client_secret": keys.VIMEO_CLIENT_SECRET}}
+            },
+            {
+                'name': 'aws',
+                "endpoint": 'http://aws-service:5000/vrs',
+                'config': {"auth": {"access_key": keys.AWS_ACCESS_KEY, "secret_key": keys.AWS_SECRET_KEY}}
+            }
+        ]
+
+        for obj in objects:
+            conn.execute(services.insert().values(name=obj.get('name'), endpoint=obj.get('endpoint'), config=obj.get('config')))
+
 
 def main():
     logging.debug(msg='running init_db, waiting for db container to become available')
@@ -84,9 +139,11 @@ def main():
     setup_db(USER_CONFIG['postgres'])
     create_tables(engine=user_engine)
     create_admin(engine=user_engine)
-    create_default_store_service(engine=user_engine)
+    create_default_actions(engine=user_engine)
+    create_default_services(engine=user_engine)
     # drop_tables()
     # teardown_db(config)
+
 
 if __name__ == '__main__':
     main()

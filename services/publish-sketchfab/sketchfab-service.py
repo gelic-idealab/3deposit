@@ -84,60 +84,74 @@ def models():
 
 
                 r = requests.delete(model_endpoint, headers=headers)
-                if r.status_code != 204:
-                    return jsonify({"msg": "Model does not exist.", "content": str(r.content)})
-                else:
-                    return jsonify({"msg": "Model successfully deleted.", "content": r.status_code})
+            if r.status_code != 204:
+                return jsonify({"msg": "Model does not exist.", "content": str(r.content)})
+            else:
+                return jsonify({"msg": "Model successfully deleted.", "content": r.status_code})
             except Exception as e:
                 return jsonify({'requestException': str(e)})
-    except Exception as err:
-        return jsonify({ 'err': str(err) })
+            except Exception as err:
+                return jsonify({ 'err': str(err) })
 
 
 
-    #Returns the details of the model.
-    if request.method == 'GET':
-        try:
-            uid = get_value(request, 'data', 'uid')
-            SKETCHFAB_DOMAIN = 'sketchfab.com'
-            SKETCHFAB_API_URL = 'https://api.{}/v3'.format(SKETCHFAB_DOMAIN)
+        #Returns the details of the model.
+        if request.method == 'GET':
+            try:
+                uid = get_value(request, 'data', 'uid')
+                SKETCHFAB_DOMAIN = 'sketchfab.com'
+                SKETCHFAB_API_URL = 'https://api.{}/v3'.format(SKETCHFAB_DOMAIN)
+                
+                
+                token = get_value(request, 'config', 'token')
+                headers = {'Authorization': 'Token {}'.format(token)}
+                model__endpoint = SKETCHFAB_API_URL + '/models/{}'.format(uid)
             
-            
-            token = get_value(request, 'config', 'token')
-            headers = {'Authorization': 'Token {}'.format(token)}
-            model__endpoint = SKETCHFAB_API_URL + '/models/{}'.format(uid)
-        
 
-            r = requests.get(model__endpoint, headers=headers)
-        except requests.exceptions.RequestException as e:
-            return jsonify({'requestException': e})
-        else:
-            response = r.json()
-            print(response)
-            return jsonify(response)
+                r = requests.get(model__endpoint, headers=headers)
+            except requests.exceptions.RequestException as e:
+                return jsonify({'requestException': e})
+            else:
+                response = r.json()
+                print(response)
+                return jsonify(response)
 
-@app.route('/users', methods=['POST', 'GET', 'DELETE'])
-def users():
-    #Get the user information 
-    if request.method == 'GET':
-        try:
-            uid = get_value(request, 'data', 'uid')
-            SKETCHFAB_DOMAIN = 'sketchfab.com'
-            SKETCHFAB_API_URL = 'https://api.{}/v3'.format(SKETCHFAB_DOMAIN)
+@app.route('/me', methods=['POST', 'GET', 'DELETE'])
+def me():
+    try:
+        #Get the user information 
+        if request.method == 'GET':
+            try:
+                SKETCHFAB_DOMAIN = 'sketchfab.com'
+                SKETCHFAB_API_URL = 'https://api.{}/v3'.format(SKETCHFAB_DOMAIN)
+                MODEL_ENDPOINT1 = SKETCHFAB_API_URL + '/me'
+                MODEL_ENDPOINT2 = SKETCHFAB_API_URL + '/me/followers'
+                MODEL_ENDPOINT3 = SKETCHFAB_API_URL + '/me/collections'
+                MODEL_ENDPOINT4 = SKETCHFAB_API_URL + '/me/backgrounds'
+                MODEL_ENDPOINT5 = SKETCHFAB_API_URL + '/me/followings'
+                MODEL_ENDPOINT6 = SKETCHFAB_API_URL + '/me/subscriptions'
+                MODEL_ENDPOINT7 = SKETCHFAB_API_URL + '/me/models'
+                MODEL_ENDPOINT8 = SKETCHFAB_API_URL + '/me/likes'
+                MODEL_ENDPOINT9 = SKETCHFAB_API_URL + '/me/environments'
+                ALL_ENDPOINT = [MODEL_ENDPOINT1, MODEL_ENDPOINT2, MODEL_ENDPOINT3, MODEL_ENDPOINT4, MODEL_ENDPOINT5
+                MODEL_ENDPOINT6, MODEL_ENDPOINT7, MODEL_ENDPOINT8, MODEL_ENDPOINT9]
+                
+                config = json.loads(request.form.get('config'))
+                auth = config.get('auth')
+                token = auth.get('token')
+                headers = {'Authorization': 'Token {}'.format(token)}
             
-            
-            token = get_value(request, 'config', 'token')
-            headers = {'Authorization': 'Token {}'.format(token)}
-            users_endpoint = SKETCHFAB_API_URL + '/users/{}'.format(uid)
-        
+            for x in ALL_ENDPOINT:
+                    r = requests.get(x, headers=headers)
+                except requests.exceptions.RequestException as e:
+                    return jsonify({'requestException': e})
+                else:
+                    response = r.json()
+                    print(response)
+                    return jsonify(response)
+            else:
+                print("All information retrieved")
 
-            r = requests.get(users_endpoint, headers=headers)
-        except requests.exceptions.RequestException as e:
-            return jsonify({'requestException': e})
-        else:
-            response = r.json()
-            print(response)
-            return jsonify(response)
 
 
 if __name__ == '__main__':

@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+
+  vimeo-service:
+    build: .
+    container_name: vimeo-service
+    ports:
+      - 5000:5000
+    # networks:
+    #   - gateway_internal
+    environment: 
+      FLASK_ENV: development
+      FLASK_APP: vimeo-service
+    command: pipenv run flask run --host=0.0.0.0
+    labels:
+      - "traefik.enable=false" 
+
+# networks:
+#     gateway_internal:
+#         external: false

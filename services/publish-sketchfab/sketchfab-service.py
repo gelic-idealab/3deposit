@@ -64,11 +64,9 @@ def models():
             else:
                 response = r.json()
                 uid = response.get('uid')
-                location = f"https://sketchfab.com/models/{uid}/embed"
-                logging.debug(msg="LOCATION: "+location)
                 if os.path.exists('model.zip'):
                     os.remove('model.zip')
-                return jsonify({"location": location})
+                return jsonify({"location": uid})
 
 
         #Deletes the model from sketchfab.

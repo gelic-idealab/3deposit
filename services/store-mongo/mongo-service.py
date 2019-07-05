@@ -58,10 +58,10 @@ def create_app():
             deposit_metadata = data.get('deposit_metadata')
 
             if not collection_name:
-                return jsonify({"err":"No collection_name."})
+                return jsonify({"err": "No collection_name."})
 
             if not deposit_id:
-                return jsonify({"err":"Please enter a valid deposit_id."})
+                return jsonify({"err": "Please enter a valid deposit_id."})
 
             collection = database[collection_name]
             post_id = collection.insert_one(deposit_metadata).inserted_id
@@ -79,19 +79,18 @@ def create_app():
 
                 deposit_id = get_value(request=request, scope='config', field='deposit_id')
                 collection_name = get_value(request=request, scope='config', field='collection_name')
-
+                logging.debug("COLLECTION NAME:"+collection_name)
                 # JSONEncoder().encode()
 
                 collection = database[collection_name]
 
                 document = collection.find_one(filter={"deposit_id": deposit_id},projection={'_id':False})
-                #deposit_metadata = document.get('deposit_metadata')
+                # deposit_metadata = document.get('deposit_metadata')
 
                 return jsonify(document)
 
             except Exception as err:
-                return jsonify({"err":str(err),
-                                "collection":str(collection)})
+                return jsonify({"err": str(err)})
 
         if request.method == 'DELETE':
             # try:

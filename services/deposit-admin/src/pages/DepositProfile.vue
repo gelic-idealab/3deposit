@@ -6,7 +6,7 @@
         </div>
         <div class="card-body">
             <h5 class="card-title">{{ deposit.deposit_id }}</h5>
-            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+            <p class="card-text">{{ deposit_metadata }}</p>
             <p class="card-text"><small class="text-muted">{{ deposit.deposit_date }}</small></p>
         </div>
       </div>
@@ -20,6 +20,8 @@ export default {
     data() {
         return{
             deposit: {},
+            deposit_metadata: {},
+            publish_metadata: {},
             id: ''
         }
     },
@@ -28,9 +30,16 @@ export default {
     },
     mounted() {
         this.id = this.$route.params.id;
-        console.log(this.id)
+        console.log(this.id);
+        axios.get("http://localhost:8080/metadata", {params: {deposit_id: this.id}})
+        .then(response => (this.deposit_metadata = response.data));
+
         axios.get("http://localhost:8080/deposits", {params: {id: this.id}})
-        .then(response => (this.deposit = response.data));
+        .then(response => (this.deposit = response.data))
+        .then(
+            axios.get("http://localhost:8080/publish/models", {params: {resource_id: this.deposit.location}})
+            .then(response => (this.publish_metadata = response.data))
+        )
     }
 };
 </script>

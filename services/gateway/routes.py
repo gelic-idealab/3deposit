@@ -11,7 +11,8 @@ from views import (
     services_configs,
     services_actions,
     publish_models,
-    deposits
+    deposits,
+    metadata
 )
 
 
@@ -54,3 +55,6 @@ def setup_routes(app):
 
     # deposit routes
     app.router.add_get('/deposits', deposits)
+
+    # metadata routes
+    app.router.add_view('/metadata', metadata)

@@ -95,18 +95,19 @@ async def trigger_publish(conn, data):
                 location = resp_json.get('location')
                 return location
 
+
 async def trigger_metadata(data):
     collection_name = 'deposits'
     did = data.get('id')
     form = data.get('form')
     form_data = extract_data_from_form(form)
-    deposit_metadata = dict({ 'deposit_metadata': form_data })
-    deposit_id = dict({ 'deposit_id': did })
+    deposit_metadata = dict({'deposit_metadata': form_data})
+    deposit_id = dict({'deposit_id': did})
     data = {}
     data.update(deposit_id)
     data.update(deposit_metadata)
     config = {}
-    collection_name = dict({ 'collection_name': collection_name })
+    collection_name = dict({'collection_name': collection_name})
     config.update(collection_name)
     fd = FormData()
     fd.add_field('data', json.dumps(data), content_type='application/json')
@@ -121,6 +122,7 @@ async def trigger_metadata(data):
 Helper function to return service configs for a given action and media_type
 """
 
+
 async def get_service_config_by_action(conn, action, media_type):
     try:
         logging.debug(msg='get_service_config_by_action called with: {}, {}'.format(action, media_type))
@@ -133,4 +135,3 @@ async def get_service_config_by_action(conn, action, media_type):
             return None
     except Exception as err:
         logging.debug(msg='get_service_config_by_action err: {}'.format(str(err)))
-

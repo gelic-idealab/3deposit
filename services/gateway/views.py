@@ -239,7 +239,7 @@ async def deposit_form(request):
                         if id:
                             try:
                                 await db.update_form_by_id(conn, req.get('id'), req.get('content'))
-                                return web.json_reponse({ 'msg': f'Updated content for form {form_id}'})
+                                return web.json_response({ 'msg': f'Updated content for form {form_id}'})
                             except Exception as e:
                                 return web.json_response({ 'err': f'Error updating form id {id}: ' + str(e) })
                         try:
@@ -250,7 +250,7 @@ async def deposit_form(request):
                 except Exception as e:
                     return web.json_response({ 'err': str(e) })
         except Exception as e:
-            return web.json_response({ 'err': 'Error handling request: ' + str(e) })
+            return web.json_response({'err': 'Error handling request: ' + str(e) })
 
 
 async def deposit_upload(request):
@@ -403,8 +403,12 @@ async def publish_models(request):
     service_name = service_config.get('name')
 
     if request.method == 'GET':
-        async with new_request(method='GET', url=endpoint+PATH, data=fd) as resp:
-            
+        q = request.query
+        data = {
+            "uid": q.get('resource_id')
+        }
+        async with new_request(method='GET', url=endpoint+PATH, data=data) as resp:
+            return web.json_response(await resp.json())
     
     # if request.method == 'POST':
     #     try:
@@ -452,5 +456,28 @@ async def deposits(request):
                     deposits = await db.get_deposits(conn=conn)
                     logging.debug(msg=f'deposits: {str(deposits)}')
                     return web.json_response({ 'deposits': deposits }, headers=headers)
+        except Exception as err:
+            return web.json_response({ 'err': str(err) }, headers=headers)
+
+
+async def metadata(request):
+    headers = {
+    'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
+    'Access-Control-Allow-Headers': 'content-type'
+    }
+
+    if request.method == 'GET':
+        try:
+            q = request.query
+            fd = FormData()
+
+            config = dict({'collection_name': 'deposits', "deposit_id": q.get('deposit_id')})
+            fd.add_field('config', json.dumps(config), content_type='application/json')
+            
+            async with new_request(method='GET', url='http://mongo-service:5000/objects', data=fd) as resp:
+                logging.debug("MONGO ERROR:"+await resp.text())
+                resp_json = await resp.json()
+                return web.json_response(resp_json, headers=headers)
+        
         except Exception as err:
             return web.json_response({ 'err': str(err) }, headers=headers)

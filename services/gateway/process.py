@@ -38,8 +38,15 @@ async def start_deposit_processing_task(data):
                 await db.add_deposit_by_id(conn, deposit_id)
                 etag = await trigger_store(conn, deposit_id)
                 mongo_id = await trigger_metadata(data)
-                location = await trigger_publish(conn, data)
-                await db.update_deposit_by_id(conn, deposit_id=deposit_id, etag=etag, mongo_id=mongo_id, location=location)
+                publish_resp = await trigger_publish(conn, data)
+                await db.update_deposit_by_id(
+                    conn, 
+                    deposit_id=deposit_id, 
+                    etag=etag,
+                    mongo_id=mongo_id,
+                    location=publish_resp.get('location'),
+                    resource_id=publish_resp.get('resource_id')
+                )
             if os.path.exists(TMP_FILE_LOCATION.format(deposit_id)):
                 os.remove(TMP_FILE_LOCATION.format(deposit_id))
             return True
@@ -92,12 +99,10 @@ async def trigger_publish(conn, data):
             async with new_request(method='POST', url=endpoint, data=fd) as resp:
                 resp_json = await resp.json()
                 logging.debug(msg="DEBUG: "+str(resp_json))
-                location = resp_json.get('location')
-                return location
+                return resp_json
 
 
 async def trigger_metadata(data):
-    collection_name = 'deposits'
     did = data.get('id')
     form = data.get('form')
     form_data = extract_data_from_form(form)
@@ -106,15 +111,11 @@ async def trigger_metadata(data):
     data = {}
     data.update(deposit_id)
     data.update(deposit_metadata)
-    config = {}
-    collection_name = dict({'collection_name': collection_name})
-    config.update(collection_name)
     fd = FormData()
     fd.add_field('data', json.dumps(data), content_type='application/json')
-    fd.add_field('config', json.dumps(config), content_type='application/json')
     async with new_request(method='POST', url='http://mongo-service:5000/objects', data=fd) as resp:
         resp_json = await resp.json()
-        mongo_id = resp_json.get('post_id')
+        mongo_id = resp_json.get('mongo_id')
         return mongo_id
 
 

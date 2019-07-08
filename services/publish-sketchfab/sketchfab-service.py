@@ -66,7 +66,7 @@ def models():
                 uid = response.get('uid')
                 if os.path.exists('model.zip'):
                     os.remove('model.zip')
-                return jsonify({"location": uid})
+                return jsonify({"resource_id": uid, "location": f"https://sketchfab.com/models/{uid}/embed"})
 
 
         #Deletes the model from sketchfab.
@@ -96,17 +96,21 @@ def models():
     #Returns the details of the model.
     if request.method == 'GET':
         try:
-            uid = get_value(request, 'data', 'uid')
+            data = json.loads(request.form.get('data'))
+            
+            uid = data.get('uid')
             SKETCHFAB_DOMAIN = 'sketchfab.com'
             SKETCHFAB_API_URL = 'https://api.{}/v3'.format(SKETCHFAB_DOMAIN)
             
-            
-            token = get_value(request, 'config', 'token')
+            config = json.loads(request.form.get('config'))
+            auth = config.get('auth')
+            token = auth.get('token')
+
             headers = {'Authorization': 'Token {}'.format(token)}
-            model__endpoint = SKETCHFAB_API_URL + '/models/{}'.format(uid)
+            model_endpoint = SKETCHFAB_API_URL + '/models/{}'.format(uid)
         
 
-            r = requests.get(model__endpoint, headers=headers)
+            r = requests.get(model_endpoint, headers=headers)
         except requests.exceptions.RequestException as e:
             return jsonify({'requestException': e})
         else:

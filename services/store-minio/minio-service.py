@@ -184,10 +184,10 @@ def create_app():
                 #         return jsonify({"err":"This deposit_id is already registered. Please enter a new deposit_id.",
                 #                         "log":str(err)})
 
-                metadata={}
+                metadata = {}
                 metadata['BUCKET_NAME'] = bucket_name
 
-                r = minioClient.fput_object(bucket_name, object_name=deposit_id, file_path=deposit_id,metadata=metadata)
+                r = minioClient.fput_object(bucket_name, object_name=deposit_id, file_path=deposit_id, metadata=metadata)
                 # cleanup temp file
 
                 try:

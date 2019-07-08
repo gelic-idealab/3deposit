@@ -23,6 +23,7 @@ deposits = Table(
     Column('deposit_date', Date, nullable=False),
     Column('etag', String(256)),
     Column('mongo_id', String(256)),
+    Column('resource_id', String(256)),
     Column('location', String(256))
 )
 

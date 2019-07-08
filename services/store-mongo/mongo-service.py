@@ -7,6 +7,8 @@ from unpack_001 import get_value
 import logging
 
 DATABASE_NAME = '3deposit'
+COLLECTION_NAME = 'deposits'
+
 
 def create_client(request):
     if not request:
@@ -50,23 +52,16 @@ def create_app():
 
             logging.debug(msg=str(request.form))
 
-            config = json.loads(request.form.get('config'))
-            logging.debug(msg=str(config))
-            collection_name = config.get('collection_name')
             data = json.loads(request.form.get('data'))
             deposit_id = data.get('deposit_id')
-            deposit_metadata = data.get('deposit_metadata')
-
-            if not collection_name:
-                return jsonify({"err": "No collection_name."})
 
             if not deposit_id:
                 return jsonify({"err": "Please enter a valid deposit_id."})
 
-            collection = database[collection_name]
-            post_id = collection.insert_one(deposit_metadata).inserted_id
-            if post_id:
-                return jsonify({"post_id": str(post_id)})
+            collection = database[COLLECTION_NAME]
+            mongo_id = collection.insert_one(data).inserted_id
+            if mongo_id:
+                return jsonify({"mongo_id": str(mongo_id)})
 
             # except Exception as err:
             #     return jsonify({"err": str(err)})
@@ -75,16 +70,18 @@ def create_app():
             try:
                 client = create_client(request)
 
-                database = client['3deposit']
+                database = client[DATABASE_NAME]
 
-                deposit_id = get_value(request=request, scope='config', field='deposit_id')
-                collection_name = get_value(request=request, scope='config', field='collection_name')
-                logging.debug("COLLECTION NAME:"+collection_name)
+                config = json.loads(request.form.get('config'))
+                deposit_id = config.get('deposit_id')
+                # logging.debug("COLLECTION NAME:"+collection_name)
                 # JSONEncoder().encode()
 
-                collection = database[collection_name]
-
-                document = collection.find_one(filter={"deposit_id": deposit_id},projection={'_id':False})
+                collection = database[COLLECTION_NAME]
+                logging.debug(msg="MONGO GET COLLECTION: "+str(collection))
+                logging.debug(msg="MONGO GET COLLECTION: "+str(dir(collection)))
+                                
+                document = collection.find_one(filter={"deposit_id": deposit_id}, projection={'_id': False})
                 # deposit_metadata = document.get('deposit_metadata')
 
                 return jsonify(document)

@@ -396,20 +396,39 @@ async def store_objects(request):
 Relay endpoint to get/post to Model publication service
 """
 async def publish_models(request):
-    PATH = '/models'
-    async with request.app['db'].acquire() as conn:
-        service_config = await get_service_config_by_action(conn=conn, action='publish', media_type='model')
-    logging.debug(msg='service_config: {}'.format(str(service_config)))
-    service_name = service_config.get('name')
+    headers = {
+    'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
+    'Access-Control-Allow-Headers': 'content-type'
+    }
+    # PATH = '/models'
+    try:
+        async with request.app['db'].acquire() as conn:
+            service_config = await get_service_config_by_action(conn=conn, action='publish', media_type='model')
+        logging.debug(msg='service_config: {}'.format(str(service_config)))
+        endpoint = service_config.get('endpoint')
+        config = service_config.get('config')
 
-    if request.method == 'GET':
-        q = request.query
-        data = {
-            "uid": q.get('resource_id')
-        }
-        async with new_request(method='GET', url=endpoint+PATH, data=data) as resp:
-            return web.json_response(await resp.json())
-    
+        if request.method == 'GET':
+            q = request.query
+            data = {
+                'uid': q.get('resource_id')
+            }
+
+            payload = {}
+            payload.update({'data': json.dumps(data)})
+            payload.update({'config': json.dumps(config)})
+
+            logging.debug(msg="PAYLOAD LOG: "+str(payload))
+            async with new_request(method='GET', url=endpoint, data=payload) as resp:
+                logging.debug(await resp.text())
+                return web.json_response(await resp.json(), headers=headers)
+        
+        else:
+            return web.Response(status=200, headers=headers)
+
+    except Exception as err:
+        return web.json_response({"err": str(err)})
+
     # if request.method == 'POST':
     #     try:
     #         q = request.query
@@ -471,7 +490,7 @@ async def metadata(request):
             q = request.query
             fd = FormData()
 
-            config = dict({'collection_name': 'deposits', "deposit_id": q.get('deposit_id')})
+            config = dict({"deposit_id": q.get('deposit_id')})
             fd.add_field('config', json.dumps(config), content_type='application/json')
             
             async with new_request(method='GET', url='http://mongo-service:5000/objects', data=fd) as resp:

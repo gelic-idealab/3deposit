@@ -143,14 +143,11 @@ def me():
             
             for x in ALL_ENDPOINT:
                     r = requests.get(x, headers=headers)
+                    resp_obj.update({x: r.json()})
                 except requests.exceptions.RequestException as e:
                     return jsonify({'requestException': e})
-                else:
-                    resp_obj.update({x: r.json()})
-                    print(resp_obj)
-                    return jsonify(resp_obj)
             else:
-                print("All information retrieved")
+                return jsonify(resp_obj)
 
 
 

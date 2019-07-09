@@ -19,12 +19,13 @@ def create_client(request):
 
     client = MongoClient(
         'mongodb://{username}:{password}@mongo-server:27017/'.format(
-        username=username,
-        password=password
+            username=username,
+            password=password
         )
     )
 
     return client
+
 
 def create_app():
     app = Flask(__name__)

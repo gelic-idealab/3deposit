@@ -11,6 +11,7 @@ from aiohttp import request as new_request
 
 TMP_FILE_LOCATION = './data/{}'
 
+
 async def get_service_engine():
     engine = await create_engine(
         database='threedeposit',
@@ -27,6 +28,8 @@ async def get_service_engine():
 """
 Trigger function to begin storage operation with buffered deposit file
 """
+
+
 async def start_deposit_processing_task(data):
     try:
         engine = await get_service_engine()
@@ -40,8 +43,8 @@ async def start_deposit_processing_task(data):
                 mongo_id = await trigger_metadata(data)
                 publish_resp = await trigger_publish(conn, data)
                 await db.update_deposit_by_id(
-                    conn, 
-                    deposit_id=deposit_id, 
+                    conn,
+                    deposit_id=deposit_id,
                     etag=etag,
                     mongo_id=mongo_id,
                     location=publish_resp.get('location'),
@@ -69,11 +72,13 @@ async def trigger_store(conn, did):
                 logging.debug(msg=f'trigger_store resp: {str(resp_json)}, {etag}')
                 return etag
 
+
 def extract_data_from_form(form):
     form_data = {}
     for field in form:
         form_data.update({ field.get('label'): field.get('value') })
     return form_data
+
 
 async def trigger_publish(conn, data):
     media_type = data.get('media_type')

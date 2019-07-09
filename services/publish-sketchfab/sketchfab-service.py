@@ -19,17 +19,18 @@ published model. Everything else can get dumped into a 'description' field.
 
 app = Flask(__name__) 
 
+
 @app.route('/models', methods=['POST', 'GET', 'DELETE'])
 def models():
     try:
-        #Posts the model to sketchfab.
+        # Posts the model to sketchfab.
         if request.method == 'POST':
             logging.debug(msg='sketchfab req: {}'.format(request.form))
 
             SKETCHFAB_DOMAIN = 'sketchfab.com'
             SKETCHFAB_API_URL = 'https://api.{}/v3'.format(SKETCHFAB_DOMAIN)
             MODEL_ENDPOINT = SKETCHFAB_API_URL + '/models'
-            
+
             logging.debug(msg='sketchfab req: {}'.format(request.form))
             # token = get_value(request, 'config', 'token')
             config = json.loads(request.form.get('config'))
@@ -55,7 +56,6 @@ def models():
             f = open('model.zip', 'rb')
             files = {'modelFile': f}
 
-
             try:
                 r = requests.post(MODEL_ENDPOINT, data=data, files=files, headers=headers)
                 f.close()
@@ -68,14 +68,12 @@ def models():
                     os.remove('model.zip')
                 return jsonify({"resource_id": uid, "location": f"https://sketchfab.com/models/{uid}/embed"})
 
-
-        #Deletes the model from sketchfab.
+        # Deletes the model from sketchfab.
         if request.method == 'DELETE':
             try:
                 uid = get_value(request, 'data', 'uid')
                 SKETCHFAB_DOMAIN = 'sketchfab.com'
                 SKETCHFAB_API_URL = 'https://api.{}/v3'.format(SKETCHFAB_DOMAIN)
-                
 
                 token = get_value(request, 'config', 'token')
                 headers = {'Authorization': 'Token {}'.format(token)}
@@ -93,22 +91,21 @@ def models():
 
 
 
-    #Returns the details of the model.
+    # Returns the details of the model.
     if request.method == 'GET':
         try:
             data = json.loads(request.form.get('data'))
-            
+
             uid = data.get('uid')
             SKETCHFAB_DOMAIN = 'sketchfab.com'
             SKETCHFAB_API_URL = 'https://api.{}/v3'.format(SKETCHFAB_DOMAIN)
-            
+
             config = json.loads(request.form.get('config'))
             auth = config.get('auth')
             token = auth.get('token')
 
             headers = {'Authorization': 'Token {}'.format(token)}
             model_endpoint = SKETCHFAB_API_URL + '/models/{}'.format(uid)
-        
 
             r = requests.get(model_endpoint, headers=headers)
         except requests.exceptions.RequestException as e:
@@ -117,20 +114,19 @@ def models():
             response = r.json()
             return jsonify(response)
 
+
 @app.route('/users', methods=['POST', 'GET', 'DELETE'])
 def users():
-    #Get the user information 
+    # Get the user information
     if request.method == 'GET':
         try:
             uid = get_value(request, 'data', 'uid')
             SKETCHFAB_DOMAIN = 'sketchfab.com'
             SKETCHFAB_API_URL = 'https://api.{}/v3'.format(SKETCHFAB_DOMAIN)
-            
-            
+
             token = get_value(request, 'config', 'token')
             headers = {'Authorization': 'Token {}'.format(token)}
             users_endpoint = SKETCHFAB_API_URL + '/users/{}'.format(uid)
-        
 
             r = requests.get(users_endpoint, headers=headers)
         except requests.exceptions.RequestException as e:

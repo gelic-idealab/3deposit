@@ -10,6 +10,10 @@
             <p class="card-text">{{ publish_metadata }}</p>
             <p class="card-text"><small class="text-muted">{{ deposit.deposit_date }}</small></p>
         </div>
+        <div>
+            <metadata-json :deposit_metadata="deposit_metadata">
+            </metadata-json>
+        </div>
       </div>
     </div>
 </template>
@@ -17,6 +21,8 @@
 <script>
 import axios from 'axios';
 import EmbedCard from "./DepositProfile/EmbedCard.vue";
+import MetadataJson from "./DepositProfile/MetadataJson.vue";
+
 export default {
     data() {
         return{
@@ -27,7 +33,8 @@ export default {
         }
     },
     components: {
-        EmbedCard
+        EmbedCard,
+        MetadataJson
     },
     mounted() {
         this.id = this.$route.params.id;

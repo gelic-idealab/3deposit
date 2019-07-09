@@ -159,6 +159,17 @@ services:
     labels:
       - "traefik.enable=false"
 
+  aws-service:
+    build: ./services/publish-aws/
+    container_name: aws-service
+    networks:
+      - gateway_internal
+    environment: 
+      FLASK_ENV: development
+      FLASK_APP: aws-service
+    command: pipenv run flask run --host=0.0.0.0
+    labels:
+      - "traefik.enable=false"
 networks:
     proxy:
         external: true

@@ -1,4 +1,4 @@
-# library for unpacking gateway request object
+# library for unpacking 3deposit gateway request object
 import json
 
 def _flatten_json(y):
@@ -15,7 +15,7 @@ def _flatten_json(y):
 def get_value(request, scope, field):
     if request.form:
         request_json = json.loads(request.form.get(scope))
-    if request.json:
+    elif request.json:
         request_json = request.json
     else:
         return None

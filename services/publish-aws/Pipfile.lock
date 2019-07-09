@@ -88,10 +88,11 @@
         },
         "unpack": {
             "hashes": [
-                "sha256:e84761bf840957c895f09cb4fa69a346e84404d4743914a090c85480fb780386"
+                "sha256:238d3e947416495429cd841defb268741e3feb5dcc6b045d48f9f129d7278a37",
+                "sha256:8cfa7a5725778d260553438fbc0458dfffd4eb9df9a3c748710d0fa0420cb839"
             ],
             "index": "pypi",
-            "version": "==0.0.3"
+            "version": "==0.0.8"
         },
         "werkzeug": {
             "hashes": [

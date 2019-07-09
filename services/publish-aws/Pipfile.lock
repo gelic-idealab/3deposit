@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "dce37197a7cf27a08e7ff78ec78d48907cb9f167488e7ff9955d0e245da34d2b"
+            "sha256": "0603d4352042e085c967f0c22108dac066765e0dd11bae3967169518eef7f06d"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -30,6 +30,13 @@
                 "sha256:5b94b49521f6456670fdb30cd82a4eca9412788a93fa6dd6df72c94d5a8ff2d7"
             ],
             "version": "==7.0"
+        },
+        "filechunkio": {
+            "hashes": [
+                "sha256:c8540c2d27e851d3a475b2e14ac109d66c777dd43ab67031891c826e82026745"
+            ],
+            "index": "pypi",
+            "version": "==1.8"
         },
         "flask": {
             "hashes": [

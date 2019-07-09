@@ -91,6 +91,7 @@ async def trigger_publish(conn, data):
     logging.debug(msg="PUBLISH METADATA "+str(metadata))
     data = {}
     data.update({'metadata': metadata})
+    data.update({'deposit_id': did})
     fd = FormData()
     fd.add_field('data', json.dumps(data), content_type='application/json')
     service_config = await db.get_service_config(conn=conn, name=service_name)
@@ -102,8 +103,8 @@ async def trigger_publish(conn, data):
             fd.add_field('file', f, filename=did, content_type='application/octet-stream')
             logging.debug(msg="ENDPOINT: "+endpoint+"FORM DATA: "+str(data))
             async with new_request(method='POST', url=endpoint, data=fd) as resp:
+                logging.debug(msg="DEBUG: "+str(await resp.text()))
                 resp_json = await resp.json()
-                logging.debug(msg="DEBUG: "+str(resp_json))
                 return resp_json
 
 

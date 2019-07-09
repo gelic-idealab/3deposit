@@ -120,7 +120,7 @@ def users():
     # Get the user information
     if request.method == 'GET':
         try:
-            uid = get_value(request, 'data', 'uid')
+            uid = get_value(request, 'data', 'resource_id')
             SKETCHFAB_DOMAIN = 'sketchfab.com'
             SKETCHFAB_API_URL = 'https://api.{}/v3'.format(SKETCHFAB_DOMAIN)
 

@@ -216,6 +216,7 @@ async def services_actions(request):
 Handlers for deposit form frontend
 """
 
+
 async def deposit_form(request):
     if request.method == 'GET':
         form_id = request.query.get('id')
@@ -395,24 +396,27 @@ async def store_objects(request):
 """
 Relay endpoint to get/post to Model publication service
 """
-async def publish_models(request):
+async def publications(request):
     headers = {
     'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
     'Access-Control-Allow-Headers': 'content-type'
     }
+
     # PATH = '/models'
     try:
-        async with request.app['db'].acquire() as conn:
-            service_config = await get_service_config_by_action(conn=conn, action='publish', media_type='model')
-        logging.debug(msg='service_config: {}'.format(str(service_config)))
-        endpoint = service_config.get('endpoint')
-        config = service_config.get('config')
-
         if request.method == 'GET':
             q = request.query
             data = {
-                'uid': q.get('resource_id')
+                'resource_id': q.get('resource_id')
             }
+
+            media_type = q.get('media_type')
+
+            async with request.app['db'].acquire() as conn:
+                service_config = await get_service_config_by_action(conn=conn, action='publish', media_type=media_type)
+            logging.debug(msg='service_config: {}'.format(str(service_config)))
+            endpoint = service_config.get('endpoint')
+            config = service_config.get('config')
 
             payload = {}
             payload.update({'data': json.dumps(data)})
@@ -427,7 +431,7 @@ async def publish_models(request):
             return web.Response(status=200, headers=headers)
 
     except Exception as err:
-        return web.json_response({"err": str(err)})
+        return web.json_response({"err": str(err)}, headers=headers)
 
     # if request.method == 'POST':
     #     try:

@@ -8,7 +8,7 @@ DEPOSIT_ID = str(uuid4())
 
 querystring = {"resumableChunkNumber":"1","resumableTotalChunks":"1","deposit_id":DEPOSIT_ID}
 
-f = open('C:\\Users\\Mihir Joshi\\Downloads\\medieval_village.zip', 'rb')
+f = open('a-frame.zip', 'rb')
 files = {'file': f}
 
 headers = {
@@ -28,16 +28,16 @@ response = requests.request("POST", url, files=files, headers=headers, params=qu
 print(response.text)
 url = "http://localhost:8080/form/submit"
 payload_dict = { 
-    'media_type': 'model',
+    'media_type': 'vr',
     'id': DEPOSIT_ID,
     'form': [
         {
             'label': 'Object Title',
-            'value': 'test large'
+            'value': 'VR Scene'
         },
         {
             'label': 'media_type',
-            'value': 'model'
+            'value': 'vr'
         }
     ]
 }

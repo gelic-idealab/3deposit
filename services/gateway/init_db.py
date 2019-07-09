@@ -124,8 +124,8 @@ def create_default_services(engine):
             },
             {
                 'name': 'aws',
-                "endpoint": 'http://aws-service:5000/vrs',
-                'config': {"auth": {"access_key": keys.AWS_ACCESS_KEY, "secret_key": keys.AWS_SECRET_KEY}}
+                "endpoint": 'http://aws-service:5000',
+                'config': {"bucket_name": "new-3deposit", "auth": {"access_key": keys.AWS_ACCESS_KEY, "secret_key": keys.AWS_SECRET_KEY}}
             }
         ]
 

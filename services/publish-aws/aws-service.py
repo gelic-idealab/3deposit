@@ -20,24 +20,25 @@ def index():
         # get keys from request object
         access_key = get_value(request, 'config', 'access_key')
         secret_key = get_value(request, 'config', 'secret_key')
-        print("KEYS:", access_key,  secret_key)
+
+        # get AWS S3 bucket name being used for static hosting
+        bucket_name = get_value(request, 'config', 'bucket_name')
+        logging.debug(bucket_name)
+
+        # Connect to S3
+        c = boto.connect_s3(access_key, secret_key)
+        b = c.get_bucket(bucket_name)
 
         if request.method == 'POST':
 
             # get deposit it and use as temporary directory name
             deposit_id = get_value(request, 'data', 'deposit_id')
             logging.debug(deposit_id)
-            # get AWS S3 bucket name being used for static hosting
-            bucket_name = get_value(request, 'config', 'bucket_name')
-            logging.debug(bucket_name)
+            
             # get deposit file and save to temporary location
             deposit_file = request.files['file']
             deposit_file.save('tmp.zip')
             deposit_file.close()
-
-            # Connect to S3
-            c = boto.connect_s3(access_key, secret_key)
-            b = c.get_bucket(bucket_name)
 
             # unzip into directory and remove tmp file
             with zipfile.ZipFile('tmp.zip','r') as zip_ref:
@@ -45,6 +46,7 @@ def index():
             os.remove('tmp.zip')
 
             file_paths = []
+
             def get_file_paths(tmp_dir):
                 for dir_, _, files in os.walk(tmp_dir):
                     for file_name in files:
@@ -88,19 +90,37 @@ def index():
                 source_path = f
                 if source_path.endswith('.html'):
                     index_path = source_path
-                    break   
-                                 
+                    break
+
             if os.path.exists(deposit_id):
                 shutil.rmtree(deposit_id)
 
-        # return deposit id as resource id and build object url from bucket name
-        # https://<bucket_name>.s3.amazonaws.com/<deposit_id>
-        return jsonify ({ 
-            'resource_id': deposit_id,
-            'location': f'https://{bucket_name}.s3.amazonaws.com/{index_path}'
-            })
+            # return deposit id as resource id and build object url from bucket name
+            # https://<bucket_name>.s3.amazonaws.com/<deposit_id>
+            return jsonify({ 
+                'resource_id': deposit_id,
+                'location': f'https://{bucket_name}.s3.amazonaws.com/{index_path}'
+                })
+
+        elif request.method == 'GET':
+            resource_id = get_value(request, 'data', 'resource_id')
+            obj_list = []
+            attr_list = ['metadata', 'content_type', 'etag', 'last_modified', 'md5', 'storage_class', 'size']
+            length = 0
+
+            for obj in b.list(prefix=resource_id):
+                obj_metadata = {}
+                obj_metadata.update({'s3_key_name': obj.name})
+                for attr in attr_list:
+                    obj_metadata.update({attr: getattr(obj, attr)})
+                obj_list.append(obj_metadata)
+                length += 1
+
+            return jsonify({'metadata': obj_list, 'files': length})
+
     except Exception as err:
-        return jsonify({ 'err': str(err)})
+        return jsonify({'err': str(err)})
+
 
 if __name__ == '__main__':
     app.run()

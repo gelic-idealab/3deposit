@@ -2,9 +2,9 @@ import setuptools
 
 setuptools.setup(
     name="unpack",
-    version="0.0.3",
+    version="0.0.4",
     author="Mihir Joshi",
-    author_email="author@example.com",
+    author_email="idealab@library.illinois.edu",
     description="Library for unpacking request object for 3deposit services",
     packages=setuptools.find_packages(),
     classifiers=[

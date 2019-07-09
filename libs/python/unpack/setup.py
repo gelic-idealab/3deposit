@@ -2,10 +2,10 @@ import setuptools
 
 setuptools.setup(
     name="unpack",
-    version="0.0.1",
+    version="0.0.3",
     author="Mihir Joshi",
     author_email="author@example.com",
-    description="A small example package",
+    description="Library for unpacking request object for 3deposit services",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",

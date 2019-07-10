@@ -6,6 +6,7 @@
         <sidebar-link to="/stats" name="User Profile" icon="ti-user"/>
         <sidebar-link to="/services" name="Services" icon="ti-widget"/>
         <sidebar-link to="/deposits" name="Deposits" icon="ti-dropbox"/>
+        <sidebar-link to="/gallery-builder" name="Gallery" icon="ti-gallery"/>
         <sidebar-link to="/icons" name="Icons" icon="ti-pencil-alt2"/>
         <sidebar-link to="/notifications" name="Notifications" icon="ti-bell"/>
         <sidebar-link to="/forms" name="Deposit Forms" icon="ti-pencil-alt"/>

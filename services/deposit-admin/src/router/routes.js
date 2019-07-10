@@ -11,6 +11,7 @@ import Deposits from "@/pages/Deposits.vue";
 import Services from "@/pages/Services.vue";
 import DepositProfile from "@/pages/DepositProfile.vue";
 import FormBuilder from "@/pages/FormBuilder.vue";
+import GalleryBuilder from "@/pages/GalleryBuilder.vue";
 
 const routes = [
   {
@@ -53,10 +54,15 @@ const routes = [
         component: FormBuilder
       },
       {
+        path: "gallery-builder",
+        name: "gallery-builder",
+        component: GalleryBuilder
+      },
+      {
         path: "/:id", 
         name: "deposit-profile", 
         component: DepositProfile
-      }
+      },
     ]
   },
   { path: "*", component: NotFound }

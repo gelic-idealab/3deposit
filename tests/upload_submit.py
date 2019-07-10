@@ -6,7 +6,7 @@ url = "http://localhost:8080/form/upload"
 
 DEPOSIT_ID = str(uuid4())
 
-querystring = {"resumableChunkNumber":"1","resumableTotalChunks":"1","deposit_id":DEPOSIT_ID}
+querystring = {"resumableChunkNumber": "1", "resumableTotalChunks": "1", "deposit_id": DEPOSIT_ID}
 
 f = open('model.zip', 'rb')
 files = {'file': f}
@@ -34,6 +34,10 @@ payload_dict = {
         {
             'label': 'Object Title',
             'value': 'test'
+        },
+        {
+            'label': 'media_type',
+            'value': 'model'
         }
     ]
 }

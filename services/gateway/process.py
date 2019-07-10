@@ -35,6 +35,7 @@ async def start_deposit_processing_task(data):
         engine = await get_service_engine()
 
         deposit_id = data.get('id')
+        media_type = data.get('media_type')
         if deposit_id:
             logging.debug(msg=f'start_deposit_processing_task id: {str(deposit_id)}')
             async with engine.acquire() as conn:
@@ -48,7 +49,8 @@ async def start_deposit_processing_task(data):
                     etag=etag,
                     mongo_id=mongo_id,
                     location=publish_resp.get('location'),
-                    resource_id=publish_resp.get('resource_id')
+                    resource_id=publish_resp.get('resource_id'),
+                    media_type=media_type
                 )
             if os.path.exists(TMP_FILE_LOCATION.format(deposit_id)):
                 os.remove(TMP_FILE_LOCATION.format(deposit_id))

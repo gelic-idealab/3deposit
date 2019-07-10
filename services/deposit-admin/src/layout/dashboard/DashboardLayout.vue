@@ -8,6 +8,8 @@
         <sidebar-link to="/deposits" name="Deposits" icon="ti-dropbox"/>
         <sidebar-link to="/icons" name="Icons" icon="ti-pencil-alt2"/>
         <sidebar-link to="/notifications" name="Notifications" icon="ti-bell"/>
+        <sidebar-link to="/forms" name="Deposit Forms" icon="ti-pencil-alt"/>
+
       </template>
       <mobile-menu>
         <li class="nav-item">

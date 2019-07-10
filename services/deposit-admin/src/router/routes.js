@@ -10,6 +10,7 @@ import Icons from "@/pages/Icons.vue";
 import Deposits from "@/pages/Deposits.vue";
 import Services from "@/pages/Services.vue";
 import DepositProfile from "@/pages/DepositProfile.vue";
+import FormBuilder from "@/pages/FormBuilder.vue";
 
 const routes = [
   {
@@ -45,6 +46,11 @@ const routes = [
         path: "deposits",
         name: "deposits",
         component: Deposits
+      },
+      {
+        path: "forms",
+        name: "form-builder",
+        component: FormBuilder
       },
       {
         path: "/:id", 

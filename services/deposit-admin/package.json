@@ -16,10 +16,10 @@
     "chartist": "^0.11.0",
     "es6-promise": "^4.2.4",
     "jquery": "^3.4.0",
-    "json-formatter-js": "^2.2.1",
     "popper.js": "^1.15.0",
     "vue": "^2.5.13",
     "vue-clickaway": "^2.1.0",
+    "vue-json-pretty": "^1.6.0",
     "vue-notifyjs": "^0.3.0",
     "vue-router": "^3.0.1",
     "vue-template-compiler": "^2.6.10"

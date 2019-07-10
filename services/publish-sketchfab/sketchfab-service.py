@@ -94,7 +94,7 @@ def models():
         try:
             data = json.loads(request.form.get('data'))
 
-            uid = data.get('uid')
+            uid = data.get('resource_id')
             SKETCHFAB_DOMAIN = 'sketchfab.com'
             SKETCHFAB_API_URL = 'https://api.{}/v3'.format(SKETCHFAB_DOMAIN)
 

@@ -1,20 +1,39 @@
 <template>
-    <div class="row">
-    <div class="card mb-3">
-        <div class="embed-responsive embed-responsive-16by9">
-            <embed-card :location="deposit.location" class="embed-responsive-item"></embed-card>
-        </div>
-        <div class="card-body">
-            <h5 class="card-title">{{ deposit.deposit_id }}</h5>
-            <p class="card-text">{{ deposit_metadata }}</p>
-            <p class="card-text">{{ publish_metadata }}</p>
-            <p class="card-text"><small class="text-muted">{{ deposit.deposit_date }}</small></p>
-        </div>
-        <div>
-            <metadata-json :deposit_metadata="deposit_metadata">
-            </metadata-json>
-        </div>
-      </div>
+    <div>
+        <div class="row">
+            <div class ="col">
+                <div class="card mb-3 mr-9">
+                    <div class="embed-responsive embed-responsive-16by9">
+                        <embed-card :location="deposit.location" class="embed-responsive-item"></embed-card>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ deposit.deposit_id }}</h5>
+                        <!-- <p class="card-text">{{ deposit_metadata }}</p> -->
+                        <!-- <p class="card-text">{{ publish_metadata }}</p> -->
+                        <p class="card-text"><small class="text-muted">{{ deposit.deposit_date }}</small></p>
+                    </div>
+                </div>
+                <div class="card">
+                    <h5 class="card-header">Publication Metadata</h5>
+                    <div class="card-body">
+                        <vue-json-pretty
+                            :data="publish_metadata"
+                            :deep=4>
+                        </vue-json-pretty>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card">
+                    <h5 class="card-header">User Metadata</h5>
+                    <div class="card-body">
+                        <vue-json-pretty
+                            :data="deposit_metadata">
+                        </vue-json-pretty>
+                    </div>
+                </div>
+            </div>
+        </div>        
     </div>
 </template>
 
@@ -22,6 +41,7 @@
 import axios from 'axios';
 import EmbedCard from "./DepositProfile/EmbedCard.vue";
 import MetadataJson from "./DepositProfile/MetadataJson.vue";
+import VueJsonPretty from 'vue-json-pretty'
 
 export default {
     data() {
@@ -34,7 +54,8 @@ export default {
     },
     components: {
         EmbedCard,
-        MetadataJson
+        MetadataJson,
+        VueJsonPretty
     },
     mounted() {
         this.id = this.$route.params.id;

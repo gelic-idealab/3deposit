@@ -3,7 +3,7 @@
       </div>
 </template>
 <script>
-import JSONFormatter from 'json-formatter-js'
+import VueJsonPretty from 'vue-json-pretty'
 
 export default {
     name: 'metadata-json',

@@ -18,6 +18,7 @@ aiohttp-session = "*"
 bcrypt = "*"
 cryptography = "*"
 uvloop = "*"
+filechunkio = "*"
 
 [requires]
 python_version = "3.7"

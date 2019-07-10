@@ -11,7 +11,11 @@
         <td v-for="(column, index) in columns"
             :key="index"
             v-if="hasValue(item, column)">
-            {{itemValue(item, column)}}
+            <router-link v-if="isLink(column)" :to="{ name: 'deposit-profile', params: { id: itemValue(item,column) }}"> {{ itemValue(item,column) }}
+            </router-link>
+            <a v-else>
+              {{itemValue(item, column)}}
+            </a>
         </td>
       </slot>
     </tr>
@@ -48,7 +52,16 @@ export default {
     },
     itemValue(item, column) {
       return item[column.toLowerCase()];
-    }
+    },
+    isLink(column) {
+      if(column == 'deposit_id') {
+        return true
+      }
+    },
+    // makeHref(itemValue) {
+    //   // console.log(this.$router.push({ name:"deposits", params:{ 'id': itemValue.toString() } }))
+    //   return "http://localhost:8081/deposits/"+itemValue.toString()
+    // }
   }
 };
 </script>

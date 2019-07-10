@@ -1,10 +1,10 @@
 Metadata-Version: 1.1
 Name: unpack
-Version: 0.0.1
-Summary: A small example package
+Version: 0.0.8
+Summary: Library for unpacking request object for 3deposit services
 Home-page: UNKNOWN
 Author: Mihir Joshi
-Author-email: author@example.com
+Author-email: idealab@library.illinois.edu
 License: UNKNOWN
 Description: UNKNOWN
 Platform: UNKNOWN

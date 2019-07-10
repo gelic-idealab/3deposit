@@ -39,7 +39,8 @@ services:
   gateway:
       build: ./services/gateway/
       container_name: gateway
-
+      ports:
+        - 8080:8080
       links:
           - postgres
       depends_on: 
@@ -57,16 +58,16 @@ services:
       volumes:
         - ./services/gateway/data:/gateway/data
   
-  reverse-proxy:
-      image: traefik # The official Traefik docker image
-      command: --api --docker # Enables the web UI and tells Traefik to listen to docker
-      ports:
-        - "80:80"     # The HTTP port
-        - "8080:8080" # The Web UI (enabled by --api)
-      volumes:
-        - /var/run/docker.sock:/var/run/docker.sock
-      networks:
-        - proxy
+  # reverse-proxy:
+  #     image: traefik # The official Traefik docker image
+  #     command: --api --docker # Enables the web UI and tells Traefik to listen to docker
+  #     ports:
+  #       - "80:80"     # The HTTP port
+  #       - "8080:8080" # The Web UI (enabled by --api)
+  #     volumes:
+  #       - /var/run/docker.sock:/var/run/docker.sock
+  #     networks:
+  #       - proxy
 
   minio-server:
     container_name: minio-server
@@ -121,8 +122,8 @@ services:
   mongo-express:
     image: mongo-express
     restart: always
-    # ports:
-    #   - 8081:8081
+    ports:
+      - 8081:8081
     networks:
       - mongo_internal
       - proxy
@@ -170,6 +171,17 @@ services:
     labels:
       - "traefik.enable=false"
 
+  aws-service:
+    build: ./services/publish-aws/
+    container_name: aws-service
+    networks:
+      - gateway_internal
+    environment: 
+      FLASK_ENV: development
+      FLASK_APP: aws-service
+    command: pipenv run flask run --host=0.0.0.0
+    labels:
+      - "traefik.enable=false"
 networks:
     proxy:
         external: true

@@ -27,12 +27,13 @@ async def current_user_ctx_processor(request):
     is_anonymous = not bool(username)
     return {'current_user': {'is_anonymous': is_anonymous}}
 
+
 async def init_app(argv=None):
 
     app = web.Application(client_max_size=10*1024*1024) # max client payload of 10MB
 
     app['config'] = get_config(argv)
-    
+
     # create db connection on startup, close on exit
     # app.on_startup.append(init_pg)
     try:
@@ -45,7 +46,7 @@ async def init_app(argv=None):
     fernet_key = fernet.Fernet.generate_key()
     secret_key = base64.urlsafe_b64decode(fernet_key)
     setup_session(app, EncryptedCookieStorage(secret_key))
-    
+
     aiohttp_jinja2.setup(
         app,
         loader=jinja2.PackageLoader(PACKAGE_NAME),
@@ -66,10 +67,10 @@ async def init_app(argv=None):
 
 def main(argv):
     logging.basicConfig(level=logging.DEBUG)  #, filename='./data/gateway.log')
-    
+
     # use uvloop instead of asyncio event loop
     # uvloop.install()
-    
+
     # init & run app with args & config
     app = init_app(argv)
     config = get_config(argv)

@@ -81,7 +81,7 @@ def create_app():
                 collection = database[COLLECTION_NAME]
                 logging.debug(msg="MONGO GET COLLECTION: "+str(collection))
                 logging.debug(msg="MONGO GET COLLECTION: "+str(dir(collection)))
-                                
+
                 document = collection.find_one(filter={"deposit_id": deposit_id}, projection={'_id': False})
                 # deposit_metadata = document.get('deposit_metadata')
 
@@ -106,10 +106,9 @@ def create_app():
             if del_obj:
                 return jsonify({"del_obj": deposit_id})
             else:
-                return jsonify({"err":"Document not deleted."})
+                return jsonify({"err": "Document not deleted."})
 
             # except Exception as err:
             #     return jsonify({"err": str(err)})
-
 
     return app

@@ -15,7 +15,6 @@ from process import get_service_config_by_action, start_deposit_processing_task
 import logging
 
 
-
 def redirect(router, route_name):
     location = router[route_name].url_for()
     return web.HTTPFound(location)
@@ -25,6 +24,7 @@ View endpoints for authorizing user
 
 'index', 'login', and 'logout' validate user, store secure cookie
 """
+
 
 @aiohttp_jinja2.template('index.html')
 async def index(request):
@@ -69,7 +69,6 @@ async def logout(request):
     return response
 
 
-
 """
 Helper function to relay form data with files
 """
@@ -88,19 +87,21 @@ Helper function to relay form data with files
 Handlers for getting and setting services & service configs
 """
 
+
 async def services(request):
     if request.method == 'GET':
         try:
             async with request.app['db'].acquire() as conn:
                 services = await db.get_services(conn)
                 if services:
-                    return web.json_response({ 'services': services }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+                    return web.json_response({'services': services}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
                 else:
-                    return web.json_response({ 'res': 'no services'}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+                    return web.json_response({'res': 'no services'}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
         except Exception as err:
-            return web.json_response({ 'err': str(err) }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+            return web.json_response({'err': str(err)}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
     else:
         return web.Response(headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+
 
 async def services_configs(request):
 
@@ -114,11 +115,11 @@ async def services_configs(request):
             async with request.app['db'].acquire() as conn:
                 service_config = await db.get_service_config(conn=conn, name=req.get('name'))
                 if service_config:
-                    return web.json_response({ 'service_config': service_config }, headers=headers)
+                    return web.json_response({'service_config': service_config}, headers=headers)
                 else:
-                    return web.json_response({ 'err': 'No matching service', 'req': req }, headers=headers)
+                    return web.json_response({'err': 'No matching service', 'req': req}, headers=headers)
         except Exception as err:
-            return web.json_response({ 'err': str(err), 'req': req }, headers=headers)
+            return web.json_response({'err': str(err), 'req': req}, headers=headers)
     elif request.method == 'POST':
         """
         request.json():
@@ -138,14 +139,14 @@ async def services_configs(request):
             async with request.app['db'].acquire() as conn:
                 service = await db.set_service_config(conn=conn, name=req.get('name'), endpoint=req.get('endpoint'), config=req.get('config'))
                 if service:
-                    return web.json_response({ 'res': service }, headers=headers)
+                    return web.json_response({'res': service}, headers=headers)
                 else:
-                    return web.json_response({'req':str(req),'err':'Could not create service.'}, headers=headers)
+                    return web.json_response({'req': str(req), 'err': 'Could not create service.'}, headers=headers)
         except Exception as err:
-            return web.json_response({ 'err': str(err) }, headers=headers)
-    
+            return web.json_response({'err': str(err)}, headers=headers)
+
     else:
-        return web.Response(headers=headers)        
+        return web.Response(headers=headers)
 
 # async def services_actions(request):
 #     if request.method == 'GET':
@@ -171,7 +172,7 @@ async def services_configs(request):
 #         except Exception as err:
 #             return web.json_response({ 'err': str(err) }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
 
-          
+
 async def services_actions(request):
     if request.method == 'GET':
         try:
@@ -182,19 +183,21 @@ async def services_actions(request):
                 async with request.app['db'].acquire() as conn:
                     service_name = await db.get_action_service_name(conn, action=action, media_type=media_type)
                     if service_name:
-                        return web.json_response({ 'service_name': service_name }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+                        return web.json_response({'service_name': service_name}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
                     else:
-                        return web.json_response({ 'res': 'no service configured for {}, {}'.format(action, media_type)}, 
-                        headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+                        return web.json_response(
+                            {'res': 'no service configured for {}, {}'.format(action, media_type)},
+                            headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'})
+                        )
 
             async with request.app['db'].acquire() as conn:
                 services = await db.get_action_services(conn)
                 if services:
-                    return web.json_response({ 'services': services }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+                    return web.json_response({'services': services}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
                 else:
-                    return web.json_response({ 'res': 'no action services'}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+                    return web.json_response({'res': 'no action services'}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
         except Exception as err:
-            return web.json_response({ 'err': str(err) }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+            return web.json_response({'err': str(err)}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
 
     if request.method == 'POST':
         try:
@@ -202,15 +205,15 @@ async def services_actions(request):
             async with request.app['db'].acquire() as conn:
                 service = await db.set_action_service_name(conn=conn, action=req.get('action'), media_type=req.get('media_type'), service_name=req.get('service_name'))
                 if service:
-                    return web.json_response({ 'res': service }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+                    return web.json_response({'res': service}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
         except Exception as err:
-            return web.json_response({ 'err': str(err) }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+            return web.json_response({'err': str(err)}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
 
     else:
         return web.Response(headers={
-        'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
-        'Access-Control-Allow-Headers': 'content-type'
-    })
+            'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
+            'Access-Control-Allow-Headers': 'content-type'
+        })
 
 """
 Handlers for deposit form frontend
@@ -225,9 +228,9 @@ async def deposit_form(request):
         async with request.app['db'].acquire() as conn:
             form = await db.get_form_by_id(conn, id=form_id)
         if form:
-            return web.json_response({ 'form': form }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+            return web.json_response({'form': form}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
         else:
-            return web.json_response({ 'err': f'No form with id {form_id}' }, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+            return web.json_response({'err': f'No form with id {form_id}'}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
 
     if request.method == 'POST':
         try:
@@ -240,18 +243,18 @@ async def deposit_form(request):
                         if id:
                             try:
                                 await db.update_form_by_id(conn, req.get('id'), req.get('content'))
-                                return web.json_response({ 'msg': f'Updated content for form {form_id}'})
+                                return web.json_response({'msg': f'Updated content for form {form_id}'})
                             except Exception as e:
-                                return web.json_response({ 'err': f'Error updating form id {id}: ' + str(e) })
+                                return web.json_response({'err': f'Error updating form id {id}: ' + str(e)})
                         try:
                             created = await db.create_form(conn, content)
-                            return web.json_response({ 'msg': str(created) })
+                            return web.json_response({'msg': str(created)})
                         except Exception as e:
-                            return web.json_response({ 'err': 'Error creating form: ' + str(e) })
+                            return web.json_response({'err': 'Error creating form: ' + str(e)})
                 except Exception as e:
-                    return web.json_response({ 'err': str(e) })
+                    return web.json_response({'err': str(e)})
         except Exception as e:
-            return web.json_response({'err': 'Error handling request: ' + str(e) })
+            return web.json_response({'err': 'Error handling request: ' + str(e)})
 
 
 async def deposit_upload(request):
@@ -279,19 +282,19 @@ async def deposit_upload(request):
                             f.write(b)
                     if rcn == rtc:
                         os.rename('./data/{}'.format(did+'_partial'), './data/{}'.format(did))
-            return web.Response(status=200, headers=headers)       
+            return web.Response(status=200, headers=headers)
         except Exception as err:
             logging.debug(msg='err: {}'.format(str(err)))
-            return web.json_response({ 'err': str(err) }, headers=headers)
+            return web.json_response({'err': str(err)}, headers=headers)
     else:
         return web.Response(status=200, headers=headers)
 
 
 async def deposit_submit(request):
     headers = {
-    'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
-    'Access-Control-Allow-Headers': 'content-type'
-    }   
+        'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
+        'Access-Control-Allow-Headers': 'content-type'
+    }
     if request.method == 'POST':
         try:
             data = await request.json()
@@ -302,7 +305,7 @@ async def deposit_submit(request):
             else:
                 return web.Response(status=418, headers=headers)
         except Exception as err:
-            return web.json_response({ 'err': str(err) }, headers=headers)
+            return web.json_response({'err': str(err)}, headers=headers)
     else:
         return web.Response(status=200, headers=headers)
 
@@ -311,6 +314,7 @@ async def deposit_submit(request):
 Relay endpoint to make object storage calls
 Endpoints are scoped for objects and buckets
 """
+
 
 async def store_buckets(request):
     PATH = '/bucket'
@@ -329,9 +333,9 @@ async def store_buckets(request):
                     resp_json = await resp.json()
                 except Exception as err:
                     return web.json_response({'err': str(err), 'resp': await resp.text()})
-                return web.json_response({ 'resp': resp_json })
+                return web.json_response({'resp': resp_json})
         except Exception as err:
-            return web.json_response({ 'origin': 'gateway', 'err': str(err) })
+            return web.json_response({'origin': 'gateway', 'err': str(err)})
 
     if request.method == 'POST':
         try:
@@ -342,9 +346,9 @@ async def store_buckets(request):
             # payload = dict({'config': config, 'data': data})
             async with new_request(method='POST', url=endpoint+PATH, data=fd) as resp:
                 resp_json = await resp.json()
-                return web.json_response({ 'resp': resp_json })
+                return web.json_response({'resp': resp_json})
         except Exception as err:
-            return web.json_response({ 'origin': 'gateway', 'err': str(err) })
+            return web.json_response({'origin': 'gateway', 'err': str(err)})
 
 
 async def store_objects(request):
@@ -367,9 +371,9 @@ async def store_objects(request):
                     resp_json = await resp.json()
                 except Exception as err:
                     return web.json_response({'err': str(err), 'resp': await resp.text()})
-                return web.json_response({ 'resp': resp_json, 'payload': payload })
+                return web.json_response({'resp': resp_json, 'payload': payload})
         except Exception as err:
-            return web.json_response({ 'origin': 'gateway', 'err': str(err) })
+            return web.json_response({'origin': 'gateway', 'err': str(err)})
 
     if request.method == 'POST':
         try:
@@ -390,16 +394,18 @@ async def store_objects(request):
                 resp_json = await resp.json()
                 return web.json_response(resp_json)
         except Exception as err:
-            return web.json_response({ 'origin': 'gateway', 'err': str(err) })
+            return web.json_response({'origin': 'gateway', 'err': str(err)})
 
 
 """
 Relay endpoint to get/post to Model publication service
 """
+
+
 async def publications(request):
     headers = {
-    'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
-    'Access-Control-Allow-Headers': 'content-type'
+        'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
+        'Access-Control-Allow-Headers': 'content-type'
     }
 
     # PATH = '/models'
@@ -426,7 +432,7 @@ async def publications(request):
             async with new_request(method='GET', url=endpoint, data=payload) as resp:
                 logging.debug(await resp.text())
                 return web.json_response(await resp.json(), headers=headers)
-        
+
         else:
             return web.Response(status=200, headers=headers)
 
@@ -471,22 +477,22 @@ async def deposits(request):
         try:
             if id:
                 async with request.app['db'].acquire() as conn:
-                    deposits = await db.get_deposit_by_id(conn=conn,deposit_id=id)
+                    deposits = await db.get_deposit_by_id(conn=conn, deposit_id=id)
                     logging.debug(msg=f'deposits: {str(deposits)}')
                     return web.json_response(deposits, headers=headers)
             else:
                 async with request.app['db'].acquire() as conn:
                     deposits = await db.get_deposits(conn=conn)
                     logging.debug(msg=f'deposits: {str(deposits)}')
-                    return web.json_response({ 'deposits': deposits }, headers=headers)
+                    return web.json_response({'deposits': deposits}, headers=headers)
         except Exception as err:
-            return web.json_response({ 'err': str(err) }, headers=headers)
+            return web.json_response({'err': str(err)}, headers=headers)
 
 
 async def metadata(request):
     headers = {
-    'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
-    'Access-Control-Allow-Headers': 'content-type'
+        'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
+        'Access-Control-Allow-Headers': 'content-type'
     }
 
     if request.method == 'GET':
@@ -496,11 +502,11 @@ async def metadata(request):
 
             config = dict({"deposit_id": q.get('deposit_id')})
             fd.add_field('config', json.dumps(config), content_type='application/json')
-            
+
             async with new_request(method='GET', url='http://mongo-service:5000/objects', data=fd) as resp:
                 logging.debug("MONGO ERROR:"+await resp.text())
                 resp_json = await resp.json()
                 return web.json_response(resp_json, headers=headers)
-        
+
         except Exception as err:
             return web.json_response({ 'err': str(err) }, headers=headers)

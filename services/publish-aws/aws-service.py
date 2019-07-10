@@ -14,6 +14,7 @@ from uuid import uuid4
 from unpack.unpack import get_value
 app = Flask(__name__) 
 
+
 @app.route('/', methods=['POST', 'GET', 'DELETE'])
 def index():
     try:
@@ -34,7 +35,7 @@ def index():
             # get deposit it and use as temporary directory name
             deposit_id = get_value(request, 'data', 'deposit_id')
             logging.debug(deposit_id)
-            
+
             # get deposit file and save to temporary location
             deposit_file = request.files['file']
             deposit_file.save('tmp.zip')
@@ -58,7 +59,6 @@ def index():
             fps = get_file_paths(deposit_id)
             print(fps)
 
-
             # Get file info
             for f in fps:
                 source_path = f
@@ -67,7 +67,7 @@ def index():
 
                 # Create a multipart upload request
                 content_type = str(mimetypes.guess_type(source_path)[0])
-                mp = b.initiate_multipart_upload(source_path, policy='public-read', headers = {'Content-Type': content_type})
+                mp = b.initiate_multipart_upload(source_path, policy='public-read', headers={'Content-Type': content_type})
 
                 # Use a chunk size of 50 MiB (feel free to change this)
                 chunk_size = 52428800

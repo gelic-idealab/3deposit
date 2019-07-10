@@ -76,7 +76,7 @@ async def trigger_store(conn, did):
 def extract_data_from_form(form):
     form_data = {}
     for field in form:
-        form_data.update({ field.get('label'): field.get('value') })
+        form_data.update({field.get('label'): field.get('value')})
     return form_data
 
 

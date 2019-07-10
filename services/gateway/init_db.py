@@ -68,12 +68,14 @@ def drop_tables(engine):
     meta = MetaData()
     meta.drop_all(bind=engine, tables=[forms, deposits, users, services])
 
+
 def create_admin(engine):
     username = 'admin'
     password_hash = generate_password_hash('admin')
     role = 'admin'
     with engine.connect() as conn:
         conn.execute(users.insert().values(username=username, password_hash=password_hash, role=role))
+
 
 def create_default_actions(engine):
     with engine.connect() as conn:
@@ -137,7 +139,7 @@ def main():
     logging.debug(msg='running init_db, waiting for db container to become available')
     time.sleep(5)
     setup_db(USER_CONFIG['postgres'])
-    create_tables(engine=user_engine)
+    create_tables(engine=user_engine) 
     create_admin(engine=user_engine)
     create_default_actions(engine=user_engine)
     create_default_services(engine=user_engine)

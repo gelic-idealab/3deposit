@@ -6,14 +6,14 @@ import logging
 from unpack_001 import get_value
 
 '''
-Flask app that takes in zipped 3d model file, JSON data, and Sketchfab API token
-and publishes to Sketchfab. 
+Flask app that takes in zipped 3d model file, JSON data, and Sketchfab API
+token and publishes to Sketchfab.
 
-Returns JSON object with two fields, if successful, indicating Sketchfab UID and 
-permalink to hosted model location. 
+Returns JSON object with two fields, if successful, indicating Sketchfab UID
+and permalink to hosted model location.
 
-JSON data can be arbitrary: needs at least a 'name' field for the title of the 
-published model. Everything else can get dumped into a 'description' field. 
+JSON data can be arbitrary: needs at least a 'name' field for the title of the
+published model. Everything else can get dumped into a 'description' field.
 
 '''
 
@@ -87,9 +87,7 @@ def models():
             except Exception as e:
                 return jsonify({'requestException': str(e)})
     except Exception as err:
-        return jsonify({ 'err': str(err) })
-
-
+        return jsonify({'err': str(err)})
 
     # Returns the details of the model.
     if request.method == 'GET':

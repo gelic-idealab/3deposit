@@ -11,7 +11,6 @@ from sqlalchemy import (
 from settings import BASE_DIR, get_config
 
 
-
 __all__ = ['forms', 'deposits', 'users', 'services', 'actions']
 
 meta = MetaData()
@@ -62,12 +61,12 @@ actions = Table(
     Column('service_name', String(128), nullable=False)
 )
 
+
 class RecordNotFound(Exception):
     """Requested record in database was not found"""
 
 
-
-### Application database init & teardown
+# Application database init & teardown
 async def init_pg(app):
     conf = app['config']['postgres']
     engine = await aiopg.sa.create_engine(
@@ -88,7 +87,7 @@ async def close_pg(app):
     await app['db'].wait_closed()
 
 
-### Deposit queries
+# Deposit queries
 async def add_deposit_by_id(conn, deposit_id):
     logging.debug(msg=f'add_deposit_by_id id: {deposit_id}')
     await conn.execute(
@@ -96,6 +95,7 @@ async def add_deposit_by_id(conn, deposit_id):
         .insert()
         .values(deposit_id=deposit_id, deposit_date=datetime.datetime.now())
     )
+
 
 async def update_deposit_by_id(conn, deposit_id, **kwargs):
     logging.debug(f'kwargs passed to update_deposit_id {deposit_id}: {kwargs}')
@@ -105,6 +105,7 @@ async def update_deposit_by_id(conn, deposit_id, **kwargs):
         .where(deposits.c.deposit_id == deposit_id)
         .values(kwargs)
     )
+
 
 async def get_deposits(conn):
     result = await conn.execute(
@@ -124,6 +125,7 @@ async def get_deposits(conn):
     else:
         return None
 
+
 async def get_deposit_by_id(conn, deposit_id):
     result = await conn.execute(
         deposits
@@ -139,12 +141,13 @@ async def get_deposit_by_id(conn, deposit_id):
     return d_obj
 
 
-### User queries
+# User queries
 async def get_users(conn):
     records = await conn.execute(
         users.select().order_by(users.c.id)
     )
     return records
+
 
 async def get_user_by_name(conn, username):
     result = await conn.execute(
@@ -155,10 +158,9 @@ async def get_user_by_name(conn, username):
     user_record = await result.first()
     return user_record
 
-    
+# Deposit form queries
 
 
-### Deposit form queries
 async def get_form_by_id(conn, id):
     result = await conn.execute(
         forms
@@ -171,12 +173,14 @@ async def get_form_by_id(conn, id):
     else:
         return None
 
+
 async def create_form(conn, content):
     await conn.execute(
         forms
         .insert()
         .values(content=content)
     )
+
 
 async def update_form_by_id(conn, id, content):
     await conn.execute(
@@ -186,8 +190,9 @@ async def update_form_by_id(conn, id, content):
         .values(content=content)
     )
 
+# Service config queries
 
-### Service config queries
+
 async def get_services(conn):
     result = await conn.execute(
         services
@@ -206,6 +211,7 @@ async def get_services(conn):
     else:
         return None
 
+
 async def get_service_config(conn, name):
     result = await conn.execute(
         services
@@ -218,6 +224,7 @@ async def get_service_config(conn, name):
         return dict(service)
     else:
         return None
+
 
 async def set_service_config(conn, name, endpoint, config):
     service = await get_service_config(conn, name)
@@ -236,6 +243,7 @@ async def set_service_config(conn, name, endpoint, config):
             .values(name=name, endpoint=endpoint, config=config)
         )
         return 'service config created for {}'.format(name)
+
 
 # action config queries
 async def get_action_service_name(conn, action, media_type='default'):
@@ -258,6 +266,7 @@ async def get_action_service_name(conn, action, media_type='default'):
         return str(service_name)
     else:
         return None
+
 
 # action config queries
 async def set_action_service_name(conn, action, media_type, service_name):
@@ -284,6 +293,7 @@ async def set_action_service_name(conn, action, media_type, service_name):
             .values(action=action, media_type=media_type, service_name=service_name)
         )
         return 'action config created for {}, {}: {}'.format(action, media_type, service_name)
+
 
 async def get_action_services(conn):
     result = await conn.execute(

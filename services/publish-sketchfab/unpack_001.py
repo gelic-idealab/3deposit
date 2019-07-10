@@ -3,6 +3,7 @@
 
 import json
 
+
 def flatten_json(y):
     out = {}
 
@@ -16,6 +17,7 @@ def flatten_json(y):
 
     flatten(y)
     return out
+
 
 def get_value(request, scope, field):
     if request.form:

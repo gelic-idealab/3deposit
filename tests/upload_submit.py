@@ -27,13 +27,13 @@ response = requests.request("POST", url, files=files, headers=headers, params=qu
 
 print(response.text)
 url = "http://localhost:8080/form/submit"
-payload_dict = { 
-    'media_type':'model',
-    'id':DEPOSIT_ID,
+payload_dict = {
+    'media_type': 'model',
+    'id': DEPOSIT_ID,
     'form': [
         {
-            'label':'Object Title',
-            'value':'test'
+            'label': 'Object Title',
+            'value': 'test'
         }
     ]
 }

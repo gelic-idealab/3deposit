@@ -11,7 +11,7 @@ services:
     labels:
       - "traefik.frontend.rule=Host:3deposit.library.illinois.edu"
       - "traefik.backend=deposit-form"
-      - "traefik.port=8080"
+      - "traefik.port=80"
       - "traefik.docker.network=proxy"
 
   postgres:
@@ -33,7 +33,7 @@ services:
     labels:
       - "traefik.frontend.rule=Host:admin.3deposit.library.illinois.edu"
       - "traefik.backend=admin"
-      - "traefik.port=8080"
+      - "traefik.port=80"
       - "traefik.docker.network=proxy"
 
   gateway:
@@ -51,7 +51,7 @@ services:
       labels:
         - "traefik.frontend.rule=Host:api.3deposit.library.illinois.edu"
         - "traefik.backend=gateway"
-        - "traefik.port=8080"
+        - "traefik.port=80"
         - "traefik.docker.network=proxy"
       volumes:
         - ./services/gateway/data:/gateway/data

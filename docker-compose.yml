@@ -9,10 +9,11 @@ services:
     container_name: deposit-form
     command: npm run serve
     labels:
-      - "traefik.frontend.rule=Host:3deposit.library.illinois.edu"
+      - "traefik.frontend.rule=Host:3deposit.localhost"
       - "traefik.backend=deposit-form"
       - "traefik.port=8080"
       - "traefik.docker.network=proxy"
+      - "traefik.passHostHeader=true"
 
   postgres:
       container_name: postgres
@@ -31,30 +32,34 @@ services:
     container_name: admin
     command: npm run serve
     labels:
-      - "traefik.frontend.rule=Host:admin.3deposit.library.illinois.edu"
+      - "traefik.frontend.rule=Host:admin.3deposit.localhost"
       - "traefik.backend=admin"
       - "traefik.port=8080"
       - "traefik.docker.network=proxy"
+      - "traefik.passHostHeader=true"
+
 
   gateway:
-      build: ./services/gateway/
-      container_name: gateway
-      links:
-          - postgres
-      depends_on: 
-          - postgres
-      networks:
-        - gateway_internal
-        - proxy
-      command: bash -c "pipenv run python init_db.py && pipenv run python gateway.py"
-      # command: bash -c "pipenv run python gateway.py"
-      labels:
-        - "traefik.frontend.rule=Host:api.3deposit.library.illinois.edu"
-        - "traefik.backend=gateway"
-        - "traefik.port=8080"
-        - "traefik.docker.network=proxy"
-      volumes:
-        - ./services/gateway/data:/gateway/data
+    build: ./services/gateway/
+    container_name: gateway
+    links:
+        - postgres
+    depends_on: 
+        - postgres
+    networks:
+      - gateway_internal
+      - proxy
+    command: bash -c "pipenv run python init_db.py && pipenv run python gateway.py"
+    # command: bash -c "pipenv run python gateway.py"
+    labels:
+      - "traefik.frontend.rule=Host:api.3deposit.localhost"
+      - "traefik.backend=gateway"
+      - "traefik.port=8080"
+      - "traefik.docker.network=proxy"
+      - "traefik.passHostHeader=true"
+
+    volumes:
+      - ./services/gateway/data:/gateway/data
   
   reverse-proxy:
       container_name: reverse-proxy

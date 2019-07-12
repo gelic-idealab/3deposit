@@ -31,19 +31,14 @@ services:
     networks:
       - proxy
     container_name: admin
-    # command: npm run serve
+    command: npm run serve
     labels:
-      # - "traefik.enable=true"
-      # - "traefik.frontend.rule=Host:admin.3deposit.library.illinois.edu"
-      # - "traefik.backend=admin"
-      # - "traefik.port=8080"
-      # - "traefik.docker.network=proxy"
-      # - "traefik.passHostHeader=true"
-      - "traefik.docker.network=proxy"
       - "traefik.enable=true"
-      - "traefik.basic.frontend.rule=Host:admin.3deposit.library.illinois.edu"
-      - "traefik.basic.port=80"
-      - "traefik.basic.protocol=http"
+      - "traefik.frontend.rule=Path:/admin;PathStrip:/admin"
+      - "traefik.backend=admin"
+      - "traefik.port=8080"
+      - "traefik.docker.network=proxy"
+      - "traefik.passHostHeader=true"
 
 
   gateway:

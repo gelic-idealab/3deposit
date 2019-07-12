@@ -10,7 +10,6 @@ services:
     command: npm run serve
     labels:
       - "traefik.enable=true" 
-      - "traefik.domain=3deposit.library.illinois.edu"
       - "traefik.frontend.rule=Host:3deposit.library.illinois.edu"
       - "traefik.backend=deposit-form"
       - "traefik.port=8080"
@@ -35,7 +34,6 @@ services:
     command: npm run serve
     labels:
       - "traefik.enable=true"
-      - "traefik.domain=3deposit.library.illinois.edu"
       - "traefik.frontend.rule=Host:admin.3deposit.library.illinois.edu"
       - "traefik.backend=admin"
       - "traefik.port=8080"
@@ -57,7 +55,6 @@ services:
     # command: bash -c "pipenv run python gateway.py"
     labels:
       - "traefik.enable=true"
-      - "traefik.domain=3deposit.library.illinois.edu"
       - "traefik.frontend.rule=Host:api.3deposit.library.illinois.edu"
       - "traefik.backend=gateway"
       - "traefik.port=8080"

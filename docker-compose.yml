@@ -9,6 +9,7 @@ services:
     container_name: deposit-form
     command: npm run serve
     labels:
+      - "traefik.enable=true" 
       - "traefik.domain=3deposit.library.illinois.edu"
       - "traefik.frontend.rule=Host:3deposit.library.illinois.edu"
       - "traefik.backend=deposit-form"
@@ -33,6 +34,7 @@ services:
     container_name: admin
     command: npm run serve
     labels:
+      - "traefik.enable=true"
       - "traefik.domain=3deposit.library.illinois.edu"
       - "traefik.frontend.rule=Host:admin.3deposit.library.illinois.edu"
       - "traefik.backend=admin"
@@ -54,6 +56,7 @@ services:
     command: bash -c "pipenv run python init_db.py && pipenv run python gateway.py"
     # command: bash -c "pipenv run python gateway.py"
     labels:
+      - "traefik.enable=true"
       - "traefik.domain=3deposit.library.illinois.edu"
       - "traefik.frontend.rule=Host:api.3deposit.library.illinois.edu"
       - "traefik.backend=gateway"
@@ -73,6 +76,7 @@ services:
         - "8080:8080" # The Web UI (enabled by --api)
       volumes:
         - /var/run/docker.sock:/var/run/docker.sock
+        - ./traefik.toml:/traefik.toml
       networks:
         - proxy
 

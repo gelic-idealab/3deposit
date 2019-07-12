@@ -42,7 +42,7 @@ services:
       - "traefik.docker.network=proxy"
       - "traefik.enable=true"
       - "traefik.basic.frontend.rule=Host:admin.3deposit.library.illinois.edu"
-      - "traefik.basic.port=8080"
+      - "traefik.basic.port=80"
       - "traefik.basic.protocol=http"
 
 

@@ -31,7 +31,7 @@ services:
     networks:
       - proxy
     container_name: admin
-    command: npm run serve
+    # command: npm run serve
     labels:
       # - "traefik.enable=true"
       # - "traefik.frontend.rule=Host:admin.3deposit.library.illinois.edu"

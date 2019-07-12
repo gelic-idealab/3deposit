@@ -62,7 +62,8 @@ def post_file():
                 })
 
                 os.remove(filename)
-                return jsonify({'res': {'uri': uri}})
+                resource_id = uri.split('/')[-1]
+                return jsonify({"resource_id": resource_id, "location": "https://vimeo.com/{}".format(resource_id)})
             else:
                 return jsonify({'err': 'No file provided'})
         except Exception as err:

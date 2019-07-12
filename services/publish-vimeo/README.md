@@ -1,6 +1,10 @@
 # 3deposit - Vimeo Service
 
-This service posts 360 videos to Vimeo and gets metadata from it.
+This service posts 360 videos to Vimeo, gets video data from it, and deletes uploaded videos.
 
-## Prerequisites
+## Installation
 
+- Python 3.5
+- Flask
+- PyVimeo
+- requests

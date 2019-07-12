@@ -9,7 +9,6 @@ verify_ssl = true
 pyvimeo = "*"
 flask = "*"
 requests = "*"
-unpack = "*"
 
 [requires]
 python_version = "3.5"

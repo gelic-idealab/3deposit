@@ -10,7 +10,6 @@ services:
     command: npm run serve
     labels:
       - "traefik.enable=true" 
-      - "traefik.frontend.rule=PathPrefixStrip:/deposit"
       - "traefik.backend=deposit-form"
       - "traefik.port=8080"
       - "traefik.docker.network=proxy"

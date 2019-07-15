@@ -27,9 +27,9 @@ def setup_routes(app):
 
     # auth routes
     app.router.add_get('/', index, name='index')
-    app.router.add_get('/login', login, name='login')
-    app.router.add_post('/login', login, name='login')
-    app.router.add_get('/logout', logout, name='logout')
+    app.router.add_get('/login/', login, name='login')
+    app.router.add_post('/login/', login, name='login')
+    app.router.add_get('/logout/', logout, name='logout')
 
     # service config routes
     app.router.add_view('/services', services)

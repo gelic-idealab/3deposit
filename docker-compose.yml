@@ -16,15 +16,15 @@ services:
       - "traefik.docker.network=proxy"
       - "traefik.frontend.headers.contentTypeNosniff=false" 
 
-   postgres:
-      container_name: postgres
-      image: postgres:10
-      networks:
-          - gateway_internal    
-      volumes:
-          - pg_data:/var/lib/postgresql
-      labels:
-        - "traefik.enable=false"    
+  postgres:
+    container_name: postgres
+    image: postgres:10
+    networks:
+        - gateway_internal    
+    volumes:
+        - pg_data:/var/lib/postgresql
+    labels:
+      - "traefik.enable=false"    
 
   admin:
     build: ./services/deposit-admin/

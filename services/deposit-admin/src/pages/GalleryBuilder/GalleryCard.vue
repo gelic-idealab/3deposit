@@ -1,27 +1,55 @@
 <template>
     <div>
-      <!-- <h5>Placeholder</h5> -->
-        <div class="card">
-            <vue-json-pretty :data="localDep">
-            </vue-json-pretty>
+        <template v-if="deposit.media_type==='vr'">
+            <a :href="deposit.location">
+                <img class="card-img-top" src="../../assets/img/apple-icon.png" width="300" height="300"/>
+            </a>
+        </template>
+        <template v-else-if="deposit.media_type==='model'">
+            <a :href="deposit.location">
+                <div class="embed-responsive embed-responsive-16by9">
+                    <embed class="embed-responsive-item" :src="publish_metadata.thumbnails.images[2].url"/>
+                </div>
+            </a>
+        </template>
+        <div class="card-body">
+            <p class="card-text">{{ deposit_metadata }}</p>
         </div>
-  </div>
+        <div class="card-footer text-muted">{{ deposit.deposit_date }}</div>
+    </div>
 </template>
 <script>
 
 import VueJsonPretty from 'vue-json-pretty'
+import axios from 'axios'
 
 export default {
     data() {
         return {
-            localDep: {}
+            deposit_metadata: {},
+            publish_metadata: {
+                thumbnails: {
+                    images: [{
+                        url: ''
+                    },
+                    {
+                        url: ''
+                    },
+                    {
+                        url: ''
+                    }]
+                }
+            },
         }
     },
     props: {
-        deposit: Object
+        deposit: Object,
     },
-    created() {
-        this.localDep = this.deposit;
+    mounted() {
+        axios.get("http://localhost:8080/metadata", {params: {deposit_id: this.deposit.deposit_id}})
+        .then(response => this.deposit_metadata = response.data.deposit_metadata);
+        axios.get("http://localhost:8080/publications", {params: {resource_id: this.deposit.resource_id, media_type: this.deposit.media_type}})
+        .then(response => this.publish_metadata = response.data);
     }
 }
 </script>

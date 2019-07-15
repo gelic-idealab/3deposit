@@ -10,13 +10,13 @@ services:
     command: npm run serve
     labels:
       - "traefik.enable=true" 
-      - "traefik.frontend.rule=PathPrefixStrip:/deposit"
+      - "traefik.frontend.rule=Path:/deposit"
       - "traefik.backend=deposit-form"
       - "traefik.port=8080"
       - "traefik.docker.network=proxy"
-      - "traefik.passHostHeader=true"
+      - "traefik.frontend.headers.contentTypeNosniff=false" 
 
-  postgres:
+   postgres:
       container_name: postgres
       image: postgres:10
       networks:
@@ -34,7 +34,7 @@ services:
     command: npm run serve
     labels:
       - "traefik.enable=true"
-      - "traefik.frontend.rule=PathPrefixStrip:/admin"
+      - "traefik.frontend.rule=:/admin"
       - "traefik.backend=admin"
       - "traefik.port=8080"
       - "traefik.docker.network=proxy"

@@ -10,7 +10,7 @@ services:
     command: npm run serve
     labels:
       - "traefik.enable=true" 
-      - "traefik.frontend.rule=PathPrefixStrip: /deposit"
+      - "traefik.frontend.rule=PathPrefix: /deposit"
       - "traefik.backend=deposit-form"
       - "traefik.port=8080"
       - "traefik.docker.network=proxy"
@@ -33,7 +33,7 @@ services:
     command: npm run serve
     labels:
       - "traefik.enable=true"
-      - "traefik.frontend.rule=PathPrefixStrip: /admin"
+      - "traefik.frontend.rule=PathPrefix: /admin"
       - "traefik.backend=admin"
       - "traefik.port=8080"
       - "traefik.docker.network=proxy"
@@ -54,7 +54,7 @@ services:
     # command: bash -c "pipenv run python gateway.py"
     labels:
       - "traefik.enable=true"
-      - "traefik.frontend.rule=PathPrefixStrip: /api"
+      - "traefik.frontend.rule=PathPrefix:/api"
       - "traefik.backend=gateway"
       - "traefik.port=8080"
       - "traefik.docker.network=proxy"

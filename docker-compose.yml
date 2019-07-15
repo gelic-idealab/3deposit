@@ -56,7 +56,7 @@ services:
     # command: bash -c "pipenv run python gateway.py"
     labels:
       - "traefik.enable=true"
-      - "traefik.frontend.rule=PathPrefixStrip:/api"
+      - "traefik.frontend.rule=PathPrefix:/api"
       - "traefik.backend=gateway"
       - "traefik.port=8080"
       - "traefik.docker.network=proxy"

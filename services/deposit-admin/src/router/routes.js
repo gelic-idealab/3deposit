@@ -59,7 +59,7 @@ const routes = [
         component: GalleryBuilder
       },
       {
-        path: "/:id", 
+        path: "deposits/:id", 
         name: "deposit-profile", 
         component: DepositProfile
       },

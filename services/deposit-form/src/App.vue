@@ -36,7 +36,7 @@ export default {
   },
   mounted () {
     axios
-      .get('http://api.3deposit.library.illinois.edu')
+      .get('http://3deposit.library.illinois.edu/api/form')
       .then(response => (this.form = response.data.form.content));
     // eslint-disable-next-line
     console.log(this.id);

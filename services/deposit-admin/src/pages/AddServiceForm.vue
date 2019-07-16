@@ -83,7 +83,7 @@ export default {
     configureService() {
       this.parseConfigText();
       axios
-      .post('http://gateway.docker.localhost/services/configs',this.service_config)
+      .post('../api/services/configs',this.service_config)
       .then(response => (console.log(response)));
     },
     addConfigKey() {

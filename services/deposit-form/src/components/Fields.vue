@@ -105,7 +105,7 @@ export default {
     },
     submitDeposit: function () {
       axios({
-        url: '/deposit/form/submit',
+        url: '../api/form/submit',
         data: {
           'media_type': this.fields[0].value,
           'form': this.fields, 

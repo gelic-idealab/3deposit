@@ -26,7 +26,7 @@ def setup_routes(app):
     """
 
     # auth routes
-    app.router.add_get('/api', index, name='index')
+    app.router.add_get('/api/', index, name='index')
     app.router.add_get('/api/login', login, name='login')
     app.router.add_post('/api/login', login, name='login')
     app.router.add_get('/api/logout', logout, name='logout')

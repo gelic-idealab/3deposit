@@ -31,7 +31,7 @@ export default {
   mounted () {
     let comp = this
     let r = new Resumable({ 
-            target:'http://3deposit.library.illinois.edu/form/upload',
+            target:'/deposit/form/upload',
             chunkSize: 10*1024*1024, // 10MB
             maxFileSize: 1000*10*1024*1024, // 10GB
             testChunks: false,

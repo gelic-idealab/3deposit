@@ -105,7 +105,7 @@ export default {
     },
     submitDeposit: function () {
       axios({
-        url: 'http://gateway.docker.localhost/form/submit',
+        url: '/deposit/form/submit',
         data: {
           'media_type': this.fields[0].value,
           'form': this.fields, 
@@ -116,7 +116,7 @@ export default {
         })
       .then(function(response) {
         if (response.status === 200) {
-          window.location.href = "http://deposit-form.docker.localhost";
+          window.location.href = "/deposit";
         } else {
           (console.log(response));
         }

@@ -1,0 +1,292 @@
+{
+	"fields": [
+	{
+            "id": 0,
+            "label":"pbcoreDescriptionDocument",
+            "type": "container",
+            "repeatable": true,
+            "required": true,
+            "attributes": ["xmlns", "xsi", "schemaLocation"],
+            "value": [],
+            "subfields":[
+                            {
+                                "label":"pbcoreAssetType",
+                                "type": "text",
+                                "repeatable": true,
+                                "required": false,
+                                "value": [""],
+                                "attributes": ["source", "ref", "version", "annotation"],
+                                "placeholder": "Enter asset type",
+                            },
+                            {
+                                "label":"pbcoreAssetDate",
+                                "type": "date",
+                                "repeatable": true,
+                                "required": false,
+                                "value": [""],
+                                "attributes":["dateType", "source", "ref", "version", "annotation"]
+                            },
+                            {
+                                "label":"pbcoreIdentifier",
+                                "type": "text",
+                                "repeatable": true,
+                                "required": true,
+                                "value": [""],
+                                "attributes": ["source", "ref", "version", "annotation"],
+                                "placeholder": "Enter creator's department or team affiliation"
+                            },
+                            {
+                                "label":"pbcoreTitle",
+                                "type": "text",
+                                "repeatable": true,
+                                "required": true,
+                                "value": [""],
+                                "attributes": ["titleType", "titleTypeSource", "titleTypeRef", "titleTypeVersion", "titleTypeAnnotation", "source", "ref", "version", "annotation", "startTime", "endTime", "timeAnnotation"],
+                                "placeholder": "Enter Title",
+                            },
+                            {
+                                "label":"pbcoreSubject",
+                                "type": "text",
+                                "repeatable": true,
+                                "required": true,
+                                "value": [""],
+                                "attributes":["subjectType", "subjectTypeSource", "subjectTypeRef", "subjectTypeVersion", "subjectTypeAnnotation", "source", "ref", "version", "annotation", "startTime", "endTime", "timeAnnotation"],
+                                "placeholder": ["Enter Subject"]
+                            },
+                            {
+                                "label":"pbcoreDescription",
+                                "type": "text",
+                                "repeatable": true,
+                                "required": true,
+                                "value": [""],
+                                "attributes": ["descriptionType", "descriptionTypeSource", "descriptionTypeRef", "descriptionTypeVersion", "descriptionTypeAnnotation", "segmentType", "segmentTypeSource", "segmentTypeRef", "segmentTypeVersion", "segmentTypeAnnotation", "startTime", "endTime", "timeAnnotation", "source", "ref", "version", "annotation"],
+                                "placeholder": "Enter Description"
+                            },
+                            {
+                                "label":"pbcoreGenre",
+                                "type": "text",
+                                "repeatable": true,
+                                "required": true,
+                                "value": [""],
+                                "attributes": ["source", "ref", "version", "annotation", "startTime", "endTime", "timeAnnotation"],
+                                "placeholder": "Enter Genre",
+                            },
+                            {
+                                "label":"pbcoreRelation",
+                                "type": "container",
+                                "repeatable": true,
+                                "required": true,   
+                            },
+                            	{
+                            		"label": "pbcoreRelationshipType",
+                            		"type": "text",
+                            		"repeatable": false,
+                            		"required": true,
+                            		"value": [""],
+                            		"attributes": ["source", "ref", "version", "annotation"]
+                            	},
+                            	{
+                            		"label": "pbcoreRelationshipIdentifier",
+                            		"type": "text",
+                            		"repeatable": false,
+                            		"required": true,
+                            		"value": [""],
+                            		"attributes": ["source", "ref", "version", "annotation"]
+                            	},
+                            {
+                                "label":"pbcoreCoverage",
+                                "type": "text",
+                                "repeatable": true,
+                                "required": false,
+                            },
+                            	{
+                            		"label": "coverage",
+                            		"type": "select",
+                            		"repeatable": false,
+                            		"required": true,
+                            		"value": [""],
+                            		"attributes": ["source", "ref", "version", "annotation", "startTime", "endTime", "timeAnnotation"],
+                            		"options": [{"value": "temporal"},
+                        						{"value": "spatial"}],
+                            	},
+                            	{
+                            		"label": "coverageType",
+                            		"type": "text",
+                            		"repeatable": false,
+                            		"required": true,
+                            		"value": [""],
+                            	},
+                            {
+                                "label":"pbcoreAudienceLevel",
+                                "type": "text",
+                                "repeatable": true,
+                                "required": true,
+                                "value": [""],
+                                "attributes": ["source", "ref", "version", "annotation"],
+                            },
+                            {
+                                "label":"pbcoreAudienceRating",
+                                "type": "date",
+                                "repeatable": true,
+                                "required": false,
+                                "value": [""],
+                                "attributes":["source", "ref", "version", "annotation"]
+                            },
+                            {
+                                "label":"pbcoreCreator",
+                                "type": "container",
+                                "repeatable": true,
+                                "required": false,
+                                "value": [""],
+                            },
+                            	{
+                            		"label": "creator",
+                            		"type": "text",
+                            		"repeatable": false,
+                            		"required": true,
+                            		"value": [""],
+                            		"attributes": ["affliation", "affiliationSource", "affiliationRef", "affiliationVersion", "affiliationAnnotation", "source", "ref", "version", "annotation", "startTime", "endTime", "timeAnnotation"]
+                            	},
+                            	{
+                            		"label": "creatorRole",
+                            		"type": "text",
+                            		"repeatable": true,
+                            		"required": false,
+                            		"value": [""],
+                            		"attributes": ["source", "ref", "version", "annotation"]
+                            	},
+                            {
+                                "label":"pbcorePublisher",
+                                "type": "text",
+                                "repeatable": true,
+                                "required": false,
+                            },
+                            	{
+                            		"label": "publisher",
+                            		"type": "text",
+                            		"repeatable": false,
+                            		"required": true,
+                            		"value": [""],
+                            		"attributes": ["affliation", "affiliationSource", "affiliationRef", "affiliationVersion", "affiliationAnnotation", "source", "ref", "version", "annotation", "startTime", "endTime", "timeAnnotation"]
+                            	},
+                            	{
+                            		"label": "publisherRole",
+                            		"type": "text",
+                            		"repeatable": true,
+                            		"required": false,
+                            		"value": [""],
+                            		"attributes": ["source", "ref", "version", "annotation"]
+                            	},
+                            {
+                                "label":"pbcoreRightsSummary",
+                                "type": "text",
+                                "repeatable": true,
+                                "required": false,
+                                "value": [""],
+                                "attributes":["startTime", "endTime", "timeAnnotation"]
+                            },
+                            	{
+                            		"label": "rightsSummary",
+                            		"type": "text",
+                            		"repeatable": false,
+                            		"required": false,
+                            		"value": [""],
+                            		"attributes": ["source", "ref", "version", "annotation"]
+                            	},
+                            	{
+                            		"label": "rightsLink",
+                            		"type": "text",
+                            		"repeatable": false,
+                            		"required": false,
+                            		"value": [""],
+                            		"attributes": ["source", "ref", "version", "annotation"]
+                            	},
+                            	{
+                            		"label": "rightsEmbedded",
+                            		"type": "text",
+                            		"repeatable": false,
+                            		"required": false,
+                            		"value": [""],
+                            		"attributes": ["source", "ref", "version", "annotation"]
+                            	},
+                            {
+                                "label":"pbcorePart",
+                                "type": "text",
+                                "repeatable": true,
+                                "required": false,
+                                "value": [""],
+                                "attributes": ["partType", "partTypeSource", "partTypeRef", "partTypeVersion", "partTypeAnnotation", "startTime", "endTime", "timeAnnotation"]
+                            },
+                            {
+                                "label":"pbcoreAnnotation",
+                                "type": "text",
+                                "repeatable": true,
+                                "required": false,
+                                "value": [""],
+                                "attributes": ["annotationType", "source", "ref", "version", "annotation"],
+                            },
+                            {
+                                "label":"pbcoreExtension",
+                                "type": "date",
+                                "repeatable": true,
+                                "required": false,
+                                "value": [""],
+                            },
+                            	{
+                            		"label": "extensionWrap",
+                            		"type": "text",
+                            		"repeatable": true,
+                            		"required": true,
+                            		"value": [""],
+                            		"attributes": ["source", "ref", "version", "annotation"]
+                            	},
+	                            	{
+	                            		"label": "extensionElement",
+	                            		"type": "text",
+	                            		"repeatable": false,
+	                            		"required": true,
+	                            		"value": [""],
+	                            	},
+	                            	{
+	                            		"label": "extensionValue",
+	                            		"type": "text",
+	                            		"repeatable": false,
+	                            		"required": true,
+	                            		"value": [""],
+	                            	},
+	                            	{
+	                            		"label": "extensionAuthorityUsed",
+	                            		"type": "text",
+	                            		"repeatable": false,
+	                            		"required": false,
+	                            		"value": [""],
+	                            	},
+                            	{
+                            		"label": "extensionEmbedded",
+                            		"type": "text",
+                            		"repeatable": true,
+                            		"required": true,
+                            		"value": [""],
+                            		"attributes": ["source", "ref", "version", "annotation"]
+                            	},
+                           
+                      
+
+                        ],
+    },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    ]
+}

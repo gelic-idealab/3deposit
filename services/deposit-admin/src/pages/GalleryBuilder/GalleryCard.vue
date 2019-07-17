@@ -2,7 +2,7 @@
     <div>
         <template v-if="deposit.media_type==='vr'">
             <a :href="deposit.location">
-                <img class="card-img-top" src="../../assets/img/apple-icon.png" width="300" height="300"/>
+                <img class="card-img-top" src="../../assets/img/vr.svg"/>
             </a>
         </template>
         <template v-else-if="deposit.media_type==='model'">
@@ -13,9 +13,10 @@
             </a>
         </template>
         <div class="card-body">
-            <p class="card-text">{{ deposit_metadata }}</p>
+            <h5 class="card-title mb-3">{{ deposit_metadata['Object Title'] }}</h5>
+            <p class="card-text">{{ deposit_metadata.description }}</p>
         </div>
-        <div class="card-footer text-muted">{{ deposit.deposit_date }}</div>
+        <div class="card-footer text-muted">{{ deposit.deposit_date.substring(0, deposit.deposit_date.indexOf('.')) }}</div>
     </div>
 </template>
 <script>

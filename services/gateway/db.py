@@ -4,7 +4,7 @@ import logging
 import aiopg.sa
 from sqlalchemy import (
     MetaData, Table, Column, ForeignKey,
-    Integer, String, Date, Boolean, JSON,
+    Integer, String, DateTime, Boolean, JSON,
     and_
 )
 
@@ -19,11 +19,11 @@ deposits = Table(
     'deposits', meta,
 
     Column('deposit_id', String(256), primary_key=True),
-    Column('deposit_date', Date, nullable=False),
+    Column('deposit_date', DateTime, nullable=False),
     Column('etag', String(256)),
     Column('mongo_id', String(256)),
     Column('resource_id', String(256)),
-    Column('location', String(256)),
+    Column('location', String(256), nullable=True),
     Column('media_type', String(256))
 )
 
@@ -112,6 +112,7 @@ async def get_deposits(conn):
     result = await conn.execute(
         deposits
         .select()
+        .where(deposits.c.location != 'None')
     )
     deposit_list = await result.fetchall()
     if deposit_list:
@@ -119,7 +120,7 @@ async def get_deposits(conn):
         deposit_objects = []
         for d in deposit_list:
             d_obj = {}
-            for (i,k) in enumerate(column_keys):
+            for (i, k) in enumerate(column_keys):
                 d_obj.update(dict({k:str(d[i])}))
             deposit_objects.append(d_obj)
         return deposit_objects

@@ -105,7 +105,7 @@ async def trigger_publish(conn, data):
             fd.add_field('file', f, filename=did, content_type='application/octet-stream')
             logging.debug(msg="ENDPOINT: "+endpoint+"FORM DATA: "+str(data))
             async with new_request(method='POST', url=endpoint, data=fd) as resp:
-                logging.debug(msg="DEBUG: "+str(await resp.text()))
+                logging.debug(msg="PUBLISH RESPONSE: "+str(await resp.text()))
                 resp_json = await resp.json()
                 return resp_json
 

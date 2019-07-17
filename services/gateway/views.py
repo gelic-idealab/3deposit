@@ -53,12 +53,12 @@ async def login(request):
             if error:
                 return {'error': error}
             else:
-                response = redirect(request.app.router, 'index')
+                response = web.HTTPFound('/admin/')
 
                 user = await db.get_user_by_name(conn, form['username'])
                 await remember(request, response, user['username'])
 
-                raise response
+                return response
 
     return {}
 

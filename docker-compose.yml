@@ -9,53 +9,74 @@ services:
     container_name: deposit-form
     command: npm run serve
     labels:
-      - "traefik.frontend.rule=Host:deposit-form.docker.localhost"
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=PathPrefix:/deposit"
       - "traefik.backend=deposit-form"
       - "traefik.port=8080"
       - "traefik.docker.network=proxy"
+      - "traefik.passHostHeader=true"
+
 
   postgres:
-      container_name: postgres
-      image: postgres:10
-      networks:
-          - gateway_internal    
-      volumes:
-          - pg_data:/var/lib/postgresql
-      labels:
-        - "traefik.enable=false"    
+    container_name: postgres
+    image: postgres:10
+    networks:
+        - gateway_internal    
+    volumes:
+        - pg_data:/var/lib/postgresql
+    labels:
+      - "traefik.enable=false"    
+
+  admin:
+    build: ./services/deposit-admin/
+    networks:
+      - proxy
+    container_name: admin
+    command: npm run serve
+    labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=PathPrefix:/admin"
+      - "traefik.backend=admin"
+      - "traefik.port=8080"
+      - "traefik.docker.network=proxy"
+      - "traefik.passHostHeader=true"
+
 
   gateway:
-      build: ./services/gateway/
-      container_name: gateway
-      ports:
-        - 8080:8080
-      links:
-          - postgres
-      depends_on: 
-          - postgres
-      networks:
-        - gateway_internal
-        - proxy
-      command: bash -c "pipenv run python init_db.py && pipenv run python gateway.py"
-      # command: bash -c "pipenv run python gateway.py"
-      labels:
-        - "traefik.frontend.rule=Host:gateway.docker.localhost"
-        - "traefik.backend=gateway"
-        - "traefik.port=8080"
-        - "traefik.docker.network=proxy"
-      volumes:
-        - ./services/gateway/data:/gateway/data
+    build: ./services/gateway/
+    container_name: gateway
+    links:
+        - postgres
+    depends_on: 
+        - postgres
+    networks:
+      - gateway_internal
+      - proxy
+    command: bash -c "pipenv run python init_db.py && pipenv run python gateway.py"
+    # command: bash -c "pipenv run python gateway.py"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=PathPrefix:/api"
+      - "traefik.backend=gateway"
+      - "traefik.port=8080"
+      - "traefik.docker.network=proxy"
+      - "traefik.passHostHeader=true"
+
+    volumes:
+      - ./services/gateway/data:/gateway/data
   
-  # reverse-proxy:
-  #     image: traefik # The official Traefik docker image
-  #     command: --api --docker # Enables the web UI and tells Traefik to listen to docker
-  #     ports:
-  #       - "80:80"     # The HTTP port
-  #       - "8080:8080" # The Web UI (enabled by --api)
-  #     volumes:
-  #       - /var/run/docker.sock:/var/run/docker.sock
-  #     networks:
-  #       - proxy
+  reverse-proxy:
+      container_name: reverse-proxy
+      image: traefik # The official Traefik docker image
+      command: --api --docker # Enables the web UI and tells Traefik to listen to docker
+      ports:
+        - "80:80"     # The HTTP port
+        - "8080:8080" # The Web UI (enabled by --api)
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+        - ./traefik.toml:/traefik.toml
+      networks:
+        - proxy
 
   minio-server:
     container_name: minio-server
@@ -83,20 +104,14 @@ services:
       - minio-server
     networks:
       - minio_internal
-      - proxy
     command: pipenv run flask run --host=0.0.0.0
     labels:
-        - "traefik.frontend.rule=Host:minio.docker.localhost"
-        - "traefik.backend=minio-service"
-        - "traefik.port=5000"
-        - "traefik.docker.network=proxy"
+      - "traefik.enable=false" 
 
   mongo-server:
     image: mongo
     container_name: mongo-server
     restart: always
-    # ports:
-    #   - 27017:27017
     networks:
       - mongo_internal
     environment:
@@ -107,45 +122,34 @@ services:
     labels:
       - "traefik.enable=false" 
 
-  mongo-express:
-    image: mongo-express
-    restart: always
-    ports:
-      - 8081:8081
-    networks:
-      - mongo_internal
-      - proxy
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: example
-      ME_CONFIG_MONGODB_SERVER: mongo-server
-    labels:
-      - "traefik.frontend.rule=Host:mongo-express.docker.localhost"
-      - "traefik.backend=mongo-express"
-      - "traefik.port=8081"
-      - "traefik.docker.network=proxy"
+  # mongo-express:
+  #   image: mongo-express
+  #   restart: always
+  #   networks:
+  #     - mongo_internal
+  #     - proxy
+  #   environment:
+  #     ME_CONFIG_MONGODB_ADMINUSERNAME: root
+  #     ME_CONFIG_MONGODB_ADMINPASSWORD: example
+  #     ME_CONFIG_MONGODB_SERVER: mongo-server
+  #   labels:
+  #     - "traefik.enable=false" 
 
   mongo-service:
     build: ./services/store-mongo/
     container_name: mongo-service
-    # ports: 
-    #   - "5000:5000"
     depends_on:
       - mongo-server
     links: 
       - mongo-server
     networks:
       - mongo_internal
-      - proxy
     environment: 
       FLASK_ENV: development
       FLASK_APP: mongo-service
     command: pipenv run flask run --host=0.0.0.0
     labels:
-        - "traefik.frontend.rule=Host:mongo.docker.localhost"
-        - "traefik.backend=mongo-service"
-        - "traefik.port=5000"
-        - "traefik.docker.network=proxy"
+      - "traefik.enable=false" 
 
   sketchfab-service:
     build: ./services/publish-sketchfab/

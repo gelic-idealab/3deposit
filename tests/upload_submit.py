@@ -2,7 +2,7 @@ import requests
 import json
 from uuid import uuid4
 
-url = "http://localhost:8080/form/upload"
+url = "http://3deposit.library.illinois.edu/api/form/upload"
 
 DEPOSIT_ID = str(uuid4())
 
@@ -26,7 +26,7 @@ headers = {
 response = requests.request("POST", url, files=files, headers=headers, params=querystring)
 
 print(response.text)
-url = "http://localhost:8080/form/submit"
+url = "http://3deposit.library.illinois.edu/api/form/submit"
 payload_dict = {
     'media_type': 'model',
     'id': DEPOSIT_ID,

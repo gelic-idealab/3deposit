@@ -12,7 +12,8 @@ from views import (
     services_actions,
     publications,
     deposits,
-    metadata
+    metadata,
+    metadata_keys
 )
 
 
@@ -57,3 +58,4 @@ def setup_routes(app):
 
     # metadata routes
     app.router.add_view('/metadata', metadata)
+    app.router.add_view('/metadata/keys', metadata_keys)

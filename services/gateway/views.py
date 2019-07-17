@@ -510,3 +510,20 @@ async def metadata(request):
 
         except Exception as err:
             return web.json_response({ 'err': str(err) }, headers=headers)
+
+
+async def metadata_keys(request):
+    headers = {
+        'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
+        'Access-Control-Allow-Headers': 'content-type'
+    }
+
+    if request.method == 'GET':
+        try:
+            async with new_request(method='GET', url='http://mongo-service:5000/keys') as resp:
+                logging.debug("MONGO KEYS ERROR:"+await resp.text())
+                resp_json = await resp.json()
+                return web.json_response(resp_json, headers=headers)
+
+        except Exception as err:
+            return web.json_response({'err': str(err)}, headers=headers)

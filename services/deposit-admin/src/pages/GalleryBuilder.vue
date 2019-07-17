@@ -10,12 +10,16 @@
                 </div>
             <!-- </div> -->
         </div>
+        <filter-key @addFilter="addFilter">
+
+        </filter-key>
     </div>
 </template>
 
 <script>
 import axios from 'axios';
 import GalleryCard from "./GalleryBuilder/GalleryCard.vue";
+import FilterKey from "./GalleryBuilder/FilterKey.vue"
 
 export default {
     name: "gallery-builder",
@@ -25,18 +29,20 @@ export default {
             sortBy: {
                 field: 'deposit_date',
                 ascending: false
-            }
+            },
+            filters: []
         }
     },
     components: {
-        GalleryCard
+        GalleryCard,
+        FilterKey
     },
     created() {  
         axios.get("http://localhost:8080/deposits")
         .then(response => this.deposits = response.data.deposits)
     },
     methods: {
-         order(deposits) {
+        order(deposits) {
              let sb = this.sortBy;
              if (sb.field==='deposit_date') {
                 return deposits.slice().sort(function(a, b) {
@@ -50,6 +56,10 @@ export default {
                     }
                 });   
             }
+        },
+        addFilter(filter) {
+            this.filters.push(filter)
+            console.log("parent",filter)
         }
     }
 }

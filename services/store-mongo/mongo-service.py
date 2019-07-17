@@ -3,8 +3,9 @@ import json
 from json import JSONDecodeError
 from flask import Flask, request, jsonify
 from pymongo import MongoClient
-from unpack_001 import get_value
+from unpack.unpack import get_value
 import logging
+from bson import Code
 
 DATABASE_NAME = '3deposit'
 COLLECTION_NAME = 'deposits'
@@ -29,6 +30,16 @@ def create_client(request):
 
 def create_app():
     app = Flask(__name__)
+
+    @app.route('/keys', methods=['GET'])
+    def get_keys():
+        client = create_client(request)
+        database = client['3deposit']
+        map = Code("function() { for (var key in this.deposit_metadata) { emit(key, null); } }")
+        reduce = Code("function(key, stuff) { return null; }")
+        result = database[COLLECTION_NAME].map_reduce(map, reduce, "myresults")
+        return jsonify({"keys": result.distinct('_id')})
+
 
     @app.route('/databases', methods=['GET', 'POST', 'DELETE'])
     def databases():

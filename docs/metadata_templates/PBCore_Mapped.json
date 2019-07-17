@@ -8,7 +8,7 @@
             "required": true,
             "attributes": ["xmlns", "xsi", "schemaLocation"],
             "value": [],
-            "subfields":[
+            "subelements":[
                             {
                                 "label":"pbcoreAssetType",
                                 "type": "text",
@@ -269,10 +269,448 @@
                             		"value": [""],
                             		"attributes": ["source", "ref", "version", "annotation"]
                             	},
-                           
-                      
 
                         ],
+            "id": 1,
+            "label":"pbcoreInstantiation",
+            "type": "container",
+            "repeatable": true,
+            "required": false,
+            "attributes": ["startTime", "endTime", "timeAnnotation"],
+            "subelements":[
+                        {
+                            "label":"instantiationIdentifier",
+                            "type": "text",
+                            "repeatable": true,
+                            "required": true,
+                            "value": [""],
+                            "attributes": ["source", "ref", "version", "annotation"]
+                        },
+                        {
+                            "label":"instantiationDate",
+                            "type": "date",
+                            "repeatable": false,
+                            "required": false,
+                            "value": [""],
+                            "attributes": ["dateType", "source", "ref", "version", "annotation"]
+                        },
+                        {
+                            "label":"instantiationDimensions",
+                            "type": "text",
+                            "repeatable": true,
+                            "required": false,
+                            "value": [""],
+                            "attributes": ["unitsOfMeasure", "source", "ref", "version", "annotation"]
+                        },
+                        {
+                            "label":"instantiationPhysical",
+                            "type": "text",
+                            "repeatable": false,
+                            "required": false,
+                            "value": [""],
+                            "attributes": ["source", "ref", "version", "annotation"]
+                        },
+                        {
+                            "label":"instantiationDigital",
+                            "type": "text",
+                            "repeatable": false,
+                            "required": false,
+                            "value": [""],
+                            "attributes": ["source", "ref", "version", "annotation"]
+                        },
+                        {
+                            "label":"instantiationStandard",
+                            "type": "text",
+                            "repeatable": false,
+                            "required": false,
+                            "value": [""],
+                            "attributes": ["profile", "source", "ref", "version", "annotation"]
+                        },
+                        {
+                            "label":"instantiationLocation",
+                            "type": "text",
+                            "repeatable": false,
+                            "required": true,
+                            "value": [""],
+                            "attributes": ["source", "ref", "version", "annotation"]
+                        },
+                        {
+                            "label":"instantiationMediaType",
+                            "type": "text",
+                            "repeatable": false,
+                            "required": false,
+                            "value": [""],
+                            "attributes": ["source", "ref", "version", "annotation"]
+                        },
+                        {
+                            "label":"instantiationGenerations",
+                            "type": "text",
+                            "repeatable": true,
+                            "required": false,
+                            "value": [""],
+                            "attributes": ["source", "ref", "version", "annotation"]
+                        },
+                        {
+                            "label":"instantiationFileSize",
+                            "type": "text",
+                            "repeatable": false,
+                            "required": false,
+                            "value": [""],
+                            "attributes": ["unitsOfMeasure", "source", "ref", "version", "annotation"]
+                        },
+                        {
+                            "label":"instantiationTimeStart",
+                            "type": "text",
+                            "repeatable": true,
+                            "required": false,
+                            "value": [""],
+                            "attributes": ["source", "ref", "version", "annotation"]
+                        },
+                        {
+                            "label":"instantiationDuration",
+                            "type": "text",
+                            "repeatable": false,
+                            "required": false,
+                            "value": [""],
+                            "attributes": ["source", "ref", "version", "annotation"]
+                        },
+                        {
+                            "label":"instantiationDataRate",
+                            "type": "text",
+                            "repeatable": false,
+                            "required": false,
+                            "value": [""],
+                            "attributes": ["unitsOfMeasure", "source", "ref", "version", "annotation"]
+                        },
+                        {
+                            "label":"instantiationColors",
+                            "type": "text",
+                            "repeatable": false,
+                            "required": false,
+                            "value": [""],
+                            "attributes": ["source", "ref", "version", "annotation"]
+                        },
+                        {
+                            "label":"instantiationTracks",
+                            "type": "text",
+                            "repeatable": false,
+                            "required": false,
+                            "value": [""],
+                            "attributes": ["source", "ref", "version", "annotation"]
+                        },
+                        {
+                            "label":"instantiationChannelConfiguration",
+                            "type": "text",
+                            "repeatable": false,
+                            "required": false,
+                            "value": [""],
+                            "attributes": ["source", "ref", "version", "annotation"]
+                        },
+                        {
+                            "label":"instantiationLanguage",
+                            "type": "text",
+                            "repeatable": true,
+                            "required": false,
+                            "value": [""],
+                            "attributes": ["source", "ref", "version", "annotation"]
+                        },
+                        {
+                            "label":"instantiationAlternativeModes",
+                            "type": "text",
+                            "repeatable": false,
+                            "required": false,
+                            "value": [""],
+                            "attributes": ["source", "ref", "version", "annotation"]
+                        },
+                        {
+                            "label":"instantiationIdentifier",
+                            "type": "text",
+                            "repeatable": true,
+                            "required": true,
+                            "value": [""],
+                            "attributes": ["source", "ref", "version", "annotation"]
+                        },
+                        {
+                            "label":"instantiationEssenceTrack",
+                            "type": "text",
+                            "repeatable": true,
+                            "required": false,
+                            "value": [""],
+                            "subelements": [
+                                            {
+                                                "label":"essenceTrackType",
+                                                "type": "text",
+                                                "repeatable": false,
+                                                "required": false,
+                                                "value": [""],
+                                                "attributes": ["source", "ref", "version", "annotation"]
+                                            },
+                                            {
+                                                "label":"essenceTrackIdentifier",
+                                                "type": "text",
+                                                "repeatable": true,
+                                                "required": false,
+                                                "value": [""],
+                                                "attributes": ["source", "ref", "version", "annotation"]
+                                            },
+                                            {
+                                                "label":"essenceTrackStandard",
+                                                "type": "text",
+                                                "repeatable": false,
+                                                "required": false,
+                                                "value": [""],
+                                                "attributes": ["source", "ref", "version", "annotation"]
+                                            },
+                                            {
+                                                "label":"essenceTrackEncoding",
+                                                "type": "text",
+                                                "repeatable": false,
+                                                "required": false,
+                                                "value": [""],
+                                                "attributes": ["source", "ref", "version", "annotation"]
+                                            },
+                                            {
+                                                "label":"essenceTrackDataRate",
+                                                "type": "text",
+                                                "repeatable": false,
+                                                "required": false,
+                                                "value": [""],
+                                                "attributes": ["unitsOfMeasure", "source", "ref", "version", "annotation"]
+                                            },
+                                            {
+                                                "label":"essenceTrackFrameRate",
+                                                "type": "text",
+                                                "repeatable": false,
+                                                "required": false,
+                                                "value": [""],
+                                                "attributes": ["unitsOfMeasure", "source", "ref", "version", "annotation"]
+                                            },
+                                            {
+                                                "label":"essenceTrackPlaybackSpeed",
+                                                "type": "text",
+                                                "repeatable": false,
+                                                "required": false,
+                                                "value": [""],
+                                                "attributes": ["unitsOfMeasure", "source", "ref", "version", "annotation"]
+                                            },
+                                            {
+                                                "label":"essenceTrackSamplingRate",
+                                                "type": "text",
+                                                "repeatable": false,
+                                                "required": false,
+                                                "value": [""],
+                                                "attributes": ["unitsOfMeasure", "source", "ref", "version", "annotation"]
+                                            },
+                                            {
+                                                "label":"essenceTrackBitDepth",
+                                                "type": "text",
+                                                "repeatable": false,
+                                                "required": false,
+                                                "value": [""],
+                                                "attributes": ["unitsOfMeasure""source", "ref", "version", "annotation"]
+                                            },
+                                            {
+                                                "label":"essenceFrameSize",
+                                                "type": "text",
+                                                "repeatable": false,
+                                                "required": false,
+                                                "value": [""],
+                                                "attributes": ["unitsOfMeasure", "source", "ref", "version", "annotation"]
+                                            },
+                                            {
+                                                "label":"essenceTrackAspectRatio",
+                                                "type": "text",
+                                                "repeatable": false,
+                                                "required": false,
+                                                "value": [""],
+                                                "attributes": ["unitsOfMeasure", "source", "ref", "version", "annotation"]
+                                            },
+                                            {
+                                                "label":"essenceTrackTimeStart",
+                                                "type": "text",
+                                                "repeatable": false,
+                                                "required": false,
+                                                "value": [""],
+                                                "attributes": ["source", "ref", "version", "annotation"]
+                                            },
+                                            {
+                                                "label":"essenceTrackDuration",
+                                                "type": "text",
+                                                "repeatable": false,
+                                                "required": false,
+                                                "value": [""],
+                                                "attributes": ["source", "ref", "version", "annotation"]
+                                            },
+                                            {
+                                                "label":"essenceTrackLanguage",
+                                                "type": "text",
+                                                "repeatable": true,
+                                                "required": false,
+                                                "value": [""],
+                                                "attributes": ["source", "ref", "version", "annotation"]
+                                            },
+                                            {
+                                                "label":"essenceTrackAnnotation",
+                                                "type": "text",
+                                                "repeatable": true,
+                                                "required": false,
+                                                "value": [""],
+                                                "attributes": ["annotationType", "source", "ref", "version", "annotation"]
+                                            },
+                                            {
+                                                "label":"essenceTrackExtension",
+                                                "type": "container",
+                                                "repeatable": true,
+                                                "required": false,
+                                                "value": [""],
+                                                "subelements": [
+                                                                {
+                                                                    "label":"extensionWrap",
+                                                                    "type": "text",
+                                                                    "repeatable": true,
+                                                                    "required": true,
+                                                                    "value": [""],
+                                                                    "attributes": ["source", "ref", "version", "annotation"],
+                                                                    "subelements":[
+                                                                                    {
+                                                                                        "label":"extensionElement",
+                                                                                        "type": "text",
+                                                                                        "repeatable": false,
+                                                                                        "required": true,
+                                                                                        "value": [""],
+                                                                                    },
+                                                                                    {
+                                                                                        "label":"extensionValue",
+                                                                                        "type": "text",
+                                                                                        "repeatable": false,
+                                                                                        "required": true,
+                                                                                        "value": [""],
+                                                                                    },
+                                                                                    {
+                                                                                        "label":"extensionAuthorityUsed",
+                                                                                        "type": "text",
+                                                                                        "repeatable": false,
+                                                                                        "required": false,
+                                                                                        "value": [""],
+                                                                                    },
+                                                                    ]
+                                                                },
+
+                                                ]
+                                            },
+                                            {
+                                                "label":"instatiationRelation",
+                                                "type": "text",
+                                                "repeatable": false,
+                                                "required": false,
+                                                "value": [""],
+                                                "subelements": [
+                                                                {
+                                                                    "label":"instantiationRelationType",
+                                                                    "type": "text",
+                                                                    "repeatable": false,
+                                                                    "required": true,
+                                                                    "value": [""],
+                                                                },
+                                                                {
+                                                                    "label":"instantiationRelationIdentifier",
+                                                                    "type": "text",
+                                                                    "repeatable": false,
+                                                                    "required": true,
+                                                                    "value": [""],
+                                                                },
+                                                ]
+                                            },
+                                            {
+                                                "label":"instantiationRights",
+                                                "type": "text",
+                                                "repeatable": true,
+                                                "required": false,
+                                                "value": [""],
+                                                "attributes": ["startTime", "endTime", "timeAnnotation"],
+                                                "subelements":[
+                                                                {
+                                                                    "label":"rightsSummary",
+                                                                    "type": "text",
+                                                                    "repeatable": false,
+                                                                    "required": false,
+                                                                    "value": [""],
+                                                                },
+                                                                {
+                                                                    "label":"rightsLink",
+                                                                    "type": "text",
+                                                                    "repeatable": false,
+                                                                    "required": false,
+                                                                    "value": [""],
+                                                                },
+                                                                {
+                                                                    "label":"rightsEmbedded",
+                                                                    "type": "text",
+                                                                    "repeatable": false,
+                                                                    "required": false,
+                                                                    "value": [""],
+                                                                },
+                                                ]
+                                            },
+                                            {
+                                                "label":"instantiationExtension",
+                                                "type": "container",
+                                                "repeatable": true,
+                                                "required": false,
+                                                "value": [""],
+                                                "subelements": [
+                                                                {
+                                                                    "label":"extensionWrap",
+                                                                    "type": "text",
+                                                                    "repeatable": false,
+                                                                    "required": false,
+                                                                    "value": [""],
+                                                                    "attributes": ["source", "ref", "version", "annotation"],
+                                                                    "subelements": [
+                                                                                    {
+                                                                                        "label":"extensionElement",
+                                                                                        "type": "text",
+                                                                                        "repeatable": false,
+                                                                                        "required": true,
+                                                                                        "value": [""],
+                                                                                    },
+                                                                                    {
+                                                                                        "label":"extensionValue",
+                                                                                        "type": "text",
+                                                                                        "repeatable": false,
+                                                                                        "required": true,
+                                                                                        "value": [""],
+                                                                                    },
+                                                                                    {
+                                                                                        "label":"extensionAuthorityUsed",
+                                                                                        "type": "text",
+                                                                                        "repeatable": false,
+                                                                                        "required": false,
+                                                                                        "value": [""],
+                                                                                    },
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "label":"extensionEmbedded",
+                                                                    "type": "text",
+                                                                    "repeatable": true,
+                                                                    "required": true,
+                                                                    "value": [""],
+                                                                    "attributes": ["source", "ref", "version", "annotation"]
+                                                                },
+                                                ]
+                                            },
+
+
+
+                            ]
+                        },
+
+
+
+
+
+            ]
     },
 
 

@@ -42,7 +42,7 @@ async def index(request):
 async def login(request):
     username = await authorized_userid(request)
     if username:
-        raise redirect(request.app.router, 'index')
+        return web.HTTPFound('/admin/')
 
     if request.method == 'POST':
         form = await request.post()

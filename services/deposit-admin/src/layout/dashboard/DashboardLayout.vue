@@ -2,12 +2,12 @@
   <div class="wrapper">
     <side-bar>
       <template slot="links">
-        <sidebar-link to="/dashboard" name="Dashboard" icon="ti-panel"/>
-        <sidebar-link to="/stats" name="User Profile" icon="ti-user"/>
-        <sidebar-link to="/services" name="Services" icon="ti-widget"/>
-        <sidebar-link to="/deposits" name="Deposits" icon="ti-dropbox"/>
-        <sidebar-link to="/icons" name="Icons" icon="ti-pencil-alt2"/>
-        <sidebar-link to="/notifications" name="Notifications" icon="ti-bell"/>
+        <sidebar-link to="/admin/dashboard" name="Dashboard" icon="ti-panel"/>
+        <sidebar-link to="/admin/stats" name="User Profile" icon="ti-user"/>
+        <sidebar-link to="/admin/services" name="Services" icon="ti-widget"/>
+        <sidebar-link to="/admin/deposits" name="Deposits" icon="ti-dropbox"/>
+        <sidebar-link to="/admin/icons" name="Icons" icon="ti-pencil-alt2"/>
+        <sidebar-link to="/admin/notifications" name="Notifications" icon="ti-bell"/>
       </template>
       <mobile-menu>
         <li class="nav-item">

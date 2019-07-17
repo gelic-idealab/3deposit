@@ -13,41 +13,41 @@ import DepositProfile from "@/pages/DepositProfile.vue";
 
 const routes = [
   {
-    path: "/",
+    path: "/admin/",
     component: DashboardLayout,
     children: [
       {
-        path: "dashboard",
+        path: "/admin/dashboard",
         name: "dashboard",
         component: Dashboard
       },
       {
-        path: "stats",
+        path: "/admin/stats",
         name: "stats",
         component: UserProfile
       },
       {
-        path: "notifications",
+        path: "/admin/notifications",
         name: "notifications",
         component: Notifications
       },
       {
-        path: "icons",
+        path: "/admin/icons",
         name: "icons",
         component: Icons
       },
       {
-        path: "services",
+        path: "/admin/services",
         name: "services",
         component: Services
       },
       {
-        path: "deposits",
+        path: "/admin/deposits",
         name: "deposits",
         component: Deposits
       },
       {
-        path: "/:id", 
+        path: "/admin/:id", 
         name: "deposit-profile", 
         component: DepositProfile
       }

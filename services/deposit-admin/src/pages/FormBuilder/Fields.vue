@@ -102,25 +102,6 @@ export default {
           return false
         }
       }
-    },
-    submitDeposit: function () {
-      axios({
-        url: '../api/form/submit',
-        data: {
-          'media_type': this.fields[0].value,
-          'form': this.fields, 
-          'id': this.id
-          },
-        method: 'post',
-        config: { headers: {'Content-Type': 'application/json' }}
-        })
-      .then(function(response) {
-        if (response.status === 200) {
-          window.location.href = "/deposit";
-        } else {
-          (console.log(response));
-        }
-      });
     }
   }
 }

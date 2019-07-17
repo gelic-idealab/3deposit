@@ -5,7 +5,7 @@
     <h1>Sign In</h1>
 
     {% if error %}<div class="error" style="color: red;"><strong>Error:</strong> {{ error }}</div>{% endif %}
-    <form action="/login" method="post">
+    <form action="/api/login" method="post">
         <p>
             <label for="username">Username</label><br>
             <input id="username" name="username" type="text" value="" size=20 autofocus/>

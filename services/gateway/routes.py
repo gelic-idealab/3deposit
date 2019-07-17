@@ -27,35 +27,35 @@ def setup_routes(app):
     """
 
     # auth routes
-    app.router.add_get('/', index, name='index')
-    app.router.add_get('/login', login, name='login')
-    app.router.add_post('/login', login, name='login')
-    app.router.add_get('/logout', logout, name='logout')
+    app.router.add_get('/api/', index, name='index')
+    app.router.add_get('/api/login', login, name='login')
+    app.router.add_post('/api/login', login, name='login')
+    app.router.add_get('/api/logout', logout, name='logout')
 
     # service config routes
-    app.router.add_view('/services', services)
-    app.router.add_view('/services/configs', services_configs)
-    app.router.add_view('/services/actions', services_actions)
+    app.router.add_view('/api/services', services)
+    app.router.add_view('/api/services/configs', services_configs)
+    app.router.add_view('/api/services/actions', services_actions)
 
     # form routes
-    app.router.add_get('/form', deposit_form)
-    app.router.add_post('/form', deposit_form)
-    app.router.add_view('/form/upload', deposit_upload)
-    app.router.add_view('/form/submit', deposit_submit)
+    app.router.add_get('/api/form', deposit_form)
+    app.router.add_post('/api/form', deposit_form)
+    app.router.add_view('/api/form/upload', deposit_upload)
+    app.router.add_view('/api/form/submit', deposit_submit)
 
     # storage routes
-    app.router.add_get('/store/buckets', store_buckets)
-    app.router.add_post('/store/buckets', store_buckets)
-    app.router.add_get('/store/objects', store_objects)
-    app.router.add_post('/store/objects', store_objects)
+    app.router.add_get('/api/store/buckets', store_buckets)
+    app.router.add_post('/api/store/buckets', store_buckets)
+    app.router.add_get('/api/store/objects', store_objects)
+    app.router.add_post('/api/store/objects', store_objects)
 
     # publication routes
-    app.router.add_get('/publications', publications)
-    app.router.add_post('/publications', publications)
+    app.router.add_get('/api/publications', publications)
+    app.router.add_post('/api/publications', publications)
 
     # deposit routes
-    app.router.add_get('/deposits', deposits)
+    app.router.add_get('/api/deposits', deposits)
 
     # metadata routes
-    app.router.add_view('/metadata', metadata)
-    app.router.add_view('/metadata/keys', metadata_keys)
+    app.router.add_view('/api/metadata', metadata)
+    app.router.add_view('/api/metadata/keys', metadata_keys)

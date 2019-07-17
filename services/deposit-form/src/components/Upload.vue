@@ -31,7 +31,7 @@ export default {
   mounted () {
     let comp = this
     let r = new Resumable({ 
-            target:'http://gateway.docker.localhost/form/upload',
+            target:'../api/form/upload',
             chunkSize: 10*1024*1024, // 10MB
             maxFileSize: 1000*10*1024*1024, // 10GB
             testChunks: false,

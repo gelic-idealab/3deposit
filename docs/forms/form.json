@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
   "banner": {
     "title": "Active Deposit Form",
@@ -47,3 +48,64 @@
     }
   ]
 }
+=======
+{
+  "banner": {
+    "title": "Active Deposit Form",
+    "description": "Use this form to upload your 3d models, 360 videos, and VR source code & projects",
+    "instructions": "Your files will be deposited into a Library repository and published to a third-party website. You will receive a confirmation email when your deposit is processed."
+  },
+  "fields": [
+    {
+      "id": "media_type",
+      "label": "Media Type",
+      "type": "select",
+      "repeatable": false,
+      "required": true,
+      "value": [],
+      "options": [
+        { "value": "model", "label": "3d Model" },
+        { "value": "video", "label": "360 Video" },
+        { "value": "vr", "label": "VR project" }
+      ],
+      "dependsOn": {}
+    },
+    {
+      "id": "creator_name",
+      "label": "Creator Name",
+      "type": "text",
+      "repeatable": true,
+      "required": true,
+      "value": [],
+      "placeholder": "Enter creator name",
+      "dependsOn": {}
+    },
+    {
+      "id": "creator_status",
+      "label": "Creator Status",
+      "type": "select",
+      "repeatable": false,
+      "required": true,
+      "value": [],
+      "options": [
+        { "value": "u", "label": "Undergraduate" },
+        { "value": "g", "label": "Graduate" },
+        { "value": "f", "label": "Faculty" },
+        { "value": "s", "label": "Staff" },
+        { "value": "o", "label": "Other" }
+      ],
+      "dependsOn": {}
+    },
+    {
+        "id": "object_title",
+        "label":"Object Title",
+        "type": "text",
+        "repeatable": false,
+        "required": true,
+        "value": ["Pikachu"],
+        "placeholder": "Enter object title",
+        "dependsOn": {}
+    }
+  ]
+}
+>>>>>>> dev

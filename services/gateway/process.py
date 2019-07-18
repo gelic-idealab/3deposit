@@ -63,17 +63,36 @@ async def start_deposit_processing_task(data):
 
 
 async def trigger_store(conn, did):
-    fd = FormData()
-    deposit_id = dict({'deposit_id': did})
+        # async with ClientSession() as sess:
+        #     async with sess.request(url='/store/objects', method='POST', data=fd, params=deposit_id) as resp:
+        #         resp_json = await resp.json()
+        #         etag = resp_json.get('etag')
+        #         logging.debug(msg=f'trigger_store resp: {str(resp_json)}, {etag}')
+        #         return etag
+
+    PATH = '/object'
+    service_config = await get_service_config_by_action(conn=conn, action='store', media_type='default')
+    logging.debug(msg='trigger_store service_config: {}'.format(str(service_config)))
+    config = dict(service_config.get('config'))
+    endpoint = service_config.get('endpoint')
+    bucket_name = dict({'bucket_name': '3deposit'})
+    config.update(bucket_name)
+
     with open(TMP_FILE_LOCATION.format(did), 'rb') as f:
-        fd.add_field('file', f, filename=did, content_type='application/octet-stream')
-        async with ClientSession() as sess:
-            async with sess.request(url='/api/store/objects', method='POST', data=fd, params=deposit_id) as resp:
+        try:
+            deposit_id = dict({'deposit_id': did})
+            fd = FormData()
+            fd.add_field('file', f, filename=did, content_type='application/octet-stream')
+            fd.add_field('config', json.dumps(config), content_type='application/json')
+            fd.add_field('data', json.dumps(deposit_id), content_type='application/json')
+            async with new_request(method='POST', url=endpoint+PATH, data=fd) as resp:
                 resp_json = await resp.json()
                 etag = resp_json.get('etag')
                 logging.debug(msg=f'trigger_store resp: {str(resp_json)}, {etag}')
                 return etag
 
+        except Exception as err:
+            return web.json_response({'origin': 'gateway', 'err': str(err)})
 
 def extract_data_from_form(form):
     form_data = {}

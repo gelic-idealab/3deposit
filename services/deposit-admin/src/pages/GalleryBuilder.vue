@@ -1,25 +1,31 @@
 <template>
     <div>
-        <div class="card-columns" style="column-count: 5">
-            <!-- <div class="col-lg-15"> -->
-                <div class="card" v-for="(d, index) in order(this.deposits)" :key="index">
-                    <gallery-card 
-                        :deposit="d"
-                    >
-                    </gallery-card>
-                </div>
-            <!-- </div> -->
-        </div>
-        <filter-key @addFilter="addFilter">
+        <gallery :deposits="deposits" :column_count="column_count" :sortBy="sortBy" :filters="filters">
 
-        </filter-key>
+        </gallery>
+        <template v-for="(filter,index) in filters">
+            <div :key="index" class="row mb-2">
+                <filter-key class="col-10" :key="index" :filter="filter">
+
+                </filter-key>
+                <p-button type="danger" outline icon v-on:click.native="removeFilter(index)" :key="index">
+                    <i class="ti ti-trash"></i>
+                </p-button>
+            </div>
+        </template>
+        <p-button type="success" outline icon v-on:click.native="addFilter">
+            <i class="ti ti-filter"></i>
+        </p-button>
+        <input type="range" class="custom-range" min="1" max="5" v-model="column_count.columnCount">
+
     </div>
 </template>
 
 <script>
 import axios from 'axios';
-import GalleryCard from "./GalleryBuilder/GalleryCard.vue";
 import FilterKey from "./GalleryBuilder/FilterKey.vue"
+import Gallery from "./GalleryBuilder/Gallery.vue"
+import Button from "../components/Button.vue"
 
 export default {
     name: "gallery-builder",
@@ -30,36 +36,31 @@ export default {
                 field: 'deposit_date',
                 ascending: false
             },
-            filters: []
+            filters: [],
+            column_count: {
+                columnCount: 5
+            },
         }
     },
     components: {
-        GalleryCard,
-        FilterKey
+        FilterKey,
+        Gallery,
+        Button
     },
     created() {  
-        axios.get("http://localhost:8080/deposits")
+        axios.get("../api/deposits")
         .then(response => this.deposits = response.data.deposits)
     },
     methods: {
-        order(deposits) {
-             let sb = this.sortBy;
-             if (sb.field==='deposit_date') {
-                return deposits.slice().sort(function(a, b) {
-                    var atime = new Date(a.deposit_date);
-                    var btime = new Date(b.deposit_date);
-                    if(sb.ascending===true) {
-                        return atime.getTime() - btime.getTime();
-                    }
-                    else {
-                        return btime.getTime() - atime.getTime(); 
-                    }
-                });   
-            }
+        addFilter() {
+            this.filters.push({
+                key: '',
+                op: '',
+                value: ''
+            })
         },
-        addFilter(filter) {
-            this.filters.push(filter)
-            console.log("parent",filter)
+        removeFilter(index) {
+            this.filters.splice(index,1)
         }
     }
 }

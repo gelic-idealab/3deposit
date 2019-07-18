@@ -83,6 +83,8 @@ services:
     image: minio/minio:latest
     networks:
       - minio_internal
+    ports:
+      - 9000:9000
     volumes:
       - ./services/store-minio/data:/data
     environment:
@@ -145,6 +147,7 @@ services:
       - mongo-server
     networks:
       - mongo_internal
+      - gateway_internal
     environment: 
       FLASK_ENV: development
       FLASK_APP: mongo-service

@@ -47,9 +47,9 @@ export default {
         deposit: Object,
     },
     mounted() {
-        axios.get("http://localhost:8080/metadata", {params: {deposit_id: this.deposit.deposit_id}})
+        axios.get("../api/metadata", {params: {deposit_id: this.deposit.deposit_id}})
         .then(response => this.deposit_metadata = response.data.deposit_metadata);
-        axios.get("http://localhost:8080/publications", {params: {resource_id: this.deposit.resource_id, media_type: this.deposit.media_type}})
+        axios.get("../api/publications", {params: {resource_id: this.deposit.resource_id, media_type: this.deposit.media_type}})
         .then(response => this.publish_metadata = response.data);
     }
 }

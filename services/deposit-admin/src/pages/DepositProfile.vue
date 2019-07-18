@@ -60,13 +60,13 @@ export default {
     mounted() {
         this.id = this.$route.params.id;
         console.log(this.id);
-        axios.get("http://localhost:8080/metadata", {params: {deposit_id: this.id}})
+        axios.get("../../api/metadata", {params: {deposit_id: this.id}})
         .then(response => (this.deposit_metadata = response.data.deposit_metadata))
         .then(response => {
-            axios.get("http://localhost:8080/deposits", {params: {id: this.id}})
+            axios.get("../../api/deposits", {params: {id: this.id}})
             .then(response => (this.deposit = response.data))
             .then(response => {
-                axios.get("http://localhost:8080/publications", {params: {resource_id: this.deposit.resource_id, media_type: this.deposit_metadata.media_type}})
+                axios.get("../../api/publications", {params: {resource_id: this.deposit.resource_id, media_type: this.deposit_metadata.media_type}})
                 .then(response => (this.publish_metadata = response.data))
             })     
             .then(console.log(this.deposit.resource_id))

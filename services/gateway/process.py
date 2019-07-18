@@ -68,7 +68,7 @@ async def trigger_store(conn, did):
     with open(TMP_FILE_LOCATION.format(did), 'rb') as f:
         fd.add_field('file', f, filename=did, content_type='application/octet-stream')
         async with ClientSession() as sess:
-            async with sess.request(url='http://localhost:8080/store/objects', method='POST', data=fd, params=deposit_id) as resp:
+            async with sess.request(url='/api/store/objects', method='POST', data=fd, params=deposit_id) as resp:
                 resp_json = await resp.json()
                 etag = resp_json.get('etag')
                 logging.debug(msg=f'trigger_store resp: {str(resp_json)}, {etag}')

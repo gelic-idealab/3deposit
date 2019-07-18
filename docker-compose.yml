@@ -104,6 +104,7 @@ services:
       - minio-server
     networks:
       - minio_internal
+      - gateway_internal
     command: pipenv run flask run --host=0.0.0.0
     labels:
       - "traefik.enable=false" 

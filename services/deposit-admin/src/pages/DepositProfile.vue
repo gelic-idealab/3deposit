@@ -10,7 +10,7 @@
                         <h5 class="card-title">{{ deposit.deposit_id }}</h5>
                         <!-- <p class="card-text">{{ deposit_metadata }}</p> -->
                         <!-- <p class="card-text">{{ publish_metadata }}</p> -->
-                        <p class="card-text"><small class="text-muted">{{ deposit.deposit_date }}</small></p>
+                        <p class="card-text"><small class="text-muted">{{ deposit.deposit_date.substring(0, deposit.deposit_date.indexOf('.')) }}</small></p>
                     </div>
                 </div>
                 <div class="card">

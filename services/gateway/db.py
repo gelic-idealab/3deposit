@@ -108,12 +108,47 @@ async def update_deposit_by_id(conn, deposit_id, **kwargs):
     )
 
 
-async def get_deposits(conn):
-    result = await conn.execute(
-        deposits
-        .select()
-        .where(deposits.c.location != 'None')
-    )
+async def get_deposits(conn, filters):
+    logging.debug(msg="OUTSIDE IF")
+    if filters:
+        logging.debug(msg="FILTERS: "+str(filters))
+        clauses = []
+        for f in filters:
+            key = f['key']
+            op = f['op']
+            value = f['value']
+
+            op_dict = {
+                'Equals': '=',
+                'Excludes': '!=',
+                'Between': 'between',
+                'Greater Than': '>',
+                'Less Than': '<',
+                'Contains': 'like'
+            }
+
+            op_dict_char = op_dict[op]
+            if op_dict_char == 'between':
+                clauses.append(f"({key} {op_dict_char} {value.split(',')[0]} and {value.split(',')[1]})")
+            elif op_dict_char == 'like':
+                clauses.append(f"({key} {op_dict_char} '%{value}%')")
+            else:
+                clauses.append(f"({key} {op_dict_char} '{value}')")
+
+        where_clause = " and ".join(clauses)
+        logging.debug(msg="WHERE CLAUSE: "+where_clause)
+        query = f'select * from deposits where {where_clause}'
+        logging.debug(msg="QUERY LOG:"+query)
+        result = await conn.execute(query)
+
+    else:
+        result = await conn.execute(
+            deposits
+            .select()
+            .where(deposits.c.location != 'None')
+        )
+        logging.debug(msg="TEST")
+
     deposit_list = await result.fetchall()
     if deposit_list:
         column_keys = result.keys()
@@ -121,7 +156,7 @@ async def get_deposits(conn):
         for d in deposit_list:
             d_obj = {}
             for (i, k) in enumerate(column_keys):
-                d_obj.update(dict({k:str(d[i])}))
+                d_obj.update(dict({k: str(d[i])}))
             deposit_objects.append(d_obj)
         return deposit_objects
     else:

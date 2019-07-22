@@ -8,7 +8,7 @@ DEPOSIT_ID = str(uuid4())
 
 querystring = {"resumableChunkNumber": "1", "resumableTotalChunks": "1", "deposit_id": DEPOSIT_ID}
 
-f = open('C:\\Users\\Mihir Joshi\\Downloads\\medieval_village.zip', 'rb')
+f = open('medieval_village.zip', 'rb')
 files = {'file': f}
 
 headers = {

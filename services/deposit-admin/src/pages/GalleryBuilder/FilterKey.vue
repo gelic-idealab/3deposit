@@ -1,21 +1,25 @@
 <template>
     <div>
-        <div class="row">
-            <select class="custom-select col-4 mr-3" v-model="filter.key">
-                <template v-for="(key,index) in keys">
-                    <option :value="key" :key="index">
-                        {{ key }}
-                    </option>
-                </template>
-            </select>
-            <select class="custom-select col-4 mr-3" v-model="filter.op">
-                <template v-for="(op,index) in operators">
-                    <option :value="op" :key="index">
-                        {{ op }}
-                    </option>
-                </template>
-            </select>
-            <input class="mr-3" type="text" v-model="filter.value">
+        <div class="card text-center">
+            <div class="card-body">
+                <select class="custom-select mb-3 row form-control form-control-sm" v-model="filter.key">
+                    <template v-for="(key,index) in keys">
+                        <option :value="key" :key="index">
+                            {{ key }}
+                        </option>
+                    </template>
+                </select>
+                <select class="custom-select mb-3 row form-control form-control-sm" v-model="filter.op">
+                    <template v-for="(op,index) in operators">
+                        <option :value="op" :key="index">
+                            {{ op }}
+                        </option>
+                    </template>
+                </select>
+                <div class="mb-3 row input-group input-group-sm col col-offset-2" style="text-align: center">
+                    <input class="form-control form-control-sm" type="text" v-model="filter.value">
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -27,7 +31,7 @@ import Button from '../../components/Button.vue'
 
 export default {
     props: {
-        filter: Array,
+        filter: Object,
     },
     components: {
         Button
@@ -45,8 +49,7 @@ export default {
     },
     methods: {
         saveFilter() {
-            this.$emit('addFilter', temp);
-            console.log("save_filter",this.filter)
+           
         }
     }
 }

@@ -17,6 +17,7 @@
     "es6-promise": "^4.2.4",
     "jquery": "^3.4.0",
     "popper.js": "^1.15.0",
+    "querystring": "^0.2.0",
     "vue": "^2.5.13",
     "vue-clickaway": "^2.1.0",
     "vue-json-pretty": "^1.6.0",

@@ -58,8 +58,15 @@ export default {
   mounted() {
     axios
     .get('../api/services')
-    .then(response => (this.tables.services.data = response.data.services))
-    .then(() => (this.tables.services.columns = Object.keys(this.tables.services.data[0])));
+    .then(response => {
+      (this.tables.services.data = response.data.services)
+      (this.tables.services.columns = Object.keys(this.tables.services.data[0]));
+    },
+    error => {
+      if (error.response.status === 401) {
+        window.location.href = '../api/login';
+      }
+    });
 
     axios
     .get('../api/services/actions')

@@ -27,7 +27,7 @@ export default {
   mounted() {
     axios
     .get('../api/deposits')
-    .then(response => (this.tables.deposits.data = response.data.deposits))
+    .then(response => (this.tables.deposits.data = response.data))
     .then(() => (this.tables.deposits.columns = Object.keys(this.tables.deposits.data[0])));
 
   },

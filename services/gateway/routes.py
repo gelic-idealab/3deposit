@@ -13,7 +13,8 @@ from views import (
     publications,
     deposits,
     metadata,
-    metadata_keys
+    metadata_keys,
+    gallery
 )
 
 
@@ -59,3 +60,6 @@ def setup_routes(app):
     # metadata routes
     app.router.add_view('/api/metadata', metadata)
     app.router.add_view('/api/metadata/keys', metadata_keys)
+
+    # gallery routes
+    app.router.add_get('/api/gallery', gallery)

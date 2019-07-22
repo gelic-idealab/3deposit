@@ -400,35 +400,46 @@ async def publications(request):
 
 async def deposits(request):
     headers = {
-    'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
-    'Access-Control-Allow-Headers': 'content-type'
+        'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
+        'Access-Control-Allow-Headers': 'content-type'
     }
 
     if request.method == 'GET':
         try:
-            id = request.query.get('id')
-
-            if id:
+            if request.query.get('id'):
+                id = request.query.get('id')
+                logging.debug(msg=f'ID: {id}')
                 async with request.app['db'].acquire() as conn:
                     deposits = await db.get_deposit_by_id(conn=conn, deposit_id=id)
                     logging.debug(msg=f'deposits: {str(deposits)}')
                     return web.json_response(deposits, headers=headers)
 
-            elif request.query.get('filters'):
-                filters = json.loads(request.query.get('filters'))
-                logging.debug(msg=str(filters))
+            else:
                 async with request.app['db'].acquire() as conn:
-                    deposits = await db.get_deposits(conn=conn, filters=filters)
+                    deposits = await db.get_deposits(conn=conn)
                     logging.debug(msg=f'deposits: {str(deposits)}')
                     return web.json_response(deposits, headers=headers)
 
-            else:
-                async with request.app['db'].acquire() as conn:
-                    deposits = await db.get_deposits(conn=conn, filters=None)
-                    logging.debug(msg=f'deposits: {str(deposits)}')
-                    return web.json_response({'deposits': deposits}, headers=headers)
         except Exception as err:
             return web.json_response({'err': str(err)}, headers=headers)
+
+
+async def gallery(request):
+    if request.method == 'GET':
+        filters = None
+        if request.query.get('filters'):
+            filters = json.loads(request.query.get('filters'))
+
+        logging.debug(msg=str(filters))
+        fd = FormData()
+
+        config = dict({"filters": filters})
+        fd.add_field('config', json.dumps(config), content_type='application/json')
+
+        async with new_request(method='GET', url='http://mongo-service:5000/objects', data=fd) as resp:
+            logging.debug("MONGO ERROR:"+await resp.text())
+            resp_json = await resp.json()
+            return web.json_response({'deposits': resp_json}, headers=headers)
 
 
 async def metadata(request):

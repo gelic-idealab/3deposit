@@ -1,22 +1,22 @@
 <template>
     <div>
         <template v-if="deposit.media_type==='vr'">
-            <a :href="deposit.location">
+            <a :href="location">
                 <img class="card-img-top" src="../../assets/img/vr.svg"/>
             </a>
         </template>
         <template v-else-if="deposit.media_type==='model'">
-            <a :href="deposit.location">
+            <a :href="location">
                 <div class="embed-responsive embed-responsive-16by9">
                     <embed class="embed-responsive-item" :src="publish_metadata.thumbnails.images[2].url"/>
                 </div>
             </a>
         </template>
         <div class="card-body">
-            <h5 class="card-title mb-3">{{ deposit_metadata['Object Title'] }}</h5>
-            <p class="card-text">{{ deposit_metadata.description }}</p>
+            <h5 class="card-title mb-3">{{ deposit['object_title'] }}</h5>
+            <p class="card-text">{{ deposit.description }}</p>
         </div>
-        <div class="card-footer text-muted">{{ deposit.deposit_date.substring(0, deposit.deposit_date.indexOf('.')) }}</div>
+        <div class="card-footer text-muted">{{ deposit_date.substring(0, deposit_date.indexOf('.')) }}</div>
     </div>
 </template>
 <script>
@@ -27,7 +27,9 @@ import axios from 'axios'
 export default {
     data() {
         return {
-            deposit_metadata: {},
+            resource_id: '',
+            location: '',
+            deposit_date: '',
             publish_metadata: {
                 thumbnails: {
                     images: [{
@@ -47,8 +49,12 @@ export default {
         deposit: Object,
     },
     mounted() {
-        axios.get("../api/metadata", {params: {deposit_id: this.deposit.deposit_id}})
-        .then(response => this.deposit_metadata = response.data.deposit_metadata);
+        axios.get("../api/deposits", {params: {deposit_id: this.deposit.deposit_id}})
+        .then(response => {
+            this.resource_id = response.data.resource_id;
+            this.location = response.data.location;
+            this.deposit_date = response.data.deposit_date;
+        });
         axios.get("../api/publications", {params: {resource_id: this.deposit.resource_id, media_type: this.deposit.media_type}})
         .then(response => this.publish_metadata = response.data);
     }

@@ -18,12 +18,7 @@ def create_client(request):
     username = 'root'
     password = 'example'
 
-    client = MongoClient(
-        'mongodb://{username}:{password}@mongo-server:27017/'.format(
-            username=username,
-            password=password
-        )
-    )
+    client = MongoClient(f'mongodb://{username}:{password}@mongo-server:27017/')
 
     return client
 
@@ -37,7 +32,7 @@ def create_app():
         database = client['3deposit']
         map = Code("function() { for (var key in this.deposit_metadata) { emit(key, null); } }")
         reduce = Code("function(key, stuff) { return null; }")
-        result = database[COLLECTION_NAME].map_reduce(map, reduce, "myresults")
+        result = database[COLLECTION_NAME].map_reduce(map, reduce, "metadata_keys")
         return jsonify({"keys": result.distinct('_id')})
 
 
@@ -90,13 +85,50 @@ def create_app():
                 # JSONEncoder().encode()
 
                 collection = database[COLLECTION_NAME]
-                logging.debug(msg="MONGO GET COLLECTION: "+str(collection))
-                logging.debug(msg="MONGO GET COLLECTION: "+str(dir(collection)))
 
-                document = collection.find_one(filter={"deposit_id": deposit_id}, projection={'_id': False})
-                # deposit_metadata = document.get('deposit_metadata')
+                if deposit_id:
+                    document = collection.find_one(filter={"deposit_id": deposit_id}, projection={'_id': False})    
+                    return jsonify(document)
 
-                return jsonify(document)
+                if len(config.get('filters')) > 0:
+                    filters = config.get('filters')
+                    logging.debug(msg="FILTERS: "+str(filters))
+                    where_clause = {}
+
+                    for f in filters:
+                        key = f['key']
+                        op = f['op']
+                        value = f['value']
+
+                        op_dict = {
+                            'Equals': '=',
+                            'Excludes': '$ne',
+                            'Between': 'between',
+                            'Greater Than': '$gt',
+                            'Less Than': '$lt',
+                            'Contains': '~~*'
+                        }
+
+                        key = f'deposit_metadata.{key}'
+
+                        op_dict_char = op_dict[op]
+                        if op_dict_char == op_dict['Between']:
+                            where_clause.update({key: {'$gte': value.split(',')[0], '$lte': value.split(',')[1]}})
+                        elif op_dict_char == op_dict['Contains']:
+                            where_clause.update({key: {'$regex': f'.*{value}.*'}})
+                        elif op_dict_char in [op_dict['Excludes'], op_dict['Greater Than'], op_dict['Less Than']]:
+                            where_clause.update({key: {op_dict_char: value}})
+                        elif op_dict_char == op_dict['Equals']:
+                            where_clause.update({key: value})
+
+                    # logging.debug(msg=f'WHERE CLAUSE: {str(where_clause)}')
+                    docs = collection.find(filter=where_clause, projection={'_id': False})
+                    doc_list = []
+
+                    for doc in docs:
+                        doc_list.append(doc)
+
+                    return jsonify(doc_list)
 
             except Exception as err:
                 return jsonify({"err": str(err)})

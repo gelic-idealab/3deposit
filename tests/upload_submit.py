@@ -32,7 +32,7 @@ payload_dict = {
     'id': DEPOSIT_ID,
     'form': [
         {
-            'label': 'Object Title',
+            'label': 'object_title',
             'value': 'test'
         },
         {

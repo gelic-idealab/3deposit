@@ -125,22 +125,26 @@ services:
     labels:
       - "traefik.enable=false" 
 
-  # mongo-express:
-  #   image: mongo-express
-  #   restart: always
-  #   networks:
-  #     - mongo_internal
-  #     - proxy
-  #   environment:
-  #     ME_CONFIG_MONGODB_ADMINUSERNAME: root
-  #     ME_CONFIG_MONGODB_ADMINPASSWORD: example
-  #     ME_CONFIG_MONGODB_SERVER: mongo-server
-  #   labels:
-  #     - "traefik.enable=false" 
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    networks:
+      - mongo_internal
+      - proxy
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_SERVER: mongo-server
+    labels:
+      - "traefik.enable=false" 
 
   mongo-service:
     build: ./services/store-mongo/
     container_name: mongo-service
+    ports:
+      - 5001:5000
     depends_on:
       - mongo-server
     links: 

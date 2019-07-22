@@ -60,8 +60,8 @@ export default {
         Button
     },
     created() {  
-        axios.get("../api/deposits")
-        .then(response => this.deposits = response.data.deposits)
+        axios.get("../api/gallery")
+        .then(response => this.deposits = response.data)
     },
     methods: {
         addFilter() {
@@ -77,9 +77,9 @@ export default {
         applyFilter() {
             let qs = JSON.stringify(this.filters);
 
-            axios.get("../api/deposits", {params: {filters: qs}})
+            axios.get("../api/gallery", {params: {filters: qs}})
             .then(response => {
-                this.deposits = response.data
+                this.deposits = response.data.deposits
                 console.log(response.data)
             })  
         }

@@ -2,5 +2,5 @@ module.exports = {
     devServer: {
         disableHostCheck: true
     },
-    baseUrl: '/deposit/'
+    publicPath: '/deposit'
 }

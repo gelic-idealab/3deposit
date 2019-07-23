@@ -5,5 +5,5 @@ module.exports = {
   chainWebpack: config => {
     config.module.rules.delete('eslint');
   },
-  baseUrl: '/admin'
+  publicPath: '/admin'
 }

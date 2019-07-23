@@ -61,7 +61,7 @@ export default {
     },
     created() {  
         axios.get("../api/gallery")
-        .then(response => this.deposits = response.data)
+        .then(response => this.deposits = response.data.deposits)
     },
     methods: {
         addFilter() {

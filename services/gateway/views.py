@@ -406,8 +406,8 @@ async def deposits(request):
 
     if request.method == 'GET':
         try:
-            if request.query.get('id'):
-                id = request.query.get('id')
+            if request.query.get('deposit_id'):
+                id = request.query.get('deposit_id')
                 logging.debug(msg=f'ID: {id}')
                 async with request.app['db'].acquire() as conn:
                     deposits = await db.get_deposit_by_id(conn=conn, deposit_id=id)
@@ -439,14 +439,14 @@ async def gallery(request):
         async with new_request(method='GET', url='http://mongo-service:5000/objects', data=fd) as resp:
             logging.debug("MONGO ERROR:"+await resp.text())
             resp_json = await resp.json()
-            return web.json_response({'deposits': resp_json}, headers=headers)
+            return web.json_response({'deposits': resp_json})
 
 
 async def metadata(request):
-    headers = {
-        'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
-        'Access-Control-Allow-Headers': 'content-type'
-    }
+    # headers = {
+    #     'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
+    #     'Access-Control-Allow-Headers': 'content-type'
+    # }
 
     if request.method == 'GET':
         try:
@@ -459,24 +459,24 @@ async def metadata(request):
             async with new_request(method='GET', url='http://mongo-service:5000/objects', data=fd) as resp:
                 logging.debug("MONGO ERROR:"+await resp.text())
                 resp_json = await resp.json()
-                return web.json_response(resp_json, headers=headers)
+                return web.json_response(resp_json)
 
         except Exception as err:
-            return web.json_response({ 'err': str(err) }, headers=headers)
+            return web.json_response({'err': str(err)})
 
 
 async def metadata_keys(request):
-    headers = {
-        'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
-        'Access-Control-Allow-Headers': 'content-type'
-    }
+    # headers = {
+    #     'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
+    #     'Access-Control-Allow-Headers': 'content-type'
+    # }
 
     if request.method == 'GET':
         try:
             async with new_request(method='GET', url='http://mongo-service:5000/keys') as resp:
                 logging.debug("MONGO KEYS ERROR:"+await resp.text())
                 resp_json = await resp.json()
-                return web.json_response(resp_json, headers=headers)
+                return web.json_response(resp_json)
 
         except Exception as err:
-            return web.json_response({'err': str(err)}, headers=headers)
+            return web.json_response({'err': str(err)})

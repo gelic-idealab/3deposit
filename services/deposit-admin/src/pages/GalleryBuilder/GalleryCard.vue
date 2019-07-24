@@ -8,7 +8,15 @@
         <template v-else-if="deposit.deposit_metadata.media_type==='model'">
             <a :href="location">
                 <div class="embed-responsive embed-responsive-16by9">
-                    <embed class="embed-responsive-item" :src="publish_metadata.thumbnails.images[2].url"/>
+                    <!-- <embed class="embed-responsive-item" :src="publish_metadata.thumbnails.images[2].url"/> -->
+                    <embed class="embed-responsive-item" :src="location"/>
+                </div>
+            </a>
+        </template>
+        <template v-else-if="deposit.deposit_metadata.media_type==='video'">
+            <a :href="location">
+                <div class="embed-responsive embed-responsive-16by9">
+                    <embed class="embed-responsive-item" :src="location"/>
                 </div>
             </a>
         </template>

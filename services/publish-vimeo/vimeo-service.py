@@ -53,7 +53,7 @@ def handler():
 
                 os.remove(filename)
                 resource_id = uri.split('/')[-1]
-                return jsonify({"resource_id": resource_id, "location": "https://vimeo.com/{}".format(resource_id)})
+                return jsonify({"resource_id": resource_id, "location": "https://player.vimeo.com/video/{}".format(resource_id)})
             else:
                 return jsonify({'err': 'No file provided'})
         except Exception as err:
@@ -64,8 +64,8 @@ def handler():
         try:
             data = json.loads(request.form.get('data'))
             vid = data.get('resource_id')
-            url = 'https://api.vimeo.com/videos/{vid}/pictures'
-            r = requests.get(url)
+            url = 'https://api.vimeo.com/videos/{}/pictures'.format(vid)
+            r = client.get(url)
             return jsonify(r.json())
         except Exception as err:
             return jsonify({ 'err': str(err) })

@@ -26,9 +26,17 @@
             </div>
             <div class="row mb-2">
                 <div class=" col-10">
-                    <div class="card text-center">
+                    <div class="card">
                         <div class="card-body col-12">
-                            <multiselect v-model="media_filter.selected" :options="media_filter.value"></multiselect>
+                            <template v-for="option in media_filter.options">
+                                <div class="form-check" :key="option.value">
+                                    <label class="form-check-label">
+                                        <input class="form-check-input" :id="option.value" :value="option.value" v-model="media_filter.value" type="checkbox" checked>
+                                        {{ option.label }}
+                                        <span class="check"></span>
+                                    </label>
+                                </div>
+                            </template>
                         </div>
                     </div>
                 </div>
@@ -78,7 +86,7 @@ export default {
             },
             filters: [],
             column_count: {
-                columnCount: 5
+                columnCount: 3
             },
             date_filter: {
                 key: 'deposit_date',
@@ -89,7 +97,20 @@ export default {
                 key: 'media_type',
                 op: 'Equals',
                 value: ['model', 'vr', 'video'],
-                selected: []
+                options: [
+                    {
+                        label: 'Model',
+                        value: 'model'
+                    },
+                    {
+                        label: 'VR App',
+                        value: 'vr'
+                    },
+                    {
+                        label: '360 Video',
+                        value: 'video'
+                    }
+                ]
             }
         }
     },
@@ -117,7 +138,8 @@ export default {
             this.filters.splice(index,1);
         },
         applyFilter() {
-            let qs = JSON.stringify(this.filters);
+            let all_filters = this.filters.concat([media_filter,date_filter])
+            let qs = JSON.stringify(all_filters);
 
             axios.get("../api/gallery", {params: {filters: qs}})
             .then(response => {

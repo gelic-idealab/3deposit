@@ -12,13 +12,24 @@
                     Apply
                 </p-button>
             </div>
-            <div class="row mb-2 col-10">
+            <div class="row mb-2">
+                <div class=" col-10">
                     <div class="card text-center">
-                    <div class="card-body">
-                        <el-date-picker type="datetime" placeholder="Select Start Date" v-model="date_filter.value[0]">
-                        </el-date-picker>
-                        <el-date-picker type="datetime" placeholder="Select End Date" v-model="date_filter.value[1]">
-                        </el-date-picker>
+                        <div class="card-body col-12">
+                            <el-date-picker class="row" type="datetime" placeholder="Select Start Date" v-model="date_filter.value[0]">
+                            </el-date-picker>
+                            <el-date-picker class="row" type="datetime" placeholder="Select End Date" v-model="date_filter.value[1]">
+                            </el-date-picker>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class=" col-10">
+                    <div class="card text-center">
+                        <div class="card-body col-12">
+                            <multiselect v-model="media_filter.selected" :options="media_filter.value"></multiselect>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -45,6 +56,7 @@
 import FilterKey from "./GalleryBuilder/FilterKey.vue";
 import Gallery from "./GalleryBuilder/Gallery.vue";
 import Button from "../components/Button.vue";
+import Multiselect from 'vue-multiselect'
 
 import axios from 'axios';
 import querystring from 'querystring';
@@ -76,7 +88,8 @@ export default {
             media_filter: {
                 key: 'media_type',
                 op: 'Equals',
-                value: ['model', 'vr', 'video']
+                value: ['model', 'vr', 'video'],
+                selected: []
             }
         }
     },
@@ -85,7 +98,8 @@ export default {
         Gallery,
         Button,
         [DatePicker.name]: DatePicker,
-        [TimeSelect.name]: TimeSelect
+        [TimeSelect.name]: TimeSelect,
+        Multiselect
     },
     created() {  
         axios.get("../api/gallery")
@@ -114,6 +128,8 @@ export default {
     }
 }
 </script>
+
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 
 <style>
 </style>

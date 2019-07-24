@@ -34,7 +34,7 @@ export default {
         filter: Object,
     },
     components: {
-        Button
+        Button,
     },
     data() {
         return {
@@ -50,12 +50,19 @@ export default {
     methods: {
         saveFilter() {
            
-        }
+        },
     }
 }
+
+// $(function() {
+//     $('#datetimepicker1').datetimepicker();
+// });
+
 </script>
 
 
 <style>
+
+    .fast .toggle-group { transition: left 0.1s; -webkit-transition: left 0.1s; }
 
 </style>

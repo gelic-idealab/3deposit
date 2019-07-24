@@ -116,7 +116,7 @@ def create_app():
                             if op_dict_char == op_dict['Between']:
                                 where_clause.update({key: {'$gte': value.split(',')[0], '$lte': value.split(',')[1]}})
                             elif op_dict_char == op_dict['Contains']:
-                                where_clause.update({key: {'$regex': f'.*{value}.*'}})
+                                where_clause.update({key: {'$regex': f'.*{value}.*', '$options': 'i'}})
                             elif op_dict_char in [op_dict['Excludes'], op_dict['Greater Than'], op_dict['Less Than']]:
                                 where_clause.update({key: {op_dict_char: value}})
                             elif op_dict_char == op_dict['Equals']:

@@ -68,7 +68,6 @@
 <script>
 import axios from 'axios';
 
-
 export default {
   name: 'Fields',
   props: {

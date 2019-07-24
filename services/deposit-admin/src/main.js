@@ -4,6 +4,7 @@ import router from "./router/index";
 import PaperDashboard from "./plugins/paperDashboard";
 import "vue-notifyjs/themes/default.css";
 
+
 Vue.use(PaperDashboard);
 
 /* eslint-disable no-new */

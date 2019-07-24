@@ -37,6 +37,7 @@
     </div>
 </template>
 
+
 <script>
 import axios from 'axios';
 import EmbedCard from "./DepositProfile/EmbedCard.vue";
@@ -74,5 +75,8 @@ export default {
     }
 };
 </script>
+
+
 <style>
+
 </style>

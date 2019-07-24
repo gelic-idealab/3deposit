@@ -52,6 +52,17 @@ async def start_deposit_processing_task(data):
                     resource_id=publish_resp.get('resource_id'),
                     media_type=media_type
                 )
+
+                # await db.update_deposit_by_id(
+                #     conn,
+                #     deposit_id=deposit_id,
+                #     etag=etag,
+                #     mongo_id=mongo_id,
+                #     location=publish_resp.get('location'),
+                #     resource_id=publish_resp.get('resource_id'),
+                #     media_type=media_type
+                # )
+
             if os.path.exists(TMP_FILE_LOCATION.format(deposit_id)):
                 os.remove(TMP_FILE_LOCATION.format(deposit_id))
             return True

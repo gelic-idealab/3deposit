@@ -96,7 +96,7 @@ async def services(request):
 async def services_configs(request):
     username = await authorized_userid(request)
     if not username:
-        raise redirect(request.app.router, 'login')
+        raise web.HTTPUnauthorized()
     headers = {
         'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
         'Access-Control-Allow-Headers': 'content-type'
@@ -131,7 +131,7 @@ async def services_configs(request):
 async def services_actions(request):
     username = await authorized_userid(request)
     if not username:
-        raise redirect(request.app.router, 'login')
+        raise web.HTTPUnauthorized()
     if request.method == 'GET':
         try:
             q = request.query
@@ -275,6 +275,9 @@ Endpoints are scoped for objects and buckets
 
 
 async def store_buckets(request):
+    username = await authorized_userid(request)
+    if not username:
+        raise web.HTTPUnauthorized()
     PATH = '/bucket'
     async with request.app['db'].acquire() as conn:
         service_config = await get_service_config_by_action(conn=conn, action='store', media_type='default')
@@ -310,6 +313,9 @@ async def store_buckets(request):
 
 
 async def store_objects(request):
+    username = await authorized_userid(request)
+    if not username:
+        raise web.HTTPUnauthorized()
     PATH = '/object'
     async with request.app['db'].acquire() as conn:
         service_config = await get_service_config_by_action(conn=conn, action='store', media_type='default')
@@ -361,6 +367,9 @@ Relay endpoint to get/post to Model publication service
 
 
 async def publications(request):
+    username = await authorized_userid(request)
+    if not username:
+        raise web.HTTPUnauthorized()
     headers = {
         'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
         'Access-Control-Allow-Headers': 'content-type'
@@ -425,6 +434,9 @@ async def deposits(request):
 
 
 async def gallery(request):
+    username = await authorized_userid(request)
+    if not username:
+        raise web.HTTPUnauthorized()
     if request.method == 'GET':
         filters = None
         if request.query.get('filters'):
@@ -443,6 +455,9 @@ async def gallery(request):
 
 
 async def metadata(request):
+    username = await authorized_userid(request)
+    if not username:
+        raise web.HTTPUnauthorized()
     # headers = {
     #     'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
     #     'Access-Control-Allow-Headers': 'content-type'
@@ -466,6 +481,9 @@ async def metadata(request):
 
 
 async def metadata_keys(request):
+    username = await authorized_userid(request)
+    if not username:
+        raise web.HTTPUnauthorized()
     # headers = {
     #     'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
     #     'Access-Control-Allow-Headers': 'content-type'

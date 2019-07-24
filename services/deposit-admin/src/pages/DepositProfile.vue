@@ -65,7 +65,7 @@ export default {
         .then(response => (this.deposit_metadata = response.data.deposit_metadata))
         .then(response => {
             axios.get("../../api/deposits", {params: {id: this.id}})
-            .then(response => (this.deposit = response.data))
+            .then(response => (this.deposit = response.data[0]))
             .then(response => {
                 axios.get("../../api/publications", {params: {resource_id: this.deposit.resource_id, media_type: this.deposit_metadata.media_type}})
                 .then(response => (this.publish_metadata = response.data))

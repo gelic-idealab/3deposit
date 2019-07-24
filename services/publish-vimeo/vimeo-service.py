@@ -30,7 +30,8 @@ def post_file():
         try:
             # unpack payload
             data = json.loads(request.form.get('data'))
-            name = data.get('name')
+            data = data.get('metadata')
+            name = data.get('object_title')
             description = data.get('description')
             filename = data.get('filename')
             projection = data.get('projection')

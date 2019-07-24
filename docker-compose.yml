@@ -52,8 +52,8 @@ services:
     networks:
       - gateway_internal
       - proxy
-    # command: bash -c "pipenv run python init_db.py && pipenv run python gateway.py"
-    command: bash -c "pipenv run python gateway.py"
+    command: bash -c "pipenv run python init_db.py && pipenv run python gateway.py"
+    # command: bash -c "pipenv run python gateway.py"
     labels:
       - "traefik.enable=true"
       - "traefik.frontend.rule=PathPrefix:/api"
@@ -182,6 +182,19 @@ services:
     command: pipenv run flask run --host=0.0.0.0
     labels:
       - "traefik.enable=false"
+
+  vimeo-service:
+    build: ./services/publish-vimeo/
+    container_name: vimeo-service
+    networks:
+      - gateway_internal
+    environment: 
+      FLASK_ENV: development
+      FLASK_APP: vimeo-service
+    command: pipenv run flask run --host=0.0.0.0
+    labels:
+      - "traefik.enable=false" 
+
 networks:
     proxy:
         external: true

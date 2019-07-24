@@ -408,6 +408,9 @@ async def publications(request):
 
 
 async def deposits(request):
+    username = await authorized_userid(request)
+    if not username:
+        raise web.HTTPUnauthorized()
     headers = {
         'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
         'Access-Control-Allow-Headers': 'content-type'

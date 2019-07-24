@@ -71,12 +71,16 @@ export default {
     axios
     .get('../api/services/actions')
     // .then(response => console.log(response))
-    .then(response => (this.tables.actions.data = response.data.services))
+    .then(response => {
+      this.tables.actions.data = response.data.services
+    },
+    error => {
+      if (error.response.status === 401) {
+        window.location.href = '../api/login';
+        }
+    })
     .then(() => (this.tables.actions.columns = Object.keys(this.tables.actions.data[0])));
 
-    
-    // .then(response => (this.table2.data = response.data.actions))
-    // .then(() => (this.table1.columns = Object.keys(this.table1.data[0])))
   },
   data() {
     return {

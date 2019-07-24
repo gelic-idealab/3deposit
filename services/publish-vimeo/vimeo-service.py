@@ -64,7 +64,7 @@ def handler():
         try:
             data = json.loads(request.form.get('data'))
             vid = data.get('resource_id')
-            url = 'https://api.vimeo.com/videos/{}/pictures'.format(vid)
+            url = '/videos/{}/pictures'.format(vid)
             r = client.get(url)
             return jsonify(r.json())
         except Exception as err:

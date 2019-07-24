@@ -124,7 +124,14 @@ export default {
     },
     created() {  
         axios.get("../api/gallery")
-        .then(response => this.deposits = response.data.deposits)
+        .then(response => {
+            this.deposits = response.data.deposits
+        },
+        error => {
+            if (error.response.status === 401) {
+                window.location.href = '../api/login';
+        }
+    });
     },
     methods: {
         addFilter() {

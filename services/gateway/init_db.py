@@ -121,7 +121,7 @@ def create_default_services(engine):
             },
             {
                 'name': 'vimeo',
-                "endpoint": 'http://vimeo-service:5000/vimeo',
+                "endpoint": 'http://vimeo-service:5000/',
                 'config': {"auth": {"client_id": keys.VIMEO_CLIENT_ID, "access_token": keys.VIMEO_ACCESS_TOKEN, "client_secret": keys.VIMEO_CLIENT_SECRET}}
             },
             {

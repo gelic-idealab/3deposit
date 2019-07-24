@@ -11,22 +11,25 @@ and publishes to Vimeo.
 
 app = Flask(__name__)
 
-@app.route('/vimeo', methods=['POST', 'GET'])
-def post_file():
+
+@app.route('/', methods=['POST', 'GET'])
+def handler():
+
+    # get auth values from request object
+    config = json.loads(request.form.get('config'))
+    auth = config.get('auth')
+    access_token = auth.get('access_token')
+    client_id = auth.get('client_id')          
+    client_secret = auth.get('client_secret')
+
+    # construct client
+    client = vimeo.VimeoClient(
+        token=access_token,
+        key=client_id,
+        secret=client_secret
+    )
+
     if request.method == 'POST':
-
-        config = json.loads(request.form.get('config'))
-        auth = config.get('auth')
-        access_token = auth.get('access_token')
-        client_id = auth.get('client_id')          
-        client_secret = auth.get('client_secret')
-        # construct request
-        client = vimeo.VimeoClient(
-            token=access_token,
-            key=client_id,
-            secret=client_secret
-        )
-
         try:
             # unpack payload
             data = json.loads(request.form.get('data'))
@@ -56,6 +59,16 @@ def post_file():
         except Exception as err:
             return jsonify({'err': str(err)})
 
+
+    if request.method == 'GET':
+        try:
+            data = json.loads(request.form.get('data'))
+            vid = data.get('resource_id')
+            url = 'https://api.vimeo.com/videos/{vid}/pictures'
+            r = requests.get(url)
+            return jsonify(r.json())
+        except Exception as err:
+            return jsonify({ 'err': str(err) })
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -44,7 +44,7 @@ payload_dict = {
         },
         {
             'label': 'projection',
-            'value': 'equirectangular'
+            'value': 'cylindrical'
         },
         {
             'label': 'stereo_format',

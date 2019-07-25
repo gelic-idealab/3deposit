@@ -112,7 +112,6 @@ async def get_deposits(conn):
     result = await conn.execute(
         deposits
         .select()
-        .where(deposits.c.location != 'None')
     )
 
     deposit_list = await result.fetchall()

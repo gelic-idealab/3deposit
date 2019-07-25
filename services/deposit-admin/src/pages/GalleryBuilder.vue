@@ -16,9 +16,9 @@
                 <div class=" col-10">
                     <div class="card text-center">
                         <div class="card-body col-12">
-                            <el-date-picker class="row" type="datetime" placeholder="Select Start Date" v-model="date_filter.value[0]">
+                            <el-date-picker class="row" type="datetime" placeholder="Select Start Date" v-model="date_filter.value[0][0]">
                             </el-date-picker>
-                            <el-date-picker class="row" type="datetime" placeholder="Select End Date" v-model="date_filter.value[1]">
+                            <el-date-picker class="row" type="datetime" placeholder="Select End Date" v-model="date_filter.value[0][1]">
                             </el-date-picker>
                         </div>
                     </div>
@@ -91,7 +91,7 @@ export default {
             date_filter: {
                 key: 'deposit_date',
                 op: 'Between',
-                value: []
+                value: [[]]
             },
             media_filter: {
                 key: 'media_type',
@@ -138,16 +138,28 @@ export default {
             this.filters.push({
                 key: '',
                 op: '',
-                value: ''
+                value: ['']
             })
         },
         removeFilter(index) {
             this.filters.splice(index,1);
         },
         applyFilter() {
-            let all_filters = this.filters.concat([media_filter,date_filter])
+            let formatted_date_filter = {};
+            formatted_date_filter.key = this.date_filter.key
+            formatted_date_filter.op = this.date_filter.op
+            formatted_date_filter.value = [[]]
+            this.date_filter.value.forEach(function(value, index) { 
+                formatted_date_filter.value[index][0] = Date.parse(value[0])/1000
+                formatted_date_filter.value[index][1] = Date.parse(value[1])/1000
+            })
+
+            
+
+            let all_filters = this.filters.concat([this.media_filter, formatted_date_filter])
             let qs = JSON.stringify(all_filters);
 
+            console.log(all_filters)
             axios.get("../api/gallery", {params: {filters: qs}})
             .then(response => {
                 this.deposits = response.data.deposits
@@ -158,7 +170,6 @@ export default {
 }
 </script>
 
-<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 
 <style>
 </style>

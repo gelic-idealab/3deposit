@@ -6,6 +6,7 @@ from pymongo import MongoClient
 from unpack.unpack import get_value
 import logging
 from bson import Code
+from datetime import datetime
 
 DATABASE_NAME = '3deposit'
 COLLECTION_NAME = 'deposits'
@@ -61,6 +62,11 @@ def create_app():
 
             data = json.loads(request.form.get('data'))
             deposit_id = data.get('deposit_id')
+            deposit_metadata = data.get('deposit_metadata')
+            current_timestamp = round(datetime.timestamp(datetime.now()))
+            deposit_metadata.update({'deposit_date': current_timestamp})
+            data.update(deposit_metadata)
+            data.update({'deposit_date': current_timestamp})
 
             if not deposit_id:
                 return jsonify({"err": "Please enter a valid deposit_id."})
@@ -113,17 +119,42 @@ def create_app():
                             key = f'deposit_metadata.{key}'
 
                             op_dict_char = op_dict[op]
-                            if op_dict_char == op_dict['Between']:
-                                where_clause.update({key: {'$gte': value.split(',')[0], '$lte': value.split(',')[1]}})
-                            elif op_dict_char == op_dict['Contains']:
-                                where_clause.update({key: {'$regex': f'.*{value}.*', '$options': 'i'}})
-                            elif op_dict_char in [op_dict['Excludes'], op_dict['Greater Than'], op_dict['Less Than']]:
-                                where_clause.update({key: {op_dict_char: value}})
-                            elif op_dict_char == op_dict['Equals']:
-                                where_clause.update({key: value})
+
+                            if len(value) == 1:
+                                value = value[0]
+                                if op_dict_char == op_dict['Between']:
+                                    where_clause.update({key: {'$gte': value[0], '$lte': value[1]}})
+                                elif op_dict_char == op_dict['Contains']:
+                                    where_clause.update({key: {'$regex': f'.*{value}.*', '$options': 'i'}})
+                                elif op_dict_char in [op_dict['Excludes'], op_dict['Greater Than'], op_dict['Less Than']]:
+                                    where_clause.update({key: {op_dict_char: value}})
+                                elif op_dict_char == op_dict['Equals']:
+                                    where_clause.update({key: value})
+
+                            else:
+                                temp = []
+                                if op_dict_char == op_dict['Between']:
+                                    for index, v in enumerate(value):
+                                        temp.append({key: {'$gte': v[index][0], '$lte': v[index][1]}})
+                                    where_clause.update({"$or": temp})
+
+                                elif op_dict_char == op_dict['Contains']:
+                                    for v in value:
+                                        temp.append({key: {'$regex': f'.*{v}.*', '$options': 'i'}})
+                                    where_clause.update({"$or": temp})
+
+                                elif op_dict_char in [op_dict['Excludes'], op_dict['Greater Than'], op_dict['Less Than']]:
+                                    for v in value:
+                                        temp.append({op_dict_char: v})
+                                    where_clause.update({"$or": temp})
+
+                                elif op_dict_char == op_dict['Equals']:
+                                    for v in value:
+                                        temp.append({key: v})
+                                    where_clause.update({"$or": temp})
 
                         # logging.debug(msg=f'WHERE CLAUSE: {str(where_clause)}')
-                        docs = collection.find(filter=where_clause, projection={'_id': False})
+                        docs = collection.find(where_clause, projection={'_id': False})
                         doc_list = []
 
                         for doc in docs:

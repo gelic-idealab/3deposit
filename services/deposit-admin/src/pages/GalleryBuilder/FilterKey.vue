@@ -16,9 +16,11 @@
                         </option>
                     </template>
                 </select>
-                <div class="mb-3 row input-group input-group-sm col col-offset-2" style="text-align: center">
-                    <input class="form-control form-control-sm" type="text" v-model="filter.value">
-                </div>
+                <template v-for="(v, index) in filter.value">                
+                    <div class="mb-3 row input-group input-group-sm col col-offset-2" style="text-align: center" :key="index">
+                        <input class="form-control form-control-sm" type="text" v-model="filter.value[index]">
+                    </div>
+                </template>
             </div>
         </div>
     </div>

@@ -31,27 +31,27 @@ payload_dict = {
     'id': DEPOSIT_ID,
     'form': [
         {
-            'label': 'object_title',
+            'id': 'object_title',
             'value': 'Test 360 video'
         },
         {
-            'label': 'media_type',
+            'id': 'media_type',
             'value': 'video'
         },
         {
-            'label': 'description',
+            'id': 'description',
             'value': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'
         },
         {
-            'label': 'projection',
+            'id': 'projection',
             'value': 'cylindrical'
         },
         {
-            'label': 'stereo_format',
+            'id': 'stereo_format',
             'value': 'mono'
         },
         {
-            'label': 'filename',
+            'id': 'filename',
             'value': 'test360.mp4'
         }
     ]

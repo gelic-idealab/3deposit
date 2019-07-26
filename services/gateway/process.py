@@ -7,21 +7,22 @@ import db
 from aiopg.sa import create_engine
 from aiohttp import web, FormData, ClientSession
 from aiohttp import request as new_request
+from settings import get_config
 
 
 TMP_FILE_LOCATION = './data/{}'
 
-
 async def get_service_engine():
+    conf = get_config()['postgres']
     engine = await create_engine(
-        database='threedeposit',
-        user='instance_user',
-        password='instance_password',
-        host='postgres',
-        port=5432,
-        minsize=1,
-        maxsize=5
-        )
+        database=conf['database'],
+        user=conf['user'],
+        password=conf['password'],
+        host=conf['host'],
+        port=conf['port'],
+        minsize=conf['minsize'],
+        maxsize=conf['maxsize'],
+    )
     return engine
 
 

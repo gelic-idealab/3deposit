@@ -71,4 +71,4 @@ def handler():
             return jsonify({ 'err': str(err) })
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()

@@ -10,6 +10,7 @@ pyvimeo = "*"
 flask = "*"
 requests = "*"
 unpack = "*"
+gunicorn = "*"
 
 [requires]
 python_version = "3.5"

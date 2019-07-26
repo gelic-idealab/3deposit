@@ -68,10 +68,10 @@ services:
   reverse-proxy:
       container_name: reverse-proxy
       image: traefik # The official Traefik docker image
-      command: --api --docker # Enables the web UI and tells Traefik to listen to docker
+      command: --docker # listen to docker Enables the web UI and tells Traefik to --api
       ports:
         - "80:80"     # The HTTP port
-        - "8080:8080" # The Web UI (enabled by --api)
+        # - "8080:8080" # The Web UI (enabled by --api)
       volumes:
         - /var/run/docker.sock:/var/run/docker.sock
         - ./traefik.toml:/traefik.toml
@@ -97,9 +97,9 @@ services:
   minio-service:
     build: ./services/store-minio/
     container_name: minio-service
-    environment: 
-      FLASK_ENV: development
-      FLASK_APP: minio-service
+    # environment: 
+    #   FLASK_ENV: development
+    #   FLASK_APP: minio-service
     depends_on:
       - minio-server
     links: 
@@ -107,7 +107,7 @@ services:
     networks:
       - minio_internal
       - gateway_internal
-    command: pipenv run flask run --host=0.0.0.0
+    command: pipenv run gunicorn -w 4 -b 0.0.0.0:5000 minio-service:create_app()
     labels:
       - "traefik.enable=false" 
 
@@ -143,8 +143,6 @@ services:
   mongo-service:
     build: ./services/store-mongo/
     container_name: mongo-service
-    ports:
-      - 5001:5000
     depends_on:
       - mongo-server
     links: 
@@ -152,10 +150,10 @@ services:
     networks:
       - mongo_internal
       - gateway_internal
-    environment: 
-      FLASK_ENV: development
-      FLASK_APP: mongo-service
-    command: pipenv run flask run --host=0.0.0.0
+    # environment: 
+    #   FLASK_ENV: development
+    #   FLASK_APP: mongo-service
+    command: pipenv run gunicorn -w 4 -b 0.0.0.0:5000 mongo-service:create_app()
     labels:
       - "traefik.enable=false" 
 
@@ -164,10 +162,10 @@ services:
     container_name: sketchfab-service
     networks:
       - gateway_internal
-    environment: 
-      FLASK_ENV: development
-      FLASK_APP: sketchfab-service
-    command: pipenv run flask run --host=0.0.0.0
+    # environment: 
+    #   FLASK_ENV: development
+    #   FLASK_APP: sketchfab-service
+    command: pipenv run gunicorn -w 4 -b 0.0.0.0:5000 sketchfab-service:app
     labels:
       - "traefik.enable=false"
 
@@ -176,10 +174,10 @@ services:
     container_name: aws-service
     networks:
       - gateway_internal
-    environment: 
-      FLASK_ENV: development
-      FLASK_APP: aws-service
-    command: pipenv run flask run --host=0.0.0.0
+    # environment: 
+    #   FLASK_ENV: development
+    #   FLASK_APP: aws-service
+    command: pipenv run gunicorn -w 4 -b 0.0.0.0:5000 aws-service:app
     labels:
       - "traefik.enable=false"
 
@@ -188,10 +186,10 @@ services:
     container_name: vimeo-service
     networks:
       - gateway_internal
-    environment: 
-      FLASK_ENV: development
-      FLASK_APP: vimeo-service
-    command: pipenv run flask run --host=0.0.0.0
+    # environment: 
+    #   FLASK_ENV: development
+    #   FLASK_APP: vimeo-service
+    command: pipenv run gunicorn -w 4 -b 0.0.0.0:5000 vimeo-service:app
     labels:
       - "traefik.enable=false" 
 

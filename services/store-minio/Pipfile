@@ -9,6 +9,7 @@ verify_ssl = true
 minio = "*"
 flask = "*"
 unpack = "*"
+gunicorn = "*"
 
 [requires]
 python_version = "3.7"

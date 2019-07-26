@@ -1,6 +1,6 @@
 <template>
     <div class="card-columns" :style="column_count">
-        <div class="card" v-for="(d, index) in order(this.deposits)" :key="index">
+        <div class="card" v-for="d in order(this.deposits)" :key="d.deposit_id">
             <gallery-card 
                 :deposit="d"
             >

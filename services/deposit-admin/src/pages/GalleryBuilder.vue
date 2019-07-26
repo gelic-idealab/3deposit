@@ -145,25 +145,27 @@ export default {
             this.filters.splice(index,1);
         },
         applyFilter() {
-            let formatted_date_filter = {};
-            formatted_date_filter.key = this.date_filter.key
-            formatted_date_filter.op = this.date_filter.op
-            formatted_date_filter.value = [[]]
-            this.date_filter.value.forEach(function(value, index) { 
-                formatted_date_filter.value[index][0] = Date.parse(value[0])/1000
-                formatted_date_filter.value[index][1] = Date.parse(value[1])/1000
-            })
+            let all_filters
+            if(!(this.date_filter.value[0][0]==null || this.date_filter.value[0][1]==null)) {
+                let formatted_date_filter = {};
+                formatted_date_filter.key = this.date_filter.key
+                formatted_date_filter.op = this.date_filter.op
+                formatted_date_filter.value = [[]]
 
-            
+                this.date_filter.value.forEach(function(value, index) { 
+                    formatted_date_filter.value[index][0] = Date.parse(value[0])/1000
+                    formatted_date_filter.value[index][1] = Date.parse(value[1])/1000
+                })
 
-            let all_filters = this.filters.concat([this.media_filter, formatted_date_filter])
+                all_filters = this.filters.concat([this.media_filter, formatted_date_filter])
+            }
+            else {
+                all_filters = this.filters.concat([this.media_filter])
+            }
             let qs = JSON.stringify(all_filters);
-
-            console.log(all_filters)
             axios.get("../api/gallery", {params: {filters: qs}})
             .then(response => {
                 this.deposits = response.data.deposits
-                console.log(response.data)
             })  
         }
     }

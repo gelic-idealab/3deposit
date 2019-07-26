@@ -31,15 +31,15 @@ payload_dict = {
     'id': DEPOSIT_ID,
     'form': [
         {
-            'label': 'object_title',
+            'id': 'object_title',
             'value': 'VR Scene'
         },
         {
-            'label': 'media_type',
+            'id': 'media_type',
             'value': 'vr'
         },
         {
-            'label': 'description',
+            'id': 'description',
             'value': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'
         }
     ]

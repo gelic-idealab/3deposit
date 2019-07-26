@@ -6,9 +6,9 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
+requests = "*"
 pyvimeo = "*"
 flask = "*"
-requests = "*"
 unpack = "*"
 
 [requires]

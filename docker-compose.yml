@@ -15,6 +15,7 @@ services:
       - "traefik.port=8080"
       - "traefik.docker.network=proxy"
       - "traefik.passHostHeader=true"
+    restart: always
 
 
   postgres:
@@ -26,6 +27,7 @@ services:
         - pg_data:/var/lib/postgresql
     labels:
       - "traefik.enable=false"    
+    restart: always
 
   admin:
     build: ./services/deposit-admin/
@@ -40,6 +42,7 @@ services:
       - "traefik.port=8080"
       - "traefik.docker.network=proxy"
       - "traefik.passHostHeader=true"
+    restart: always
 
 
   gateway:
@@ -61,9 +64,9 @@ services:
       - "traefik.port=8080"
       - "traefik.docker.network=proxy"
       - "traefik.passHostHeader=true"
-
     volumes:
       - ./services/gateway/data:/gateway/data
+    restart: always
   
   reverse-proxy:
       container_name: reverse-proxy
@@ -77,6 +80,7 @@ services:
         - ./traefik.toml:/traefik.toml
       networks:
         - proxy
+      restart: always
 
   minio-server:
     container_name: minio-server
@@ -93,6 +97,7 @@ services:
     command: server /data
     labels:
       - "traefik.enable=false" 
+    restart: always
 
   minio-service:
     build: ./services/store-minio/
@@ -109,7 +114,8 @@ services:
       - gateway_internal
     command: pipenv run gunicorn -w 4 -b 0.0.0.0:5000 minio-service:create_app()
     labels:
-      - "traefik.enable=false" 
+      - "traefik.enable=false"
+    restart: always
 
   mongo-server:
     image: mongo
@@ -124,6 +130,7 @@ services:
       - ./services/store-mongo/data:/data
     labels:
       - "traefik.enable=false" 
+    restart: always
 
   mongo-express:
     image: mongo-express
@@ -155,7 +162,8 @@ services:
     #   FLASK_APP: mongo-service
     command: pipenv run gunicorn -w 4 -b 0.0.0.0:5000 mongo-service:create_app()
     labels:
-      - "traefik.enable=false" 
+      - "traefik.enable=false"
+    restart: always
 
   sketchfab-service:
     build: ./services/publish-sketchfab/
@@ -168,6 +176,7 @@ services:
     command: pipenv run gunicorn -w 4 -b 0.0.0.0:5000 sketchfab-service:app
     labels:
       - "traefik.enable=false"
+    restart: always
 
   aws-service:
     build: ./services/publish-aws/
@@ -180,6 +189,7 @@ services:
     command: pipenv run gunicorn -w 4 -b 0.0.0.0:5000 aws-service:app
     labels:
       - "traefik.enable=false"
+    restart: always
 
   vimeo-service:
     build: ./services/publish-vimeo/
@@ -192,6 +202,7 @@ services:
     command: pipenv run gunicorn -w 4 -b 0.0.0.0:5000 vimeo-service:app
     labels:
       - "traefik.enable=false" 
+    restart: always
 
 networks:
     proxy:

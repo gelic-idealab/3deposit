@@ -19,6 +19,7 @@ bcrypt = "*"
 cryptography = "*"
 uvloop = "*"
 filechunkio = "*"
+gunicorn = "*"
 
 [requires]
 python_version = "3.7"

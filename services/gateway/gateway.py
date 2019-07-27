@@ -43,7 +43,8 @@ async def init_app(argv=None):
         logging.debug(msg=err)
         raise
 
-    fernet_key = fernet.Fernet.generate_key()
+    # fernet_key = fernet.Fernet.generate_key()
+    fernet_key = b'B3xPG0rI5lX2lLk5HBWkf2l4CwBh33IfP0hGxG5FWqw='
     secret_key = base64.urlsafe_b64decode(fernet_key)
     setup_session(app, EncryptedCookieStorage(secret_key))
 
@@ -62,14 +63,13 @@ async def init_app(argv=None):
     # setup views and routes
     setup_routes(app)
 
+    # logging
+    logging.basicConfig(level=logging.INFO, filename='./data/gateway.log')
+
     return app
 
 
 def main(argv):
-    logging.basicConfig(level=logging.DEBUG)  #, filename='./data/gateway.log')
-
-    # use uvloop instead of asyncio event loop
-    # uvloop.install()
 
     # init & run app with args & config
     app = init_app(argv)

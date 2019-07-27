@@ -15,58 +15,58 @@ import GalleryBuilder from "@/pages/GalleryBuilder.vue";
 
 const routes = [
   {
-    path: "/admin/",
+    path: "/",
     component: DashboardLayout,
-    redirect: '/admin/dashboard',
+    redirect: 'dashboard',
     children: [
       {
-        path: "/admin/dashboard",
+        path: "/dashboard",
         name: "dashboard",
         component: Dashboard
       },
       {
-        path: "/admin/stats",
+        path: "/stats",
         name: "stats",
         component: UserProfile
       },
       {
-        path: "/admin/notifications",
+        path: "/notifications",
         name: "notifications",
         component: Notifications
       },
       {
-        path: "/admin/icons",
+        path: "/icons",
         name: "icons",
         component: Icons
       },
       {
-        path: "/admin/services",
+        path: "/services",
         name: "services",
         component: Services
       },
       {
-        path: "/admin/deposits",
+        path: "/deposits",
         name: "deposits",
         component: Deposits
       },
       {
-        path: "/admin/forms",
+        path: "/forms",
         name: "form-builder",
         component: FormBuilder
       },
       {
-        path: "/admin/gallery-builder",
+        path: "/gallery-builder",
         name: "gallery-builder",
         component: GalleryBuilder
       },
       {
-        path: "/admin/deposits/:id", 
+        path: "/deposits/:id", 
         name: "deposit-profile", 
         component: DepositProfile
       }
     ]
   },
-  { path: "/admin/*", component: NotFound }
+  { path: "/*", component: NotFound }
 ];
 
 /**

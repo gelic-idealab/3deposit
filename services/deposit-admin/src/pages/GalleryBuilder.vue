@@ -64,7 +64,6 @@
 import FilterKey from "./GalleryBuilder/FilterKey.vue";
 import Gallery from "./GalleryBuilder/Gallery.vue";
 import Button from "../components/Button.vue";
-import Multiselect from 'vue-multiselect'
 
 import axios from 'axios';
 import querystring from 'querystring';
@@ -119,8 +118,7 @@ export default {
         Gallery,
         Button,
         [DatePicker.name]: DatePicker,
-        [TimeSelect.name]: TimeSelect,
-        Multiselect
+        [TimeSelect.name]: TimeSelect
     },
     created() {  
         axios.get("../api/gallery")

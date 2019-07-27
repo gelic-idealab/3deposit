@@ -1,9 +1,11 @@
 module.exports = {
   devServer: {
-    disableHostCheck: true
+    disableHostCheck: true,
+    public: 'http://localhost:8080/admin'
   },
+  crossorigin: "",
   chainWebpack: config => {
     config.module.rules.delete('eslint');
   },
-  publicPath: '/admin'
+  publicPath: '/admin/'
 }

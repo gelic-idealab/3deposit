@@ -10,11 +10,10 @@ services:
     command: npm run serve
     labels:
       - "traefik.enable=true"
-      - "traefik.frontend.rule=PathPrefix:/deposit"
+      - "traefik.frontend.rule=PathPrefix:/"
       - "traefik.backend=deposit-form"
       - "traefik.port=8080"
       - "traefik.docker.network=proxy"
-      - "traefik.passHostHeader=true"
     restart: always
 
 
@@ -37,11 +36,14 @@ services:
     command: npm run serve
     labels:
       - "traefik.enable=true"
-      - "traefik.frontend.rule=PathPrefix:/admin"
+      # - "traefik.frontend.rule=PathPrefix:/admin"
       - "traefik.backend=admin"
       - "traefik.port=8080"
       - "traefik.docker.network=proxy"
-      - "traefik.passHostHeader=true"
+      # add trailing slash
+      - "traefik.frontend.redirect.regex=^(.*)/admin$$"
+      - "traefik.frontend.redirect.replacement=$$1/admin/"
+      - "traefik.frontend.rule=PathPrefix:/admin"
     restart: always
 
 
@@ -63,7 +65,6 @@ services:
       - "traefik.backend=gateway"
       - "traefik.port=8080"
       - "traefik.docker.network=proxy"
-      - "traefik.passHostHeader=true"
     volumes:
       - ./services/gateway/data:/gateway/data
     restart: always

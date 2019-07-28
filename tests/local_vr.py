@@ -10,7 +10,7 @@ querystring = {"resumableChunkNumber": "1", "resumableTotalChunks": "1", "deposi
 f = open('a-frame.zip', 'rb')
 files = {'file': f}
 
-response = requests.request("POST", url, files=files, headers=headers, params=querystring)
+response = requests.request("POST", url, files=files, params=querystring)
 
 print(response.text)
 url = "http://localhost/api/form/submit"
@@ -35,6 +35,6 @@ payload_dict = {
 
 payload = json.dumps(payload_dict)
 
-response = requests.request("POST", url, data=payload, headers=headers)
+response = requests.request("POST", url, data=payload)
 
 print(response.text)

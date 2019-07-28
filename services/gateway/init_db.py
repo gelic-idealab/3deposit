@@ -136,8 +136,8 @@ def create_default_services(engine):
 
 
 def main():
-    logging.debug(msg='running init_db, waiting for db container to become available')
-    time.sleep(5)
+    logging.info(msg='running init_db, waiting for db container to become available')
+    # time.sleep(5)
     setup_db(USER_CONFIG['postgres'])
     create_tables(engine=user_engine) 
     create_admin(engine=user_engine)

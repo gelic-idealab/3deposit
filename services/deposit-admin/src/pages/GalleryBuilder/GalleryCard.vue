@@ -24,7 +24,7 @@
             <h5 class="card-title mb-3">{{ deposit.deposit_metadata.object_title }}</h5>
             <p class="card-text">{{ deposit.deposit_metadata.description }}</p>
         </div>
-        <div class="card-footer text-muted">{{ deposit.deposit_date }}</div>
+        <div class="card-footer text-muted">{{ deposit_date }}</div>
     </div>
 </template>
 <script>
@@ -66,7 +66,7 @@ export default {
             axios.get("../api/publications", {params: {resource_id: this.resource_id, media_type: this.deposit.deposit_metadata.media_type}})
             .then(response => this.publish_metadata = response.data);
         })
-
+        this.deposit_date = new Date(this.deposit.deposit_date * 1000)
     }
 }
 </script>

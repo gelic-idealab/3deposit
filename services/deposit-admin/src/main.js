@@ -6,6 +6,7 @@ import "vue-notifyjs/themes/default.css";
 
 
 Vue.use(PaperDashboard);
+Vue.config.devtools = true;
 
 /* eslint-disable no-new */
 new Vue({

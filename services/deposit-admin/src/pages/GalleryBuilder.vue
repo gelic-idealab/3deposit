@@ -11,6 +11,10 @@
                     <i class="ti ti-save mr-1"></i>
                     Apply
                 </p-button>
+                <p-button type="info" outline v-on:click.native="generateEmbed">
+                    <i class="ti ti-sharethis mr-1"></i>
+                    Embed
+                </p-button>
             </div>
             <div class="row mb-2">
                 <div class=" col-10">
@@ -166,6 +170,13 @@ export default {
             // .then(response => {
             //     this.deposits = response.data.deposits
             // })  
+        },
+        generateEmbed() {
+            const location = window.location.href;
+            location.replace("gallery-builder", "public/gallery?")
+            let qs = JSON.stringify(this.all_filters)
+            let embed = location.concat(qs)
+            console.log(embed)
         }
     }
 }

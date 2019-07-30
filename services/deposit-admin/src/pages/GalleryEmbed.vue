@@ -9,14 +9,19 @@ import Gallery from "./GalleryBuilder/Gallery.vue";
 export default {
     data() {
         return {
-            filters: []
+            filters: [],
+            sortBy: {},
+            column_count : {}
         }
     },
     components: {
         Gallery
     },
     mounted() {
-        this.filters = JSON.parse(this.$route.query.filters);
+        let query = JSON.parse(this.$route.query);
+        this.filters = query.filters;
+        this.sortBy = query.sortBy;
+        this.column_count = query.column_count;
     }
 }
 </script>

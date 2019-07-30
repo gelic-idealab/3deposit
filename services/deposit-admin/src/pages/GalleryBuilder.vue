@@ -53,7 +53,7 @@
             </template>
         </div>
         <div class="col-10">    
-            <gallery :deposits="deposits" :column_count="column_count" :sortBy="sortBy" :filters="filters">
+            <gallery :column_count="column_count" :sortBy="sortBy" :filters="all_filters">
 
             </gallery>
         </div>
@@ -84,6 +84,7 @@ export default {
                 ascending: false
             },
             filters: [],
+            all_filters: [],
             column_count: {
                 columnCount: 3
             },
@@ -121,15 +122,15 @@ export default {
         [TimeSelect.name]: TimeSelect
     },
     created() {  
-        axios.get("../api/gallery")
-        .then(response => {
-            this.deposits = response.data.deposits
-        },
-        error => {
-            if (error.response.status === 401) {
-                window.location.href = '../api/login';
-        }
-    });
+    //     axios.get("../api/gallery")
+    //     .then(response => {
+    //         this.deposits = response.data.deposits
+    //     },
+    //     error => {
+    //         if (error.response.status === 401) {
+    //             window.location.href = '../api/login';
+    //     }
+    // });
     },
     methods: {
         addFilter() {
@@ -143,7 +144,7 @@ export default {
             this.filters.splice(index,1);
         },
         applyFilter() {
-            let all_filters
+            // let all_filters
             if(!(this.date_filter.value[0][0]==null || this.date_filter.value[0][1]==null)) {
                 let formatted_date_filter = {};
                 formatted_date_filter.key = this.date_filter.key
@@ -155,16 +156,16 @@ export default {
                     formatted_date_filter.value[index][1] = Date.parse(value[1])/1000
                 })
 
-                all_filters = this.filters.concat([this.media_filter, formatted_date_filter])
+                this.all_filters = this.filters.concat([this.media_filter, formatted_date_filter])
             }
             else {
-                all_filters = this.filters.concat([this.media_filter])
+                this.all_filters = this.filters.concat([this.media_filter])
             }
-            let qs = JSON.stringify(all_filters);
-            axios.get("../api/gallery", {params: {filters: qs}})
-            .then(response => {
-                this.deposits = response.data.deposits
-            })  
+            // let qs = JSON.stringify(all_filters);
+            // axios.get("../api/gallery", {params: {filters: qs}})
+            // .then(response => {
+            //     this.deposits = response.data.deposits
+            // })  
         }
     }
 }

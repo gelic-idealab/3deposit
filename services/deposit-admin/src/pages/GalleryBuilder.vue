@@ -11,11 +11,13 @@
                     <i class="ti ti-save mr-1"></i>
                     Apply
                 </p-button>
-                <p-button type="info" outline v-on:click.native="generateEmbed">
+                <p-button type="warning" outline v-on:click.native="generateEmbed">
                     <i class="ti ti-sharethis mr-1"></i>
                     Embed
                 </p-button>
             </div>
+            <modal v-if="showEmbed" @close="showEmbed = false" :embed="embed">
+            </modal>
             <div class="row mb-2">
                 <div class=" col-10">
                     <div class="card text-center">
@@ -68,6 +70,7 @@
 import FilterKey from "./GalleryBuilder/FilterKey.vue";
 import Gallery from "./GalleryBuilder/Gallery.vue";
 import Button from "../components/Button.vue";
+import Modal from "../components/Modal.vue";
 
 import axios from 'axios';
 import querystring from 'querystring';
@@ -82,6 +85,8 @@ export default {
     name: "gallery-builder",
     data() {
         return{
+            embed: '',
+            showEmbed: false,
             deposits: [],
             sortBy: {
                 field: 'deposit_date',
@@ -122,6 +127,7 @@ export default {
         FilterKey,
         Gallery,
         Button,
+        Modal,
         [DatePicker.name]: DatePicker,
         [TimeSelect.name]: TimeSelect
     },
@@ -148,7 +154,6 @@ export default {
             this.filters.splice(index,1);
         },
         applyFilter() {
-            // let all_filters
             if(!(this.date_filter.value[0][0]==null || this.date_filter.value[0][1]==null)) {
                 let formatted_date_filter = {};
                 formatted_date_filter.key = this.date_filter.key
@@ -172,11 +177,12 @@ export default {
             // })  
         },
         generateEmbed() {
-            const location = window.location.href;
-            location.replace("gallery-builder", "public/gallery?")
-            let qs = JSON.stringify(this.all_filters)
-            let embed = location.concat(qs)
-            console.log(embed)
+            let location = window.location.href;
+            location = location.replace("gallery-builder", "public/gallery?filters=");
+            let qs = JSON.stringify(this.all_filters);
+            this.embed = location.concat(encodeURIComponent(qs));
+            console.log(this.embed);
+            this.showEmbed = true
         }
     }
 }

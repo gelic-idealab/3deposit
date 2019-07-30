@@ -17,11 +17,11 @@ export default {
     components: {
         Gallery
     },
-    mounted() {
-        let query = JSON.parse(this.$route.query);
-        this.filters = query.filters;
-        this.sortBy = query.sortBy;
-        this.column_count = query.column_count;
+    created() {
+        this.filters = JSON.parse(this.$route.query.filters);
+        // this.sortBy = query.sortBy;
+        // this.column_count = query.column_count;
+        // console.log("FILTERS:",this.filters);
     }
 }
 </script>

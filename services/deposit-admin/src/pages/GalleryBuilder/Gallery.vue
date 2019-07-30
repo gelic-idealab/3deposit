@@ -31,19 +31,12 @@ export default {
         GalleryCard
     },
     mounted() {
-        if (this.filters) {
-            let qs = JSON.stringify(this.filters);
-            axios.get("../api/gallery", {params: {filters: qs}})
-            .then(response => {
-                this.deposits = response.data.deposits
-            })
-        }
-        else {
-            axios.get("../api/gallery")
-            .then(response => {
-                this.deposits = response.data.deposits
-            });
-        }
+        console.log("Mounted",this.filters)
+        let qs = JSON.stringify(this.filters);
+        axios.get("../api/gallery", {params: {filters: qs}})
+        .then(response => {
+            this.deposits = response.data.deposits
+        })
     },
     watch: {
         filters: function (newFilters, oldFilters) {

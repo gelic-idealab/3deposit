@@ -69,6 +69,16 @@ async def logout(request):
     return response
 
 
+async def current_user(request):
+    username = await authorized_userid(request)
+    if not username:
+        raise redirect(request.app.router, 'login')
+
+    async with request.app['db'].acquire() as conn:
+        current_user = await db.get_user_by_name(conn, username)
+
+    return web.json_response({'current_user': dict(current_user)})
+
 
 """
 Handlers for getting and setting services & service configs

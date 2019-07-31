@@ -2,6 +2,7 @@ from views import (
     index,
     login,
     logout,
+    current_user,
     deposit_form,
     deposit_upload,
     deposit_submit,
@@ -32,6 +33,7 @@ def setup_routes(app):
     app.router.add_get('/api/login', login, name='login')
     app.router.add_post('/api/login', login, name='login')
     app.router.add_get('/api/logout', logout, name='logout')
+    app.router.add_get('/api/user', current_user, name='user')
 
     # service config routes
     app.router.add_view('/api/services', services)

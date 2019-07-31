@@ -86,11 +86,19 @@ export default {
    * Chart data used to render stats, charts. Should be replaced with server data
    */
   mounted() {
-    axios.get('http://mock-server/statscards')
-    .then(response => (this.data.statsCards = response.data.statsCards))
+    axios.get('../api/user')
+    .then(response => {
+      this.current_user = response.data;
+    },
+    error => {
+      if (error.response.status === 401) {
+        window.location.href = '../api/login';
+        }
+    })
   },
   data() {
     return {
+      current_user: {},
       statsCards: [],
       usersChart: {
         data: {

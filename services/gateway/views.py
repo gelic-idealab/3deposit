@@ -72,7 +72,7 @@ async def logout(request):
 async def current_user(request):
     username = await authorized_userid(request)
     if not username:
-        raise redirect(request.app.router, 'login')
+        raise web.HTTPUnauthorized()
 
     async with request.app['db'].acquire() as conn:
         current_user = await db.get_user_by_name(conn, username)

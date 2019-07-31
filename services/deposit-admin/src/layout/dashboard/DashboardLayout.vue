@@ -3,19 +3,19 @@
     <side-bar>
       <template slot="links">
         <sidebar-link to="/dashboard" name="Dashboard" icon="ti-panel"/>
-        <sidebar-link to="/stats" name="User Profile" icon="ti-user"/>
-        <sidebar-link to="/services" name="Services" icon="ti-widget"/>
+        <sidebar-link to="/profile" name="User Profile" icon="ti-user"/>
+        <!-- <sidebar-link to="/services" name="Services" icon="ti-widget"/> -->
         <sidebar-link to="/deposits" name="Deposits" icon="ti-dropbox"/>
         <sidebar-link to="/gallery-builder" name="Gallery" icon="ti-gallery"/>
-        <sidebar-link to="/icons" name="Icons" icon="ti-pencil-alt2"/>
-        <sidebar-link to="/notifications" name="Notifications" icon="ti-bell"/>
+        <!-- <sidebar-link to="/icons" name="Icons" icon="ti-pencil-alt2"/> -->
+        <!-- <sidebar-link to="/notifications" name="Notifications" icon="ti-bell"/> -->
         <sidebar-link to="/forms" name="Deposit Forms" icon="ti-pencil-alt"/>
       </template>
       <mobile-menu>
         <li class="nav-item">
           <a class="nav-link">
             <i class="ti-panel"></i>
-            <p>Stats</p>
+            <p>Profile</p>
           </a>
         </li>
         <drop-down class="nav-item"

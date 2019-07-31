@@ -13,6 +13,7 @@ import DepositProfile from "@/pages/DepositProfile.vue";
 import FormBuilder from "@/pages/FormBuilder.vue";
 import GalleryBuilder from "@/pages/GalleryBuilder.vue";
 import GalleryEmbed from "@/pages/GalleryEmbed.vue";
+import Settings from "@/pages/Settings.vue";
 
 
 const routes = [
@@ -27,25 +28,25 @@ const routes = [
         component: Dashboard
       },
       {
-        path: "/stats",
-        name: "stats",
+        path: "/profile",
+        name: "profile",
         component: UserProfile
       },
-      {
-        path: "/notifications",
-        name: "notifications",
-        component: Notifications
-      },
-      {
-        path: "/icons",
-        name: "icons",
-        component: Icons
-      },
-      {
-        path: "/services",
-        name: "services",
-        component: Services
-      },
+      // {
+      //   path: "/notifications",
+      //   name: "notifications",
+      //   component: Notifications
+      // },
+      // {
+      //   path: "/icons",
+      //   name: "icons",
+      //   component: Icons
+      // },
+      // {
+      //   path: "/services",
+      //   name: "services",
+      //   component: Services
+      // },
       {
         path: "/deposits",
         name: "deposits",
@@ -65,6 +66,11 @@ const routes = [
         path: "/deposits/:id", 
         name: "deposit-profile", 
         component: DepositProfile
+      },
+      {
+        path: "/settings",
+        name: "settings",
+        component: Settings
       }
     ]
   },

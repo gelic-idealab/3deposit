@@ -30,19 +30,19 @@
             <a class="dropdown-item" href="#">Another notification</a>
           </drop-down>
           <li v-if="current_user.role === 'admin'" class="nav-item">
-            <a href="#" class="nav-link">
+            <router-link to="/settings" class="nav-link">
               <i class="ti-settings"></i>
               <p>
                 Settings
               </p>
-            </a>
+            </router-link>
           </li>
           <drop-down class="nav-item"
                      :title="current_user.username"
                      title-classes="nav-link"
                      icon="ti-user">
             <a class="dropdown-item" href="../api/logout">Logout</a>
-            <router-link class="dropdown-item" to="/stats">Profile</router-link>
+            <router-link class="dropdown-item" to="/profile">Profile</router-link>
           </drop-down>
         </ul>
       </div>

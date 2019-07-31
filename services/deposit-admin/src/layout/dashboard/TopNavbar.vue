@@ -37,12 +37,32 @@
               </p>
             </a>
           </li>
+          <drop-down class="nav-item"
+                     :title="current_user.username"
+                     title-classes="nav-link"
+                     icon="ti-user">
+            <a class="dropdown-item" href="../api/logout">Logout</a>
+            <router-link class="dropdown-item" to="/stats">Profile</router-link>
+          </drop-down>
         </ul>
       </div>
     </div></nav>
 </template>
 <script>
+import axios from 'axios';
+
 export default {
+    mounted() {
+    axios.get('../api/user')
+    .then(response => {
+      this.current_user = response.data.current_user;
+    },
+    error => {
+      if (error.response.status === 401) {
+        window.location.href = '../api/login';
+        }
+    })
+  },
   computed: {
     routeName() {
       const { name } = this.$route;
@@ -51,6 +71,7 @@ export default {
   },
   data() {
     return {
+      current_user: {},
       activeNotifications: false
     };
   },

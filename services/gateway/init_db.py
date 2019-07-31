@@ -76,6 +76,12 @@ def create_admin(engine):
     with engine.connect() as conn:
         conn.execute(users.insert().values(username=username, password_hash=password_hash, role=role))
 
+def create_user(engine):
+    username = 'user'
+    password_hash = generate_password_hash('user')
+    role = 'user'
+    with engine.connect() as conn:
+        conn.execute(users.insert().values(username=username, password_hash=password_hash, role=role))
 
 def create_default_actions(engine):
     with engine.connect() as conn:
@@ -141,6 +147,7 @@ def main():
     setup_db(USER_CONFIG['postgres'])
     create_tables(engine=user_engine) 
     create_admin(engine=user_engine)
+    create_user(engine=user_engine)
     create_default_actions(engine=user_engine)
     create_default_services(engine=user_engine)
     # drop_tables()

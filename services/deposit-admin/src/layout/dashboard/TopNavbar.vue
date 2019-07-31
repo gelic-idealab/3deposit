@@ -49,19 +49,11 @@
     </div></nav>
 </template>
 <script>
-import axios from 'axios';
+
 
 export default {
     mounted() {
-    axios.get('../api/user')
-    .then(response => {
-      this.current_user = response.data.current_user;
-    },
-    error => {
-      if (error.response.status === 401) {
-        window.location.href = '../api/login';
-        }
-    })
+
   },
   computed: {
     routeName() {
@@ -69,9 +61,11 @@ export default {
       return this.capitalizeFirstLetter(name);
     }
   },
+  props: {
+    current_user: Object
+  },
   data() {
     return {
-      current_user: {},
       activeNotifications: false
     };
   },

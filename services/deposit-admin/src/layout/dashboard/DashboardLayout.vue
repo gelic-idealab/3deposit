@@ -38,9 +38,9 @@
       </mobile-menu>
     </side-bar>
     <div class="main-panel">
-      <top-navbar></top-navbar>
+      <top-navbar :current_user="current_user"></top-navbar>
 
-      <dashboard-content @click.native="toggleSidebar">
+      <dashboard-content :current_user="current_user" @click.native="toggleSidebar">
 
       </dashboard-content>
 
@@ -51,6 +51,8 @@
 <style lang="scss">
 </style>
 <script>
+import axios from 'axios';
+
 import TopNavbar from "./TopNavbar.vue";
 import ContentFooter from "./ContentFooter.vue";
 import DashboardContent from "./Content.vue";
@@ -61,6 +63,22 @@ export default {
     ContentFooter,
     DashboardContent,
     MobileMenu
+  },
+  data() {
+    return {
+      current_user: {}
+    }
+  },
+  mounted() {
+    axios.get('../api/user')
+    .then(response => {
+      this.current_user = response.data.current_user;
+    },
+    error => {
+      if (error.response.status === 401) {
+        window.location.href = '../api/login';
+        }
+    })
   },
   methods: {
     toggleSidebar() {

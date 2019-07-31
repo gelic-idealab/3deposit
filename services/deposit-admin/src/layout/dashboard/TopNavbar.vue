@@ -29,7 +29,7 @@
             <a class="dropdown-item" href="#">Notification 4</a>
             <a class="dropdown-item" href="#">Another notification</a>
           </drop-down>
-          <li class="nav-item">
+          <li v-if="current_user.role === 'admin'" class="nav-item">
             <a href="#" class="nav-link">
               <i class="ti-settings"></i>
               <p>

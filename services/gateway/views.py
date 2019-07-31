@@ -437,9 +437,9 @@ async def deposits(request):
 
 
 async def gallery(request):
-    username = await authorized_userid(request)
-    if not username:
-        raise web.HTTPUnauthorized()
+    # username = await authorized_userid(request)
+    # if not username:
+    #     raise web.HTTPUnauthorized()
     if request.method == 'GET':
         filters = None
         if request.query.get('filters'):

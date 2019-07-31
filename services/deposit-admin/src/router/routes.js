@@ -12,6 +12,8 @@ import Services from "@/pages/Services.vue";
 import DepositProfile from "@/pages/DepositProfile.vue";
 import FormBuilder from "@/pages/FormBuilder.vue";
 import GalleryBuilder from "@/pages/GalleryBuilder.vue";
+import GalleryEmbed from "@/pages/GalleryEmbed.vue";
+
 
 const routes = [
   {
@@ -65,6 +67,11 @@ const routes = [
         component: DepositProfile
       }
     ]
+  },
+  {
+    path: "/public/gallery",
+    name: "public-gallery",
+    component: GalleryEmbed 
   },
   { path: "/*", component: NotFound }
 ];

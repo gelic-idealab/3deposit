@@ -159,9 +159,11 @@ services:
     networks:
       - mongo_internal
       - gateway_internal
-    # environment: 
-    #   FLASK_ENV: development
-    #   FLASK_APP: mongo-service
+    environment:
+      MONGO_USERNAME: root
+      MONGO_PASSWORD: example
+      # FLASK_ENV: development
+      # FLASK_APP: mongo-service
     command: pipenv run gunicorn -w 4 -b 0.0.0.0:5000 mongo-service:create_app()
     labels:
       - "traefik.enable=false"

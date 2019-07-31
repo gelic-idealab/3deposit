@@ -9,7 +9,7 @@
             <a :href="location">
                 <div class="embed-responsive embed-responsive-16by9">
                     <!-- <embed class="embed-responsive-item" :src="publish_metadata.thumbnails.images[2].url"/> -->
-                    <embed class="embed-responsive-item" :src="location"/>
+                    <embed class="embed-responsive-item" :src="deposit.location"/>
                 </div>
             </a>
         </template>
@@ -24,7 +24,7 @@
             <h5 class="card-title mb-3">{{ deposit.deposit_metadata.object_title }}</h5>
             <p class="card-text">{{ deposit.deposit_metadata.description }}</p>
         </div>
-        <div class="card-footer text-muted">{{ deposit_date }}</div>
+        <div class="card-footer text-muted">{{ pretty_date }}</div>
     </div>
 </template>
 <script>
@@ -35,9 +35,7 @@ import axios from 'axios'
 export default {
     data() {
         return {
-            resource_id: '',
-            location: '',
-            deposit_date: '',
+            pretty_date: '',
             publish_metadata: {
                 thumbnails: {
                     images: [{
@@ -57,16 +55,9 @@ export default {
         deposit: Object,
     },
     mounted() {
-        axios.get("../api/deposits", {params: {deposit_id: this.deposit.deposit_id}})
-        .then(response => {
-            this.resource_id = response.data.resource_id;
-            this.location = response.data.location;
-        })
-        .then(() => {
-            axios.get("../api/publications", {params: {resource_id: this.resource_id, media_type: this.deposit.deposit_metadata.media_type}})
-            .then(response => this.publish_metadata = response.data);
-        })
-        this.deposit_date = new Date(this.deposit.deposit_date * 1000)
+        axios.get("../api/publications", {params: {resource_id: this.deposit.resource_id, media_type: this.deposit.deposit_metadata.media_type}})
+        .then(response => this.publish_metadata = response.data);
+        this.pretty_date = new Date(this.deposit.deposit_date * 1000)
     }
 }
 </script>

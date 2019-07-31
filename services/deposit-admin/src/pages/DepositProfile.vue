@@ -10,7 +10,7 @@
                         <h5 class="card-title">{{ deposit.deposit_id }}</h5>
                         <!-- <p class="card-text">{{ deposit_metadata }}</p> -->
                         <!-- <p class="card-text">{{ publish_metadata }}</p> -->
-                        <p class="card-text"><small class="text-muted">{{ deposit.deposit_date.substring(0, deposit.deposit_date.indexOf('.')) }}</small></p>
+                        <p class="card-text"><small class="text-muted">{{ pretty_date }}</small></p>
                     </div>
                 </div>
                 <div class="card">
@@ -25,10 +25,10 @@
             </div>
             <div class="col">
                 <div class="card">
-                    <h5 class="card-header">User Metadata</h5>
+                    <h5 class="card-header">Metadata</h5>
                     <div class="card-body">
                         <vue-json-pretty
-                            :data="deposit_metadata">
+                            :data="deposit">
                         </vue-json-pretty>
                     </div>
                 </div>
@@ -47,8 +47,13 @@ import VueJsonPretty from 'vue-json-pretty'
 export default {
     data() {
         return{
-            deposit: {},
-            deposit_metadata: {},
+            pretty_date: '',
+            deposit: {
+                deposit_metadata: {},
+                deposit_date: '',
+                location: '',
+                resource_id: ''
+            },
             publish_metadata: {},
             id: ''
         }
@@ -62,15 +67,11 @@ export default {
         this.id = this.$route.params.id;
         console.log(this.id);
         axios.get("../../api/metadata", {params: {deposit_id: this.id}})
-        .then(response => (this.deposit_metadata = response.data.deposit_metadata))
         .then(response => {
-            axios.get("../../api/deposits", {params: {deposit_id: this.id}})
-            .then(response => (this.deposit = response.data))
-            .then(response => {
-                axios.get("../../api/publications", {params: {resource_id: this.deposit.resource_id, media_type: this.deposit_metadata.media_type}})
-                .then(response => (this.publish_metadata = response.data))
-            })     
-            .then(console.log(this.deposit.resource_id))
+            this.deposit = response.data;
+            this.pretty_date = new Date(response.data.deposit_date * 1000);
+            axios.get("../../api/publications", {params: {resource_id: response.data.resource_id, media_type: response.data.deposit_metadata.media_type}})
+            .then(response => {(this.publish_metadata = response.data)})
         })
     }
 };

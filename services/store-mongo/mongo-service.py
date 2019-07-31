@@ -47,7 +47,7 @@ def create_app():
         # except Exception as err:
         #     return jsonify({"err": str(err)})
 
-    @app.route('/objects', methods=['GET', 'POST', 'DELETE'])
+    @app.route('/objects', methods=['GET', 'POST', 'PATCH', 'DELETE'])
     def objects():
         if request.method == 'POST':
             # try:
@@ -62,10 +62,7 @@ def create_app():
 
             data = json.loads(request.form.get('data'))
             deposit_id = data.get('deposit_id')
-            deposit_metadata = data.get('deposit_metadata')
             current_timestamp = round(datetime.timestamp(datetime.now()))
-            deposit_metadata.update({'deposit_date': current_timestamp})
-            data.update(deposit_metadata)
             data.update({'deposit_date': current_timestamp})
 
             if not deposit_id:
@@ -79,7 +76,7 @@ def create_app():
             # except Exception as err:
             #     return jsonify({"err": str(err)})
 
-        if request.method == 'GET':
+        if request.method == 'PATCH':
             try:
                 client = create_client(request)
 
@@ -89,6 +86,31 @@ def create_app():
                 deposit_id = config.get('deposit_id')
                 # logging.debug("COLLECTION NAME:"+collection_name)
                 # JSONEncoder().encode()
+
+                collection = database[COLLECTION_NAME]
+                update_values = json.loads(request.form.get('data'))
+                update_query = {
+                    'deposit_id': deposit_id
+                }
+
+                result = collection.update_one(update_query, {'$set': update_values})
+
+                if result.modified_count == 0:
+                    return jsonify({"err": f'Unable to update document with deposit ID {deposit_id}'})
+                else:
+                    return jsonify({"log": f'Updated deposit ID {deposit_id} with values {str(data)}'})
+
+            except Exception as err:
+                return jsonify({"err": str(err)})
+
+        if request.method == 'GET':
+            try:
+                client = create_client(request)
+
+                database = client[DATABASE_NAME]
+
+                config = json.loads(request.form.get('config'))
+                deposit_id = config.get('deposit_id')
 
                 collection = database[COLLECTION_NAME]
 

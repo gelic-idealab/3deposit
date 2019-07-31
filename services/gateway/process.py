@@ -49,20 +49,29 @@ async def start_deposit_processing_task(data):
                     deposit_id=deposit_id,
                     etag=etag,
                     mongo_id=mongo_id,
-                    location=publish_resp.get('location'),
                     resource_id=publish_resp.get('resource_id'),
                     media_type=media_type
                 )
 
-                # await db.update_deposit_by_id(
-                #     conn,
-                #     deposit_id=deposit_id,
-                #     etag=etag,
-                #     mongo_id=mongo_id,
-                #     location=publish_resp.get('location'),
-                #     resource_id=publish_resp.get('resource_id'),
-                #     media_type=media_type
-                # )
+                data = {
+                    'location': publish_resp.get('location'),
+                    'resource_id': publish_resp.get('resource_id')
+                }
+
+                config = {
+                    'deposit_id': deposit_id
+                }
+
+                fd = FormData()
+                fd.add_field('data', json.dumps(data), content_type='application/json')
+                fd.add_field('config', json.dumps(config), content_type='application/json')
+
+                async with new_request(method='PATCH', url='http://mongo-service:5000/objects', data=fd) as resp:
+                    resp_json = await resp.json()
+                    if resp_json.err:
+                        logging.error(resp_json.err)
+                    else:
+                        logging.info(resp_json.log)
 
             if os.path.exists(TMP_FILE_LOCATION.format(deposit_id)):
                 os.remove(TMP_FILE_LOCATION.format(deposit_id))
@@ -105,6 +114,7 @@ async def trigger_store(conn, did):
 
         except Exception as err:
             return web.json_response({'origin': 'gateway', 'err': str(err)})
+
 
 def extract_data_from_form(form):
     form_data = {}

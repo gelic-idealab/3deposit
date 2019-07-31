@@ -34,7 +34,7 @@
                 <div class=" col-10">
                     <div class="card">
                         <div class="card-body col-12">
-                            <template v-for="option in media_filter.options">
+                            <template v-for="option in media_options">
                                 <div class="form-check" :key="option.value">
                                     <label class="form-check-label">
                                         <input class="form-check-input" :id="option.value" :value="option.value" v-model="media_filter.value" type="checkbox" checked>
@@ -105,22 +105,22 @@ export default {
             media_filter: {
                 key: 'media_type',
                 op: 'Equals',
-                value: ['model', 'vr', 'video'],
-                options: [
-                    {
-                        label: 'Model',
-                        value: 'model'
-                    },
-                    {
-                        label: 'VR App',
-                        value: 'vr'
-                    },
-                    {
-                        label: '360 Video',
-                        value: 'video'
-                    }
-                ]
-            }
+                value: ['model', 'vr', 'video']
+            },
+            media_options: [
+                {
+                    label: 'Model',
+                    value: 'model'
+                },
+                {
+                    label: 'VR App',
+                    value: 'vr'
+                },
+                {
+                    label: '360 Video',
+                    value: 'video'
+                }
+            ]
         }
     },
     components: {
@@ -164,6 +164,7 @@ export default {
                     formatted_date_filter.value[index][0] = Date.parse(value[0])/1000
                     formatted_date_filter.value[index][1] = Date.parse(value[1])/1000
                 })
+
 
                 this.all_filters = this.filters.concat([this.media_filter, formatted_date_filter])
             }

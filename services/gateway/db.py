@@ -23,7 +23,6 @@ deposits = Table(
     Column('etag', String(256)),
     Column('mongo_id', String(256)),
     Column('resource_id', String(256)),
-    Column('location', String(256), nullable=True),
     Column('media_type', String(256))
 )
 

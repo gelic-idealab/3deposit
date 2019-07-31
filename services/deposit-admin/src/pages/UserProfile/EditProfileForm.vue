@@ -3,32 +3,6 @@
     <div>
       <form @submit.prevent>
         <div class="row">
-          <div class="col-md-5">
-            <fg-input type="text"
-                      label="Service Name"
-                      :disabled="false"
-                      placeholder=""
-                      v-model="serviceConfig.name">
-            </fg-input>
-          </div>
-          <div class="col-md-3">
-
-            <fg-input type="text"
-                      label="Access Key"
-                      placeholder="Enter Access Key"
-                      v-model="serviceConfig.config.auth.access_key">
-            </fg-input>
-          </div>
-          <div class="col-md-4">
-            <fg-input type="text"
-                      label="Secret Key"
-                      placeholder="Enter Secret Key"
-                      v-model="serviceConfig.config.auth.secret_key">
-            </fg-input>
-          </div>
-        </div>
-
-        <div class="row">
           <div class="col-md-6">
             <fg-input type="text"
                       label="First Name"
@@ -107,15 +81,6 @@
 export default {
   data() {
     return {
-      serviceConfig: {
-        "name": "",
-        "config": {
-          "auth": {
-            "access_key": "",
-            "secret_key": ""
-          }
-        }
-      }
       user: {
         company: "Paper Dashboard",
         username: "michael23",
@@ -129,9 +94,7 @@ export default {
     };
   },
   methods: {
-    updateProfile() {
-      axios.post('gateway.docker.localhost/services/configs', data=serviceConfig);
-    }
+    
   }
 };
 </script>

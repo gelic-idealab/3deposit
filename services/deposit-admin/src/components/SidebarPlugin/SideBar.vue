@@ -43,11 +43,11 @@ export default {
   props: {
     title: {
       type: String,
-      default: "Paper Dashboard"
+      default: "3deposit"
     },
     backgroundColor: {
       type: String,
-      default: "black",
+      default: "darkblue",
       validator: value => {
         let acceptedValues = ["white", "black", "darkblue"];
         return acceptedValues.indexOf(value) !== -1;

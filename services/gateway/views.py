@@ -96,21 +96,22 @@ async def services(request):
             try:
                 services = await db.get_services(conn)
                 if services:
-                    return web.json_response({'services': services}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+                    return web.json_response({'services': services})
                 else:
-                    return web.json_response({'res': 'no services'}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+                    return web.json_response({'res': 'no services'})
             except Exception as err:
-                return web.json_response({'err': str(err)}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+                return web.json_response({'err': str(err)})
         else:
-            return web.Response(headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+            return web.Response()
 
 
 async def services_configs(request):
     username = await authorized_userid(request)
-    if not username:
-        raise web.HTTPUnauthorized()
+    async with request.app['db'].acquire() as conn:
+        current_user = dict(await db.get_user_by_name(conn, username))
+        if not username or current_user.get('role') != 'admin':
+            raise web.HTTPUnauthorized()
     headers = {
-        'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
         'Access-Control-Allow-Headers': 'content-type'
     }
     if request.method == 'GET':
@@ -142,8 +143,10 @@ async def services_configs(request):
 
 async def services_actions(request):
     username = await authorized_userid(request)
-    if not username:
-        raise web.HTTPUnauthorized()
+    async with request.app['db'].acquire() as conn:
+        current_user = dict(await db.get_user_by_name(conn, username))
+        if not username or current_user.get('role') != 'admin':
+            raise web.HTTPUnauthorized()
     if request.method == 'GET':
         try:
             q = request.query
@@ -153,35 +156,37 @@ async def services_actions(request):
                 async with request.app['db'].acquire() as conn:
                     service_name = await db.get_action_service_name(conn, action=action, media_type=media_type)
                     if service_name:
-                        return web.json_response({'service_name': service_name}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+                        return web.json_response({'service_name': service_name})
                     else:
                         return web.json_response(
-                            {'res': 'no service configured for {}, {}'.format(action, media_type)},
-                            headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'})
+                            {'res': 'no service configured for {}, {}'.format(action, media_type)}
                         )
 
             async with request.app['db'].acquire() as conn:
                 services = await db.get_action_services(conn)
                 if services:
-                    return web.json_response({'services': services}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+                    return web.json_response({'services': services})
                 else:
-                    return web.json_response({'res': 'no action services'}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+                    return web.json_response({'res': 'no action services'})
         except Exception as err:
-            return web.json_response({'err': str(err)}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+            return web.json_response({'err': str(err)})
 
     if request.method == 'POST':
         try:
             req = await request.json()
             async with request.app['db'].acquire() as conn:
-                service = await db.set_action_service_name(conn=conn, action=req.get('action'), media_type=req.get('media_type'), service_name=req.get('service_name'))
+                service = await db.set_action_service_name(
+                    conn=conn, 
+                    action=req.get('action'), 
+                    media_type=req.get('media_type'), 
+                    service_name=req.get('service_name'))
                 if service:
-                    return web.json_response({'res': service}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+                    return web.json_response({'res': service})
         except Exception as err:
-            return web.json_response({'err': str(err)}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+            return web.json_response({'err': str(err)})
 
     else:
         return web.Response(headers={
-            'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
             'Access-Control-Allow-Headers': 'content-type'
         })
 
@@ -198,9 +203,9 @@ async def deposit_form(request):
         async with request.app['db'].acquire() as conn:
             form = await db.get_form_by_id(conn, id=form_id)
         if form:
-            return web.json_response({'form': form}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+            return web.json_response({'form': form})
         else:
-            return web.json_response({'err': f'No form with id {form_id}'}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+            return web.json_response({'err': f'No form with id {form_id}'})
 
     if request.method == 'POST':
         try:
@@ -228,7 +233,6 @@ async def deposit_form(request):
 
 
 async def deposit_upload(request):
-    headers = dict({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'})
     if request.method == 'POST':
         try:
             logging.debug(msg='query: {}'.format(request.query))
@@ -252,17 +256,16 @@ async def deposit_upload(request):
                             f.write(b)
                     if rcn == rtc:
                         os.rename('./data/{}'.format(did+'_partial'), './data/{}'.format(did))
-            return web.Response(status=200, headers=headers)
+            return web.Response(status=200)
         except Exception as err:
             logging.debug(msg='err: {}'.format(str(err)))
-            return web.json_response({'err': str(err)}, headers=headers)
+            return web.json_response({'err': str(err)})
     else:
-        return web.Response(status=200, headers=headers)
+        return web.Response(status=200)
 
 
 async def deposit_submit(request):
     headers = {
-        'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
         'Access-Control-Allow-Headers': 'content-type'
     }
     if request.method == 'POST':
@@ -383,7 +386,6 @@ async def publications(request):
     if not username:
         raise web.HTTPUnauthorized()
     headers = {
-        'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
         'Access-Control-Allow-Headers': 'content-type'
     }
 
@@ -424,7 +426,6 @@ async def deposits(request):
     if not username:
         raise web.HTTPUnauthorized()
     headers = {
-        'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
         'Access-Control-Allow-Headers': 'content-type'
     }
 
@@ -473,10 +474,6 @@ async def metadata(request):
     username = await authorized_userid(request)
     if not username:
         raise web.HTTPUnauthorized()
-    # headers = {
-    #     'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
-    #     'Access-Control-Allow-Headers': 'content-type'
-    # }
 
     if request.method == 'GET':
         try:
@@ -499,10 +496,6 @@ async def metadata_keys(request):
     username = await authorized_userid(request)
     if not username:
         raise web.HTTPUnauthorized()
-    # headers = {
-    #     'ACCESS-CONTROL-ALLOW-ORIGIN': '*',
-    #     'Access-Control-Allow-Headers': 'content-type'
-    # }
 
     if request.method == 'GET':
         try:

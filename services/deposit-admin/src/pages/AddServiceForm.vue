@@ -6,7 +6,7 @@
           <div class="col-md-6">
             <fg-input type="text"
                       label="Service Name"
-                      placeholder="Paper dashboard"
+                      placeholder="Service Name"
                       v-model="service_config.name">
             </fg-input>
           </div>

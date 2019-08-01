@@ -70,6 +70,13 @@ async def logout(request):
 
 @aiohttp_jinja2.template('signup.html')
 async def signup(request):
+    username = await authorized_userid(request)
+    if not username:
+        raise web.HTTPUnauthorized()
+    async with request.app['db'].acquire() as conn:
+        current_user = dict(await db.get_user_by_name(conn, username))
+        if current_user.get('role') != 'admin':
+            raise web.HTTPUnauthorized()
     if request.method == 'POST':
         form = await request.post()
 
@@ -99,6 +106,20 @@ async def current_user(request):
 
     return web.json_response({'current_user': dict(current_user)})
 
+async def users(request):
+    username = await authorized_userid(request)
+    async with request.app['db'].acquire() as conn:
+        if not username:
+            raise web.HTTPUnauthorized()
+        current_user = dict(await db.get_user_by_name(conn, username))
+        if current_user.get('role') != 'admin':
+            raise web.HTTPUnauthorized()
+
+    async with request.app['db'].acquire() as conn:
+        users = await db.get_users(conn)
+
+    return web.json_response({'users': users})
+
 
 """
 Handlers for getting and setting services & service configs
@@ -108,28 +129,33 @@ Handlers for getting and setting services & service configs
 async def services(request):
     username = await authorized_userid(request)
     async with request.app['db'].acquire() as conn:
+        if not username:
+            raise web.HTTPUnauthorized()
         current_user = dict(await db.get_user_by_name(conn, username))
-        if not username or current_user.get('role') != 'admin':
+        if current_user.get('role') != 'admin':
             raise web.HTTPUnauthorized()
     
-        if request.method == 'GET':
-            try:
+    if request.method == 'GET':
+        try:
+            async with request.app['db'].acquire() as conn:
                 services = await db.get_services(conn)
                 if services:
                     return web.json_response({'services': services})
                 else:
                     return web.json_response({'res': 'no services'})
-            except Exception as err:
-                return web.json_response({'err': str(err)})
-        else:
-            return web.Response()
+        except Exception as err:
+            return web.json_response({'err': str(err)})
+    else:
+        return web.Response()
 
 
 async def services_configs(request):
     username = await authorized_userid(request)
     async with request.app['db'].acquire() as conn:
+        if not username:
+            raise web.HTTPUnauthorized()
         current_user = dict(await db.get_user_by_name(conn, username))
-        if not username or current_user.get('role') != 'admin':
+        if current_user.get('role') != 'admin':
             raise web.HTTPUnauthorized()
     headers = {
         'Access-Control-Allow-Headers': 'content-type'
@@ -164,8 +190,10 @@ async def services_configs(request):
 async def services_actions(request):
     username = await authorized_userid(request)
     async with request.app['db'].acquire() as conn:
+        if not username:
+            raise web.HTTPUnauthorized()
         current_user = dict(await db.get_user_by_name(conn, username))
-        if not username or current_user.get('role') != 'admin':
+        if current_user.get('role') != 'admin':
             raise web.HTTPUnauthorized()
     if request.method == 'GET':
         try:
@@ -216,6 +244,13 @@ Handlers for deposit form frontend
 
 
 async def deposit_form(request):
+    username = await authorized_userid(request)
+    async with request.app['db'].acquire() as conn:
+        if not username:
+            raise web.HTTPUnauthorized()
+        current_user = dict(await db.get_user_by_name(conn, username))
+        if current_user.get('role') != 'admin':
+            raise web.HTTPUnauthorized()
     if request.method == 'GET':
         form_id = request.query.get('id')
         if form_id is None:
@@ -311,8 +346,12 @@ Endpoints are scoped for objects and buckets
 
 async def store_buckets(request):
     username = await authorized_userid(request)
-    if not username:
-        raise web.HTTPUnauthorized()
+    async with request.app['db'].acquire() as conn:
+        if not username:
+            raise web.HTTPUnauthorized()
+        current_user = dict(await db.get_user_by_name(conn, username))
+        if current_user.get('role') != 'admin':
+            raise web.HTTPUnauthorized()
     PATH = '/bucket'
     async with request.app['db'].acquire() as conn:
         service_config = await get_service_config_by_action(conn=conn, action='store', media_type='default')
@@ -349,8 +388,12 @@ async def store_buckets(request):
 
 async def store_objects(request):
     username = await authorized_userid(request)
-    if not username:
-        raise web.HTTPUnauthorized()
+    async with request.app['db'].acquire() as conn:
+        if not username:
+            raise web.HTTPUnauthorized()
+        current_user = dict(await db.get_user_by_name(conn, username))
+        if current_user.get('role') != 'admin':
+            raise web.HTTPUnauthorized()
     PATH = '/object'
     async with request.app['db'].acquire() as conn:
         service_config = await get_service_config_by_action(conn=conn, action='store', media_type='default')
@@ -470,9 +513,6 @@ async def deposits(request):
 
 
 async def gallery(request):
-    # username = await authorized_userid(request)
-    # if not username:
-    #     raise web.HTTPUnauthorized()
     if request.method == 'GET':
         filters = None
         if request.query.get('filters'):

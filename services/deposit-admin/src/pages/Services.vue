@@ -59,8 +59,8 @@ export default {
     axios
     .get('../api/services')
     .then(response => {
-      (this.tables.services.data = response.data.services)
-      (this.tables.services.columns = Object.keys(this.tables.services.data[0]));
+      (this.tables.services.data = response.data.services);
+      (this.tables.services.columns = Object.keys(response.data.services[0]));
     },
     error => {
       if (error.response.status === 401) {

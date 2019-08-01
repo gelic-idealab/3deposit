@@ -145,10 +145,21 @@ async def get_deposit_by_id(conn, deposit_id):
 
 # User queries
 async def get_users(conn):
-    records = await conn.execute(
+    result = await conn.execute(
         users.select().order_by(users.c.id)
     )
-    return records
+    column_keys = result.keys()
+    user_list = await result.fetchall()
+    if user_list:
+        user_objects = []
+        for u in user_list:
+            u_obj = {}
+            for (i,k) in enumerate(column_keys):
+                u_obj.update(dict({k:u[i]}))
+            user_objects.append(u_obj)
+        return user_objects
+    else:
+        return None
 
 
 async def get_user_by_name(conn, username):

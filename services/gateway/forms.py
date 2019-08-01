@@ -13,9 +13,7 @@ async def validate_login_form(conn, form):
         return 'password is required'
 
     user = await db.get_user_by_name(conn, username)
-    records = await db.get_users(conn)
-    for record in records.fetchall():
-        print(record)
+
     if not user:
         return 'Invalid username'
     if not check_password_hash(password, user['password_hash']):

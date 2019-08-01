@@ -20,7 +20,7 @@ export default {
         VueJsonPretty
     },
     mounted() {
-        axios.get('http://localhost:8080/form')
+        axios.get('../api/form')
         .then(response => {
             this.deposit_form = response.data.form.content;
         })

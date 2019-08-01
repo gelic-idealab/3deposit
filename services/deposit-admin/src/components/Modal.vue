@@ -2,28 +2,23 @@
     <transition name="modal">
         <div class="modal-mask">
         <div class="modal-wrapper">
-            <div class="modal-container">
+            <div class="modal-container text-center">
 
-            <div class="modal-header">
-                <slot name="header">
-                default header
-                </slot>
-            </div>
+              <div class="modal-header text-center">
+                  <slot name="header">
+                  Gallery Snippet
+                  </slot>
+              </div>
 
-            <div class="modal-body">
-                <textarea id="embedId" rows="5" style="resize: none" :value="embed">
-                    Copy to clipboard
-                </textarea>
-            </div>
+              <div class="modal-body">
+                  <textarea id="embedId" rows="5" style="resize: none" :value="embed">
+                  </textarea>
+              </div>
 
-            <div class="modal-footer">
-                <slot name="footer">
-                default footer
-                <button class="modal-default-button" @click="copyEmbed">
-                    Copy to clipboard
-                </button>
-                </slot>
-            </div>
+              <div class="modal-footer">
+                <p-button type="primary" @click.native="copyEmbed" class="btn-block">Copy to clipboard
+                </p-button>
+              </div>
             </div>
         </div>
         </div>
@@ -32,6 +27,8 @@
 
 
 <script>
+import Button from "./Button.vue";
+
 export default {
     name: 'modal',
     props: {
@@ -46,10 +43,10 @@ export default {
             try {
                 var successful = document.execCommand('copy');
                 var msg = successful ? 'successfully' : 'unsuccessfully';
-                alert('Code copied ' + msg);
+                // alert('Code copied ' + msg);
             } 
             catch (err) {
-                alert('Code copied ' + msg);                
+                alert('Unable to copy ' + msg);                
             }
 
             /* unselect the range */
@@ -100,9 +97,6 @@ export default {
   margin: 20px 0;
 }
 
-.modal-default-button {
-  float: right;
-}
 
 /*
  * The following styles are auto-applied to elements with

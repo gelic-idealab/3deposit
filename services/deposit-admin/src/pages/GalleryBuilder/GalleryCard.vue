@@ -1,7 +1,7 @@
 <template>
     <div>
         <template v-if="deposit.deposit_metadata.media_type==='vr'">
-            <a :href="location">
+            <a :href="deposit.location" target="_blank">
                 <img class="card-img-top" src="../../assets/img/vr.svg"/>
             </a>
         </template>

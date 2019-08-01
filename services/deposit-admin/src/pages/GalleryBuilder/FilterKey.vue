@@ -22,6 +22,7 @@
                     </div>
                 </template>
             </div>
+            <div class="card-footer text-muted">Custom Field: {{ filter.key }}</div>
         </div>
     </div>
 </template>

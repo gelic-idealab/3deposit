@@ -10,7 +10,7 @@ from aiohttp import request as new_request
 from aiohttp_security import remember, forget, authorized_userid
 
 import db
-from forms import validate_login_form
+from forms import validate_login_form, validate_new_user_form
 from process import get_service_config_by_action, start_deposit_processing_task
 import logging
 
@@ -62,11 +62,31 @@ async def login(request):
 
     return {}
 
-
 async def logout(request):
     response = redirect(request.app.router, 'login')
     await forget(request, response)
     return response
+
+
+@aiohttp_jinja2.template('signup.html')
+async def signup(request):
+    if request.method == 'POST':
+        form = await request.post()
+
+        async with request.app['db'].acquire() as conn:
+            error = await validate_new_user_form(conn, form)
+
+            if error:
+                return {'error': error}
+            else:
+                username = form.get('username')
+                password = form.get('password')
+                user = await db.create_user(conn, username, password)
+                logging.info(msg=f'User created: {user}')
+                return web.HTTPFound('login')
+
+    return {}
+
 
 
 async def current_user(request):

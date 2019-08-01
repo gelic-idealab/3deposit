@@ -87,20 +87,22 @@ Handlers for getting and setting services & service configs
 
 async def services(request):
     username = await authorized_userid(request)
-    if not username:
-        raise web.HTTPUnauthorized()
-    if request.method == 'GET':
-        try:
-            async with request.app['db'].acquire() as conn:
+    async with request.app['db'].acquire() as conn:
+        current_user = dict(await db.get_user_by_name(conn, username))
+        if not username or current_user.get('role') != 'admin':
+            raise web.HTTPUnauthorized()
+    
+        if request.method == 'GET':
+            try:
                 services = await db.get_services(conn)
                 if services:
                     return web.json_response({'services': services}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
                 else:
                     return web.json_response({'res': 'no services'}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
-        except Exception as err:
-            return web.json_response({'err': str(err)}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
-    else:
-        return web.Response(headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+            except Exception as err:
+                return web.json_response({'err': str(err)}, headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
+        else:
+            return web.Response(headers=({'ACCESS-CONTROL-ALLOW-ORIGIN': '*'}))
 
 
 async def services_configs(request):

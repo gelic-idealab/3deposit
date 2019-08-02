@@ -33,12 +33,11 @@ Trigger function to begin storage operation with buffered deposit file
 
 async def start_deposit_processing_task(data):
     try:
+        logging.info(msg='start_deposit_processing_task'+str(data))
         engine = await get_service_engine()
-
         deposit_id = data.get('id')
         media_type = data.get('media_type')
         if deposit_id:
-            logging.debug(msg=f'start_deposit_processing_task id: {str(deposit_id)}')
             async with engine.acquire() as conn:
                 await db.add_deposit_by_id(conn, deposit_id)
                 etag = await trigger_store(conn, deposit_id)
@@ -50,7 +49,8 @@ async def start_deposit_processing_task(data):
                     etag=etag,
                     mongo_id=mongo_id,
                     resource_id=publish_resp.get('resource_id'),
-                    media_type=media_type
+                    media_type=media_type,
+                    deposit_date=data.get('deposit_date')
                 )
 
                 data = {
@@ -68,32 +68,28 @@ async def start_deposit_processing_task(data):
 
                 async with new_request(method='PATCH', url='http://mongo-service:5000/objects', data=fd) as resp:
                     resp_json = await resp.json()
-                    if resp_json.err:
-                        logging.error(resp_json.err)
+                    if resp_json.get('err'):
+                        logging.error(resp_json.get('err'))
                     else:
-                        logging.info(resp_json.log)
+                        logging.info(resp_json.get('log'))
 
             if os.path.exists(TMP_FILE_LOCATION.format(deposit_id)):
                 os.remove(TMP_FILE_LOCATION.format(deposit_id))
+
             return True
+
         else:
             return False
+
     except Exception as err:
-        logging.debug(msg=str(err))
+        logging.error(msg=f'start_deposit_processing_task err: {str(err)}')
         return False
 
 
 async def trigger_store(conn, did):
-        # async with ClientSession() as sess:
-        #     async with sess.request(url='/store/objects', method='POST', data=fd, params=deposit_id) as resp:
-        #         resp_json = await resp.json()
-        #         etag = resp_json.get('etag')
-        #         logging.debug(msg=f'trigger_store resp: {str(resp_json)}, {etag}')
-        #         return etag
 
     PATH = '/object'
     service_config = await get_service_config_by_action(conn=conn, action='store', media_type='default')
-    logging.debug(msg='trigger_store service_config: {}'.format(str(service_config)))
     config = dict(service_config.get('config'))
     endpoint = service_config.get('endpoint')
     bucket_name = dict({'bucket_name': '3deposit'})
@@ -109,7 +105,6 @@ async def trigger_store(conn, did):
             async with new_request(method='POST', url=endpoint+PATH, data=fd) as resp:
                 resp_json = await resp.json()
                 etag = resp_json.get('etag')
-                logging.debug(msg=f'trigger_store resp: {str(resp_json)}, {etag}')
                 return etag
 
         except Exception as err:
@@ -126,12 +121,10 @@ def extract_data_from_form(form):
 async def trigger_publish(conn, data):
     media_type = data.get('media_type')
     service_config = await get_service_config_by_action(conn=conn, action='publish', media_type=media_type)
-    logging.debug(msg='service_config: {}'.format(str(service_config)))
     service_name = service_config.get('name')
     did = data.get('id')
     form = data.get('form')
     metadata = extract_data_from_form(form)
-    logging.debug(msg="PUBLISH METADATA "+str(metadata))
     data = {}
     data.update({'metadata': metadata})
     data.update({'deposit_id': did})
@@ -144,9 +137,7 @@ async def trigger_publish(conn, data):
         fd.add_field('config', json.dumps(config), content_type='application/json')
         with open(TMP_FILE_LOCATION.format(did), 'rb') as f:
             fd.add_field('file', f, filename=did, content_type='application/octet-stream')
-            logging.debug(msg="ENDPOINT: "+endpoint+"FORM DATA: "+str(data))
             async with new_request(method='POST', url=endpoint, data=fd) as resp:
-                logging.debug(msg="PUBLISH RESPONSE: "+str(await resp.text()))
                 resp_json = await resp.json()
                 return resp_json
 
@@ -155,9 +146,12 @@ async def trigger_metadata(data):
     did = data.get('id')
     form = data.get('form')
     form_data = extract_data_from_form(form)
+    deposit_date = data.get('deposit_date')
+    form_data.update({'deposit_date': deposit_date})
     deposit_metadata = dict({'deposit_metadata': form_data})
     deposit_id = dict({'deposit_id': did})
     data = {}
+    data.update({'deposit_date': deposit_date})
     data.update(deposit_id)
     data.update(deposit_metadata)
     fd = FormData()
@@ -175,13 +169,11 @@ Helper function to return service configs for a given action and media_type
 
 async def get_service_config_by_action(conn, action, media_type):
     try:
-        logging.debug(msg='get_service_config_by_action called with: {}, {}'.format(action, media_type))
         action_service_name = await db.get_action_service_name(conn=conn, action=action, media_type=media_type)
-        logging.debug(msg='action_service_name: {}'.format(action_service_name))
         service_config = await db.get_service_config(conn=conn, name=action_service_name)
         if service_config:
             return service_config
         else:
             return None
     except Exception as err:
-        logging.debug(msg='get_service_config_by_action err: {}'.format(str(err)))
+        logging.error(msg=f'get_service_config_by_action err: {str(err)}')

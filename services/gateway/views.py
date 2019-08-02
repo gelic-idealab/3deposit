@@ -1,6 +1,8 @@
 import json
 import logging
 import os
+import logging
+from datetime import datetime
 from asyncio import create_task
 
 import db
@@ -9,10 +11,8 @@ from aiohttp import web, FormData, ClientSession
 from aiohttp import request as new_request
 from aiohttp_security import remember, forget, authorized_userid
 
-import db
 from forms import validate_login_form, validate_new_user_form
 from process import get_service_config_by_action, start_deposit_processing_task
-import logging
 
 
 def redirect(router, route_name):
@@ -134,7 +134,7 @@ async def services(request):
         current_user = dict(await db.get_user_by_name(conn, username))
         if current_user.get('role') != 'admin':
             raise web.HTTPUnauthorized()
-    
+
     if request.method == 'GET':
         try:
             async with request.app['db'].acquire() as conn:
@@ -224,7 +224,7 @@ async def services_actions(request):
             req = await request.json()
             async with request.app['db'].acquire() as conn:
                 service = await db.set_action_service_name(
-                    conn=conn, 
+                    conn=conn,
                     action=req.get('action'), 
                     media_type=req.get('media_type'), 
                     service_name=req.get('service_name'))
@@ -290,10 +290,8 @@ async def deposit_form(request):
 async def deposit_upload(request):
     if request.method == 'POST':
         try:
-            logging.debug(msg='query: {}'.format(request.query))
             reader = await request.multipart()
             did = request.query['deposit_id']
-            logging.debug('uploading {}'.format(str(did)))
             rcn = int(request.query['resumableChunkNumber'])
             rtc = int(request.query['resumableTotalChunks'])
             while True:
@@ -313,7 +311,6 @@ async def deposit_upload(request):
                         os.rename('./data/{}'.format(did+'_partial'), './data/{}'.format(did))
             return web.Response(status=200)
         except Exception as err:
-            logging.debug(msg='err: {}'.format(str(err)))
             return web.json_response({'err': str(err)})
     else:
         return web.Response(status=200)
@@ -325,8 +322,9 @@ async def deposit_submit(request):
     }
     if request.method == 'POST':
         try:
+            deposit_date = {'deposit_date': round(datetime.timestamp(datetime.now()))}
             data = await request.json()
-            # logging.debug(msg=f'deposit_submit data: {data}')
+            data.update(deposit_date)
             deposit_processed = create_task(start_deposit_processing_task(data))
             if deposit_processed:
                 return web.Response(status=200, headers=headers)
@@ -397,7 +395,6 @@ async def store_objects(request):
     PATH = '/object'
     async with request.app['db'].acquire() as conn:
         service_config = await get_service_config_by_action(conn=conn, action='store', media_type='default')
-    logging.debug(msg='store_objects service_config: {}'.format(str(service_config)))
     config = dict(service_config.get('config'))
     endpoint = service_config.get('endpoint')
     bucket_name = dict({'bucket_name': '3deposit'})
@@ -464,7 +461,6 @@ async def publications(request):
 
             async with request.app['db'].acquire() as conn:
                 service_config = await get_service_config_by_action(conn=conn, action='publish', media_type=media_type)
-            logging.debug(msg='service_config: {}'.format(str(service_config)))
             endpoint = service_config.get('endpoint')
             config = service_config.get('config')
 
@@ -472,9 +468,7 @@ async def publications(request):
             payload.update({'data': json.dumps(data)})
             payload.update({'config': json.dumps(config)})
 
-            logging.debug(msg="PAYLOAD LOG: "+str(payload))
             async with new_request(method='GET', url=endpoint, data=payload) as resp:
-                logging.debug(await resp.text())
                 return web.json_response(await resp.json(), headers=headers)
 
         else:
@@ -496,16 +490,13 @@ async def deposits(request):
         try:
             if request.query.get('deposit_id'):
                 id = request.query.get('deposit_id')
-                logging.debug(msg=f'ID: {id}')
                 async with request.app['db'].acquire() as conn:
                     deposits = await db.get_deposit_by_id(conn=conn, deposit_id=id)
-                    logging.debug(msg=f'deposits: {str(deposits)}')
                     return web.json_response(deposits, headers=headers)
 
             else:
                 async with request.app['db'].acquire() as conn:
                     deposits = await db.get_deposits(conn=conn)
-                    logging.debug(msg=f'deposits: {str(deposits)}')
                     return web.json_response(deposits, headers=headers)
 
         except Exception as err:
@@ -518,16 +509,14 @@ async def gallery(request):
         if request.query.get('filters'):
             filters = json.loads(request.query.get('filters'))
 
-        logging.debug(msg=str(filters))
         fd = FormData()
 
         config = dict({"filters": filters})
         fd.add_field('config', json.dumps(config), content_type='application/json')
 
         async with new_request(method='GET', url='http://mongo-service:5000/objects', data=fd) as resp:
-            logging.debug("MONGO ERROR:"+await resp.text())
             resp_json = await resp.json()
-            return web.json_response({'deposits': resp_json})
+            return web.json_response(resp_json)
 
 
 async def metadata(request):
@@ -544,7 +533,6 @@ async def metadata(request):
             fd.add_field('config', json.dumps(config), content_type='application/json')
 
             async with new_request(method='GET', url='http://mongo-service:5000/objects', data=fd) as resp:
-                logging.debug("MONGO ERROR:"+await resp.text())
                 resp_json = await resp.json()
                 return web.json_response(resp_json)
 
@@ -560,7 +548,6 @@ async def metadata_keys(request):
     if request.method == 'GET':
         try:
             async with new_request(method='GET', url='http://mongo-service:5000/keys') as resp:
-                logging.debug("MONGO KEYS ERROR:"+await resp.text())
                 resp_json = await resp.json()
                 return web.json_response(resp_json)
 

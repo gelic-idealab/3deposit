@@ -168,8 +168,9 @@ export default {
                     formatted_date_filter.value[index][1] = Date.parse(value[1])/1000
                 })
 
-
                 this.all_filters = this.filters.concat([this.media_filter, formatted_date_filter])
+
+                console.log("ALL_FILTERS:",this.all_filters)
             }
             else {
                 this.all_filters = this.filters.concat([this.media_filter])

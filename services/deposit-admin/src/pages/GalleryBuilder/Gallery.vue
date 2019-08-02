@@ -22,7 +22,6 @@ export default {
         }
     },
     props: {
-        // deposits: Array,
         column_count: Object,
         sortBy: Object,
         filters: Array
@@ -31,8 +30,9 @@ export default {
         GalleryCard
     },
     mounted() {
-        console.log("Mounted",this.filters)
         let qs = JSON.stringify(this.filters);
+        console.log("Mounted",qs)
+
         axios.get("../api/gallery", {params: {filters: qs}})
         .then(response => {
             this.deposits = response.data.deposits

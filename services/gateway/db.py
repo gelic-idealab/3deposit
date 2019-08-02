@@ -20,7 +20,7 @@ deposits = Table(
     'deposits', meta,
 
     Column('deposit_id', String(256), primary_key=True),
-    Column('deposit_date', DateTime, nullable=False),
+    Column('deposit_date', Integer),
     Column('etag', String(256)),
     Column('mongo_id', String(256)),
     Column('resource_id', String(256)),
@@ -94,7 +94,7 @@ async def add_deposit_by_id(conn, deposit_id):
     await conn.execute(
         deposits
         .insert()
-        .values(deposit_id=deposit_id, deposit_date=datetime.datetime.now())
+        .values(deposit_id=deposit_id)
     )
 
 

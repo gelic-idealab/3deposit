@@ -50,20 +50,12 @@ def create_app():
     @app.route('/objects', methods=['GET', 'POST', 'PATCH', 'DELETE'])
     def objects():
         if request.method == 'POST':
-            # try:
             client = create_client(request)
 
             database = client['3deposit']
 
-            # collection_name = get_value(request=request, scope='config', field='collection_name')
-            # deposit_id = get_value(request=request, scope='data', field='deposit_id')
-
-            logging.debug(msg=str(request.form))
-
             data = json.loads(request.form.get('data'))
             deposit_id = data.get('deposit_id')
-            current_timestamp = round(datetime.timestamp(datetime.now()))
-            data.update({'deposit_date': current_timestamp})
 
             if not deposit_id:
                 return jsonify({"err": "Please enter a valid deposit_id."})
@@ -73,9 +65,6 @@ def create_app():
             if mongo_id:
                 return jsonify({"mongo_id": str(mongo_id)})
 
-            # except Exception as err:
-            #     return jsonify({"err": str(err)})
-
         if request.method == 'PATCH':
             try:
                 client = create_client(request)
@@ -84,8 +73,6 @@ def create_app():
 
                 config = json.loads(request.form.get('config'))
                 deposit_id = config.get('deposit_id')
-                # logging.debug("COLLECTION NAME:"+collection_name)
-                # JSONEncoder().encode()
 
                 collection = database[COLLECTION_NAME]
                 update_values = json.loads(request.form.get('data'))
@@ -98,7 +85,7 @@ def create_app():
                 if result.modified_count == 0:
                     return jsonify({"err": f'Unable to update document with deposit ID {deposit_id}'})
                 else:
-                    return jsonify({"log": f'Updated deposit ID {deposit_id} with values {str(data)}'})
+                    return jsonify({"log": f'Updated deposit ID {deposit_id} with values {str(update_values)}'})
 
             except Exception as err:
                 return jsonify({"err": str(err)})
@@ -121,7 +108,6 @@ def create_app():
                 if config.get('filters'):
                     if len(config.get('filters')) > 0:
                         filters = config.get('filters')
-                        logging.debug(msg="FILTERS: "+str(filters))
                         where_clause = {}
 
                         for f in filters:
@@ -175,7 +161,6 @@ def create_app():
                                         temp.append({key: v})
                                     where_clause.update({"$or": temp})
 
-                        # logging.debug(msg=f'WHERE CLAUSE: {str(where_clause)}')
                         docs = collection.find(where_clause, projection={'_id': False})
                         doc_list = []
 
@@ -197,7 +182,6 @@ def create_app():
                 return jsonify({"err": str(err)})
 
         if request.method == 'DELETE':
-            # try:
             client = create_client(request)
 
             database = client['3deposit']
@@ -213,8 +197,5 @@ def create_app():
                 return jsonify({"del_obj": deposit_id})
             else:
                 return jsonify({"err": "Document not deleted."})
-
-            # except Exception as err:
-            #     return jsonify({"err": str(err)})
 
     return app

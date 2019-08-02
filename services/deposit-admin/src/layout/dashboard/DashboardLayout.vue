@@ -3,19 +3,14 @@
     <side-bar>
       <template slot="links">
         <sidebar-link to="/dashboard" name="Dashboard" icon="ti-panel"/>
-        <hr/>
         <sidebar-link to="/profile" name="User Profile" icon="ti-user"/>
         <sidebar-link to="/deposits" name="Deposits" icon="ti-dropbox"/>
         <sidebar-link to="/gallery-builder" name="Gallery" icon="ti-gallery"/>
-
-        <!-- admin routes -->
-        <sidebar-link v-if="current_user.role === 'admin'" to="/actions" name="Actions" icon="ti-control-play"/>
-        <sidebar-link v-if="current_user.role === 'admin'" to="/forms" name="Forms" icon="ti-pencil-alt"/>
-        <sidebar-link v-if="current_user.role === 'admin'" to="/services" name="Services" icon="ti-layout-grid3"/>
-        <sidebar-link v-if="current_user.role === 'admin'" to="/users" name="Users" icon="ti-user"/>
-
-        <sidebar-link v-if="current_user.role === 'admin'" to="/settings" name="Settings" icon="ti-settings"/>
-
+        <sidebar-link v-show="current_user.role === 'admin'" to="/actions" name="Actions" icon="ti-control-play"/>
+        <sidebar-link v-show="current_user.role === 'admin'" to="/forms" name="Forms" icon="ti-pencil-alt"/>
+        <sidebar-link v-show="current_user.role === 'admin'" to="/services" name="Services" icon="ti-layout-grid3"/>
+        <sidebar-link v-show="current_user.role === 'admin'" to="/users" name="Users" icon="ti-user"/>
+        <sidebar-link v-show="current_user.role === 'admin'" to="/settings" name="Settings" icon="ti-settings"/>
       </template>
       <mobile-menu>
         <li class="nav-item">
@@ -63,6 +58,7 @@ import TopNavbar from "./TopNavbar.vue";
 import ContentFooter from "./ContentFooter.vue";
 import DashboardContent from "./Content.vue";
 import MobileMenu from "./MobileMenu";
+
 export default {
   components: {
     TopNavbar,

@@ -29,14 +29,14 @@
             <a class="dropdown-item" href="#">Notification 4</a>
             <a class="dropdown-item" href="#">Another notification</a>
           </drop-down>
-          <li v-if="current_user.role === 'admin'" class="nav-item">
+          <!-- <li v-if="current_user.role === 'admin'" class="nav-item">
             <router-link to="/settings" class="nav-link">
               <i class="ti-settings"></i>
               <p>
                 Settings
               </p>
             </router-link>
-          </li>
+          </li> -->
           <drop-down class="nav-item"
                      :title="current_user.username"
                      title-classes="nav-link"

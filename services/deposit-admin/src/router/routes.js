@@ -5,8 +5,7 @@ import NotFound from "@/pages/NotFoundPage.vue";
 // Admin pages
 import Dashboard from "@/pages/Dashboard.vue";
 import UserProfile from "@/pages/UserProfile.vue";
-import Notifications from "@/pages/Notifications.vue";
-import Icons from "@/pages/Icons.vue";
+import AddActionForm from '@/pages/AddActionForm.vue';
 import Deposits from "@/pages/Deposits.vue";
 import Services from "@/pages/Services.vue";
 import DepositProfile from "@/pages/DepositProfile.vue";
@@ -14,6 +13,7 @@ import FormBuilder from "@/pages/FormBuilder.vue";
 import GalleryBuilder from "@/pages/GalleryBuilder.vue";
 import GalleryEmbed from "@/pages/GalleryEmbed.vue";
 import Settings from "@/pages/Settings.vue";
+import Users from "@/pages/Settings/Users.vue";
 
 
 const routes = [
@@ -32,21 +32,21 @@ const routes = [
         name: "profile",
         component: UserProfile
       },
-      // {
-      //   path: "/notifications",
-      //   name: "notifications",
-      //   component: Notifications
-      // },
-      // {
-      //   path: "/icons",
-      //   name: "icons",
-      //   component: Icons
-      // },
-      // {
-      //   path: "/services",
-      //   name: "services",
-      //   component: Services
-      // },
+      {
+        path: "/actions",
+        name: "actions",
+        component: AddActionForm
+      },
+      {
+        path: "/users",
+        name: "users",
+        component: Users
+      },
+      {
+        path: "/services",
+        name: "services",
+        component: Services
+      },
       {
         path: "/deposits",
         name: "deposits",

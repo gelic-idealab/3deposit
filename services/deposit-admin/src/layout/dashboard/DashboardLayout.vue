@@ -3,13 +3,19 @@
     <side-bar>
       <template slot="links">
         <sidebar-link to="/dashboard" name="Dashboard" icon="ti-panel"/>
+        <hr/>
         <sidebar-link to="/profile" name="User Profile" icon="ti-user"/>
-        <!-- <sidebar-link to="/services" name="Services" icon="ti-widget"/> -->
         <sidebar-link to="/deposits" name="Deposits" icon="ti-dropbox"/>
         <sidebar-link to="/gallery-builder" name="Gallery" icon="ti-gallery"/>
-        <!-- <sidebar-link to="/icons" name="Icons" icon="ti-pencil-alt2"/> -->
-        <!-- <sidebar-link to="/notifications" name="Notifications" icon="ti-bell"/> -->
-        <sidebar-link to="/forms" name="Deposit Forms" icon="ti-pencil-alt"/>
+
+        <!-- admin routes -->
+        <sidebar-link v-if="current_user.role === 'admin'" to="/actions" name="Actions" icon="ti-control-play"/>
+        <sidebar-link v-if="current_user.role === 'admin'" to="/forms" name="Forms" icon="ti-pencil-alt"/>
+        <sidebar-link v-if="current_user.role === 'admin'" to="/services" name="Services" icon="ti-layout-grid3"/>
+        <sidebar-link v-if="current_user.role === 'admin'" to="/users" name="Users" icon="ti-user"/>
+
+        <sidebar-link v-if="current_user.role === 'admin'" to="/settings" name="Settings" icon="ti-settings"/>
+
       </template>
       <mobile-menu>
         <li class="nav-item">

@@ -43,7 +43,7 @@ export default {
   props: {
     title: {
       type: String,
-      default: "3deposit"
+      default: "3DEPOSIT"
     },
     backgroundColor: {
       type: String,

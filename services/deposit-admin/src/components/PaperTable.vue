@@ -58,10 +58,6 @@ export default {
         return true
       }
     },
-    // makeHref(itemValue) {
-    //   // console.log(this.$router.push({ name:"deposits", params:{ 'id': itemValue.toString() } }))
-    //   return "http://localhost:8081/deposits/"+itemValue.toString()
-    // }
   }
 };
 </script>

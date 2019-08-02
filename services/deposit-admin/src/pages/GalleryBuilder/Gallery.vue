@@ -31,8 +31,6 @@ export default {
     },
     mounted() {
         let qs = JSON.stringify(this.filters);
-        console.log("Mounted",qs)
-
         axios.get("../api/gallery", {params: {filters: qs}})
         .then(response => {
             this.deposits = response.data.deposits
@@ -40,7 +38,6 @@ export default {
     },
     watch: {
         filters: function (newFilters, oldFilters) {
-            console.log(newFilters, oldFilters);
             let qs = JSON.stringify(newFilters);
             axios.get("../api/gallery", {params: {filters: qs}})
             .then(response => {

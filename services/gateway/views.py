@@ -516,7 +516,7 @@ async def gallery(request):
 
         async with new_request(method='GET', url='http://mongo-service:5000/objects', data=fd) as resp:
             resp_json = await resp.json()
-            return web.json_response(resp_json)
+            return web.json_response({'deposits': resp_json})
 
 
 async def metadata(request):

@@ -82,12 +82,51 @@ export default {
     StatsCard,
     ChartCard
   },
+  mounted() {
+    axios.get('../api/store/buckets')
+    .then(response => {
+      this.statsCards[0].value = response.data.obj_stats.get('bucket_size');
+    })
+  },
   /**
    * Chart data used to render stats, charts. Should be replaced with server data
    */
   data() {
     return {
-      statsCards: [],
+       statsCards: [
+        {
+          type: "warning",
+          icon: "ti-server",
+          title: "Used Size",
+          value: '',
+          footerText: "Updated now",
+          footerIcon: "ti-reload"
+        },
+        {
+          type: "success",
+          icon: "ti-wallet",
+          title: "Number of Files",
+          value: '',
+          footerText: "Last day",
+          footerIcon: "ti-calendar"
+        },
+        {
+          type: "danger",
+          icon: "ti-pulse",
+          title: "Largest File",
+          value: '',
+          footerText: "In the last hour",
+          footerIcon: "ti-timer"
+        },
+        {
+          type: "info",
+          icon: "ti-twitter-alt",
+          title: "Followers",
+          value: "+45",
+          footerText: "Updated now",
+          footerIcon: "ti-reload"
+        }
+      ],
       usersChart: {
         data: {
           labels: [

@@ -27,6 +27,8 @@
         <div class="card-footer text-muted">{{ pretty_date }}</div>
     </div>
 </template>
+
+
 <script>
 
 import VueJsonPretty from 'vue-json-pretty'
@@ -61,5 +63,8 @@ export default {
     }
 }
 </script>
+
+
 <style>
+
 </style>

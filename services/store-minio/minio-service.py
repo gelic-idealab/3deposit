@@ -266,7 +266,7 @@ def create_app():
 
     # AT THIS ENDPOINT, EACH ACTION IS SPECIFIC TO A BUCKET AT IT'S CORE
 
-    @app.route('/bucket', methods=['GET','POST','DELETE'])
+    @app.route('/bucket', methods=['GET', 'POST', 'DELETE'])
     def bucket():
 
         # Get metadata of all or a list of objects in a specific bucket
@@ -300,6 +300,8 @@ def create_app():
                 objects = minioClient.list_objects(bucket_name, recursive=True)
 
                 if deposit_id_list:
+                    objects_stats = {}
+                    bucket_total = bucket_size = bucket_max = 0
                     for obj in objects:
                         if obj.object_name not in deposit_id_list:
                             continue
@@ -310,8 +312,17 @@ def create_app():
                                       "size": str(obj.size),
                                       "content_type": str(obj.content_type)}
                         objects_list.append(ret_object)
+                        bucket_total += 1
+                        bucket_size += obj.size
+                        if bucket_max < obj.size:
+                            bucket_max = obj.size
 
                         obj_names.append(str(obj.object_name))
+                    objects_stats.update({
+                        'bucket_total': bucket_total,
+                        'bucket_size': bucket_size,
+                        'bucket_max': bucket_max
+                    })
 
                     for i, d in enumerate(deposit_id_list):
                         if d not in obj_names:
@@ -327,7 +338,7 @@ def create_app():
                                       "content_type": str(obj.content_type)}
                         objects_list.append(ret_object)
 
-                return jsonify({"objects": objects_list, "missing deposit ids": missing_ids})
+                return jsonify({"objects": objects_list, "object_stats": objects_stats, "missing deposit ids": missing_ids})
 
             except NoSuchBucket as err:  # Handle bucket_name related errors
                 return jsonify({"err": "Bucket does not exist.",

@@ -114,11 +114,19 @@ async def users(request):
         current_user = dict(await db.get_user_by_name(conn, username))
         if current_user.get('role') != 'admin':
             raise web.HTTPUnauthorized()
+    
+    if request.method == 'GET':
+        async with request.app['db'].acquire() as conn:
+            users = await db.get_users(conn)
 
-    async with request.app['db'].acquire() as conn:
-        users = await db.get_users(conn)
-
-    return web.json_response({'users': users})
+        return web.json_response({'users': users})
+    
+    if request.method == 'DELETE':
+        data = await request.json()
+        user_to_delete = data.get('username')
+        async with request.app['db'].acquire() as conn:
+            deleted = await db.delete_user(conn, user_to_delete)
+        return web.json_response({'deleted': str(deleted)})
 
 
 """

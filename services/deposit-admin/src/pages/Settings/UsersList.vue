@@ -17,9 +17,9 @@
               </span>
             </div>
 
-            <div class="col-3">
-              <p-button type="success" outline icon>
-                <i class="fa fa-paper-plane"></i>
+            <div v-if="user.role != 'admin'" class="col-3">
+              <p-button @click.native="deleteUser(user.username)" type="danger" outline icon>
+                <i class="fa fa-trash"></i>
               </p-button>
             </div>
           </div>
@@ -52,6 +52,12 @@ export default {
         default:
           return "text-muted";
       }
+    },
+    deleteUser(username) {
+      axios.delete('../api/users', {data: {username: username}})
+      .then(response => {
+        console.log(response)
+      });
     }
   },
   mounted() {

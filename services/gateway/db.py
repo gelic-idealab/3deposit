@@ -180,6 +180,14 @@ async def create_user(conn, username, password, role='user'):
     )
     return result
 
+async def delete_user(conn, username):
+    result = await conn.execute(
+        users
+        .delete()
+        .where(users.c.username == username)
+    )
+    return result
+
 # Deposit form queries
 
 

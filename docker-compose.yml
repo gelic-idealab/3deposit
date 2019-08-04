@@ -24,7 +24,7 @@ services:
     networks:
         - gateway_internal    
     volumes:
-        - pg_data:/var/lib/postgresql
+        - ./pg_data:/var/lib/postgresql
     labels:
       - "traefik.enable=false"    
     restart: always
@@ -72,10 +72,10 @@ services:
   
   reverse-proxy:
       container_name: reverse-proxy
-      image: traefik # The official Traefik docker image
-      command: --docker # listen to docker Enables the web UI and tells Traefik to --api
+      image: traefik:1.7
+      command: --docker # --api
       ports:
-        - "80:80"     # The HTTP port
+        - "80:80"
         # - "8080:8080" # The Web UI (enabled by --api)
       volumes:
         - /var/run/docker.sock:/var/run/docker.sock
@@ -86,7 +86,7 @@ services:
 
   minio-server:
     container_name: minio-server
-    image: minio/minio:latest
+    image: minio/minio:RELEASE.2019-08-01T22-18-54Z
     networks:
       - minio_internal
     ports:
@@ -120,7 +120,7 @@ services:
     restart: always
 
   mongo-server:
-    image: mongo
+    image: mongo:4
     container_name: mongo-server
     restart: always
     networks:
@@ -218,5 +218,3 @@ networks:
     mongo_internal:
         external: false
 
-volumes: 
-    pg_data:

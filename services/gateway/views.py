@@ -274,10 +274,10 @@ async def deposit_form(request):
         try:
             req = await request.json()
             content = req.get('content')
-            id = req.get('id')
             if content:
                 try:
                     async with request.app['db'].acquire() as conn:
+                        id = req.get('id')
                         if id:
                             try:
                                 await db.update_form_by_id(conn, req.get('id'), req.get('content'))
@@ -286,11 +286,13 @@ async def deposit_form(request):
                                 return web.json_response({'err': f'Error updating form id {id}: ' + str(e)})
                         try:
                             created = await db.create_form(conn, content)
-                            return web.json_response({'msg': str(created)})
+                            return web.json_response({'form created': str(created)})
                         except Exception as e:
                             return web.json_response({'err': 'Error creating form: ' + str(e)})
                 except Exception as e:
                     return web.json_response({'err': str(e)})
+            else:
+                return web.json_response({'err': f'No form content in req: {str(req)}'})
         except Exception as e:
             return web.json_response({'err': 'Error handling request: ' + str(e)})
 

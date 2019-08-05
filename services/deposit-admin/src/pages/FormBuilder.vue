@@ -1,6 +1,6 @@
 <template>
     <div>
-        <vue-json-editor v-model="deposit_form" :show-btns="true"></vue-json-editor>
+        <vue-json-editor v-model="deposit_form" :show-btns="true" @json-save="saveForm"></vue-json-editor>
       <!-- <vue-json-pretty 
         :data="deposit_form">
       </vue-json-pretty> -->
@@ -29,6 +29,14 @@ export default {
         .then(response => {
             this.deposit_form = response.data.form.content;
         })
+    },
+    methods: {
+        saveForm() {
+            axios.post('../api/form', this.deposit_form)
+            .then(response => {
+                console.log(response.data)
+            })
+        }
     }
 };
 </script>

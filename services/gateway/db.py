@@ -210,6 +210,7 @@ async def create_form(conn, content):
         .insert()
         .values(content=content)
     )
+    return True
 
 
 async def update_form_by_id(conn, id, content):

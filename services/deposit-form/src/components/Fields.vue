@@ -115,7 +115,7 @@ export default {
         })
       .then(function(response) {
         if (response.status === 200) {
-          window.location.href = "/deposit";
+          window.location.href = "/";
         } else {
           (console.log(response));
         }

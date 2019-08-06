@@ -384,13 +384,13 @@ async def store_buckets(request):
 
 
 async def store_objects(request):
-    username = await authorized_userid(request)
-    async with request.app['db'].acquire() as conn:
-        if not username:
-            raise web.HTTPUnauthorized()
-        current_user = dict(await db.get_user_by_name(conn, username))
-        if current_user.get('role') != 'admin':
-            raise web.HTTPUnauthorized()
+    # username = await authorized_userid(request)
+    # async with request.app['db'].acquire() as conn:
+    #     if not username:
+    #         raise web.HTTPUnauthorized()
+    #     current_user = dict(await db.get_user_by_name(conn, username))
+    #     if current_user.get('role') != 'admin':
+    #         raise web.HTTPUnauthorized()
     PATH = '/object'
     async with request.app['db'].acquire() as conn:
         service_config = await get_service_config_by_action(conn=conn, action='store', media_type='default')
@@ -399,10 +399,13 @@ async def store_objects(request):
     bucket_name = dict({'bucket_name': '3deposit'})
     config.update(bucket_name)
 
+    ## TODO 
+    ## build FormData object before passing to minio service 
+
     if request.method == 'GET':
         try:
             data = request.query
-            config.update({'bucket_name': data.get('bucket_name')})
+            config.update({'deposit_id': data.get('deposit_id')})
             payload = dict({'config': config})
             async with new_request(method='GET', url=endpoint+PATH, json=payload) as resp:
                 try:

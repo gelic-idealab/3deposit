@@ -101,7 +101,6 @@ def create_app():
             try:
                 # select endpoint
                 minioClient = create_client(request)
-                print(type(minioClient))
 
                 if type(minioClient) == dict and 'err' in minioClient:
                     return jsonify(minioClient)

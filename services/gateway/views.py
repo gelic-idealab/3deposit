@@ -534,6 +534,24 @@ async def metadata(request):
         except Exception as err:
             return web.json_response({'err': str(err)})
 
+    elif request.method == 'PATCH':
+        try:
+            q = request.query
+            data = await request.json()
+
+            fd = FormData()
+            config = dict({"deposit_id": q.get('deposit_id')})
+
+            fd.add_field('config', json.dumps(config), content_type='application/json')
+            fd.add_field('data', json.dumps(data), content_type='application/json')            
+
+            async with new_request(method='PATCH', url='http://mongo-service:5000/objects', data=fd) as resp:
+                resp_json = await resp.json()
+                return web.json_response(resp_json)
+
+        except Exception as err:
+            return web.json_response({'err': str(err)})
+
 
 async def metadata_keys(request):
     username = await authorized_userid(request)

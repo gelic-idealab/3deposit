@@ -2,6 +2,7 @@
     <div>
         <div class="row">
             <div class ="col">
+             
                 <div class="card mb-3 mr-9">
                     <div class="embed-responsive embed-responsive-16by9">
                         <embed-card :location="deposit.location" class="embed-responsive-item"></embed-card>
@@ -11,6 +12,30 @@
                         <!-- <p class="card-text">{{ deposit_metadata }}</p> -->
                         <!-- <p class="card-text">{{ publish_metadata }}</p> -->
                         <p class="card-text"><small class="text-muted">{{ pretty_date }}</small></p>
+                    </div>
+                </div>
+                <div class="card mb-3 mr-9">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="container d-flex justify-content-around">
+                                <p-button type="success" outline v-on:click.native="downloadDeposit" class="btn" style="width: 20%">
+                                    <i class="ti ti-download mr-1"></i>
+                                    Download
+                                </p-button>
+                                <p-button type="info" outline v-on:click.native="republishDeposit" class="btn" style="width: 20%">
+                                    <i class="ti ti-reload mr-1"></i>
+                                    Republish
+                                </p-button>
+                                <p-button type="warning" outline v-on:click.native="unpublishDeposit" class="btn" style="width: 20%">
+                                    <i class="ti ti-close mr-1"></i>
+                                    Unpublish
+                                </p-button>
+                                <p-button type="danger" outline v-on:click.native="deleteDeposit" class="btn" style="width: 20%">
+                                    <i class="ti ti-trash mr-1"></i>
+                                    Delete
+                                </p-button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="card">
@@ -73,6 +98,16 @@ export default {
             axios.get("../../api/publications", {params: {resource_id: response.data.resource_id, media_type: response.data.deposit_metadata.media_type}})
             .then(response => {(this.publish_metadata = response.data)})
         })
+    },
+    methods: {
+        unpublishDeposit() {
+            axios.delete("../../api/publications", {params: {resource_id: this.deposit.resource_id, media_type: this.deposit.deposit_metadata.media_type}})
+            .then(response => {
+                if(response.status === 200) {
+                    axios.patch("../../api/metadata", {location: null}, {params: {deposit_id: this.id}})
+                }
+            })
+        }
     }
 };
 </script>

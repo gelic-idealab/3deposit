@@ -34,7 +34,7 @@ payload_dict = {
         },
         {
             'id': 'projection',
-            'value': 'cylindrical'
+            'value': 'pyramid'
         },
         {
             'id': 'stereo_format',

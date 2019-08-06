@@ -252,17 +252,15 @@ Handlers for deposit form frontend
 
 
 async def deposit_form(request):
-    username = await authorized_userid(request)
-    async with request.app['db'].acquire() as conn:
-        if not username:
-            raise web.HTTPUnauthorized()
-        current_user = dict(await db.get_user_by_name(conn, username))
-        if current_user.get('role') != 'admin':
-            raise web.HTTPUnauthorized()
+    # username = await authorized_userid(request)
+    # async with request.app['db'].acquire() as conn:
+    #     if not username:
+    #         raise web.HTTPUnauthorized()
+    #     current_user = dict(await db.get_user_by_name(conn, username))
+    #     if current_user.get('role') != 'admin':
+    #         raise web.HTTPUnauthorized()
     if request.method == 'GET':
-        form_id = request.query.get('id')
-        if form_id is None:
-            form_id = 1
+        form_id = request.query.get('form_id')
         async with request.app['db'].acquire() as conn:
             form = await db.get_form_by_id(conn, id=form_id)
         if form:
@@ -273,26 +271,17 @@ async def deposit_form(request):
     if request.method == 'POST':
         try:
             req = await request.json()
+            form_id = req.get('form_id')
             content = req.get('content')
-            if content:
+            if form_id and content:
                 try:
                     async with request.app['db'].acquire() as conn:
-                        id = req.get('id')
-                        if id:
-                            try:
-                                await db.update_form_by_id(conn, req.get('id'), req.get('content'))
-                                return web.json_response({'msg': f'Updated content for form {form_id}'})
-                            except Exception as e:
-                                return web.json_response({'err': f'Error updating form id {id}: ' + str(e)})
-                        try:
-                            created = await db.create_form(conn, content)
-                            return web.json_response({'form created': str(created)})
-                        except Exception as e:
-                            return web.json_response({'err': 'Error creating form: ' + str(e)})
+                        form = await db.update_form_by_id(conn, form_id, content)
+                        return web.json_response({'msg': f'Updated content for form {form_id}: {form}'})
                 except Exception as e:
                     return web.json_response({'err': str(e)})
             else:
-                return web.json_response({'err': f'No form content in req: {str(req)}'})
+                return web.json_response({'err': f'Missing params for req: {str(req)}'})
         except Exception as e:
             return web.json_response({'err': 'Error handling request: ' + str(e)})
 

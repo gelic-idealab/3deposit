@@ -30,7 +30,7 @@ deposits = Table(
 forms = Table(
     'forms', meta,
 
-    Column('id', Integer, primary_key=True),
+    Column('id', String(256), primary_key=True),
     Column('content', JSON, nullable=True)
 )
 
@@ -204,23 +204,28 @@ async def get_form_by_id(conn, id):
         return None
 
 
-async def create_form(conn, content):
+async def create_form(conn, id, content):
     await conn.execute(
         forms
         .insert()
-        .values(content=content)
+        .values(id=id, content=content)
     )
     return True
 
 
 async def update_form_by_id(conn, id, content):
-    await conn.execute(
+    result = await conn.execute(
         forms
         .update()
         .where(forms.c.id == id)
         .values(content=content)
     )
-
+    logging.debug(str(result.rowcount))
+    if result.rowcount > 0:
+        return True
+    else:
+        created = await create_form(conn, id, content)
+        return created
 # Service config queries
 
 

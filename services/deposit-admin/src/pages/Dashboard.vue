@@ -82,12 +82,6 @@ export default {
     StatsCard,
     ChartCard
   },
-  mounted() {
-    axios.get('../api/store/buckets')
-    .then(response => {
-      this.statsCards[0].value = response.data.obj_stats.get('bucket_size');
-    })
-  },
   /**
    * Chart data used to render stats, charts. Should be replaced with server data
    */
@@ -197,6 +191,12 @@ export default {
         options: {}
       }
     };
+  },
+  mounted() {
+    axios.get('../api/store/buckets')
+    .then(response => {
+      this.statsCards[0].value = response.data.obj_stats.get('bucket_size');
+    })
   }
 };
 </script>

@@ -450,28 +450,24 @@ async def publications(request):
 
     # PATH = '/models'
     try:
-        if request.method == 'GET':
-            q = request.query
-            data = {
-                'resource_id': q.get('resource_id')
-            }
+        q = request.query
+        data = {
+            'resource_id': q.get('resource_id')
+        }
 
-            media_type = q.get('media_type')
+        media_type = q.get('media_type')
 
-            async with request.app['db'].acquire() as conn:
-                service_config = await get_service_config_by_action(conn=conn, action='publish', media_type=media_type)
-            endpoint = service_config.get('endpoint')
-            config = service_config.get('config')
+        async with request.app['db'].acquire() as conn:
+            service_config = await get_service_config_by_action(conn=conn, action='publish', media_type=media_type)
+        endpoint = service_config.get('endpoint')
+        config = service_config.get('config')
 
-            payload = {}
-            payload.update({'data': json.dumps(data)})
-            payload.update({'config': json.dumps(config)})
+        payload = {}
+        payload.update({'data': json.dumps(data)})
+        payload.update({'config': json.dumps(config)})
 
-            async with new_request(method='GET', url=endpoint, data=payload) as resp:
-                return web.json_response(await resp.json(), headers=headers)
-
-        else:
-            return web.Response(status=200, headers=headers)
+        async with new_request(method=request.method, url=endpoint, data=payload) as resp:
+            return web.json_response(await resp.json(), headers=headers)
 
     except Exception as err:
         return web.json_response({"err": str(err)}, headers=headers)

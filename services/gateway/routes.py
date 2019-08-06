@@ -59,6 +59,7 @@ def setup_routes(app):
     # publication routes
     app.router.add_get('/api/publications', publications)
     app.router.add_post('/api/publications', publications)
+    app.router.add_delete('/api/publications', publications)
 
     # deposit routes
     app.router.add_get('/api/deposits', deposits)

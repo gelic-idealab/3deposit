@@ -12,7 +12,7 @@ and publishes to Vimeo.
 app = Flask(__name__)
 
 
-@app.route('/', methods=['POST', 'GET'])
+@app.route('/', methods=['POST', 'GET', 'DELETE'])
 def handler():
 
     # get auth values from request object
@@ -59,16 +59,19 @@ def handler():
         except Exception as err:
             return jsonify({'err': str(err)})
 
-
-    if request.method == 'GET':
+    else:
         try:
             data = json.loads(request.form.get('data'))
-            vid = data.get('resource_id')
-            url = '/videos/{}/pictures'.format(vid)
-            r = client.get(url)
+            video_id = data.get('resource_id')
+            url = '/videos/{}/pictures'.format(video_id)
+            if request.method == 'GET':
+                r = client.get(url)
+            elif request.method == 'DELETE':
+                r = client.delete(url)
             return jsonify(r.json())
         except Exception as err:
-            return jsonify({ 'err': str(err) })
+            return jsonify({'err': str(err)})
+
 
 if __name__ == '__main__':
     app.run()

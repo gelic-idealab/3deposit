@@ -30,7 +30,7 @@ def models():
             SKETCHFAB_DOMAIN = 'sketchfab.com'
             SKETCHFAB_API_URL = 'https://api.{}/v3'.format(SKETCHFAB_DOMAIN)
             MODEL_ENDPOINT = SKETCHFAB_API_URL + '/models'
-            
+
             logging.debug(msg='sketchfab req: {}'.format(request.form))
             # token = get_value(request, 'config', 'token')
             config = json.loads(request.form.get('config'))
@@ -86,7 +86,7 @@ def models():
                 return jsonify({"msg": "Model does not exist.", "content": str(r.content)})
             else:
                 return jsonify({"msg": "Model successfully deleted.", "content": r.status_code})
-        except requests.exceptions.RequestException as e:
+        except requests.exceptions.RequestException as e:                  
             return jsonify({'requestException': str(e)})
 
     # Returns the details of the model.

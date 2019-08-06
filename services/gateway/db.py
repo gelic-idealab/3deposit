@@ -188,9 +188,8 @@ async def delete_user(conn, username):
     )
     return result
 
-# Deposit form queries
 
-
+# Form queries
 async def get_form_by_id(conn, id):
     result = await conn.execute(
         forms
@@ -225,9 +224,9 @@ async def update_form_by_id(conn, id, content):
     else:
         created = await create_form(conn, id, content)
         return created
-# Service config queries
 
 
+# Service queries
 async def get_services(conn):
     result = await conn.execute(
         services
@@ -280,7 +279,7 @@ async def set_service_config(conn, name, endpoint, config):
         return 'service config created for {}'.format(name)
 
 
-# action config queries
+# Action queries
 async def get_action_service_name(conn, action, media_type='default'):
     logging.debug(msg='get_action_service_name called with: {}, {}'.format(action, media_type))
     result = await conn.execute(
@@ -303,7 +302,6 @@ async def get_action_service_name(conn, action, media_type='default'):
         return None
 
 
-# action config queries
 async def set_action_service_name(conn, action, media_type, service_name):
     logging.debug(msg='set_action_service_name called with: {}, {}: {}'.format(action, media_type, service_name))
     current_service = await get_action_service_name(conn, action, media_type)

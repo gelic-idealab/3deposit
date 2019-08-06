@@ -220,7 +220,6 @@ async def update_form_by_id(conn, id, content):
         .where(forms.c.id == id)
         .values(content=content)
     )
-    logging.debug(str(result.rowcount))
     if result.rowcount > 0:
         return True
     else:

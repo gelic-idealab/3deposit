@@ -6,14 +6,8 @@ from minio import Minio
 from minio.error import ResponseError, BucketAlreadyExists, NoSuchBucket, NoSuchKey, AccessDenied
 from minio.error import SignatureDoesNotMatch, InvalidBucketError, InvalidAccessKeyId, SignatureDoesNotMatch, BucketAlreadyOwnedByYou
 from werkzeug.exceptions import BadRequestKeyError
-# from sys import path
-
-# path.append("C:\Users\mihirsj2\Desktop\3deposit\libs\python\")
 
 from unpack.unpack import get_value
-
-# ACCESS KEY AKIAIOSFODNN7GRAINGER
-# SECRET KEY wJalrXUtnFEMI/K7MDENG/bPxRfiCYGRAINGERKEY
 
 
 def minio_keys(request):
@@ -78,9 +72,6 @@ def create_client(request):
 
     if server_endpoint == 'err':
         return {"err": "Please enter a valid provider."}
-
-    # except Exception as err:
-    #   return err
 
     return minioClient
 
@@ -165,14 +156,6 @@ def create_app():
                 # extract bucket_name value
                 bucket_name = config.get('bucket_name')
                 minioClient.bucket_exists(bucket_name)
-
-                # check for existing object with same deposit_id
-                # objects = minioClient.list_objects(bucket_name, recursive=True)
-
-                # for obj in objects:
-                #     if obj.object_name == deposit_id:
-                #         return jsonify({"err":"This deposit_id is already registered. Please enter a new deposit_id.",
-                #                         "log":str(err)})
 
                 metadata = {}
                 metadata['BUCKET_NAME'] = bucket_name

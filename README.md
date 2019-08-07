@@ -2,12 +2,12 @@
 
 3deposit is a 3D content storage, publication, & distribution platform for academic libraries. Key features include a customizable deposit form, automated deposit metadata harvesting, batch deposits, configurable publication ndpoints, file integrity checking, and a content 'gallery builder'. 3deposit aims to be extensible, portable, & compatible with existing content preservation systems. Ongoing support and features are planned, including federated content sharing between deployed instances. 
 
-![deposit-profile](./docs/deposit-profile.png)
+![gallery](./docs/gallery-builder.png)
 
-## Storage ##
+### Storage
 By default, 3deposit uses [Minio](https://github.com/minio/minio) for object storage. Instances can be configured to store objects locally or in a remote bucket. Remote buckets can be self-hosted with a MinIO server or with S3-compatbile providers, such as AWS. 
 
-## Publication ##
+### Publication
 3deposit natively supports three media types:
 * 3D models 
 * 360 videos
@@ -23,11 +23,13 @@ VR*           | AWS S3
 
 Custom services can be added to support additional media types & endpoints.
 
-## Deployment ##
+### Deployment
 3deposit can be deployed with docker, using the docker-compose file found in the repo. 
 
+### System
+![3deposit](./docs/3deposit-flow.png)
 
-## Acknowledgements ##
+### Acknowledgements
 3deposit was developed in Grainger Engineering Library's IDEA Lab, as part of the [Mellon Foundation Immersive Scholar grant] (https://www.immersivescholar.org/). In addition to members of the grant cohort, the developers wish to thank the input and guidance from many others at the U of I, including:
 
 Undergraduate Library
@@ -39,6 +41,3 @@ Research Data Services
 School of Information Sciences
 College of Engineering
 Carle Illinois College of Medicine
-
-## Data flow ##
-![3deposit](./docs/3deposit-flow.png)

@@ -59,19 +59,25 @@ def handler():
         except Exception as err:
             return jsonify({'err': str(err)})
 
-    else:
+    elif request.method == 'GET':
         try:
             data = json.loads(request.form.get('data'))
             video_id = data.get('resource_id')
             url = '/videos/{}/pictures'.format(video_id)
-            if request.method == 'GET':
-                r = client.get(url)
-            elif request.method == 'DELETE':
-                r = client.delete(url)
+            r = client.get(url)
             return jsonify(r.json())
         except Exception as err:
             return jsonify({'err': str(err)})
 
+    elif request.method == 'DELETE':
+        try:    
+            data = json.loads(request.form.get('data'))
+            video_id = data.get('resource_id')
+            url = '/videos/{}'.format(video_id)
+            r = client.delete(url)
+            return jsonify(r.json())
+        except Exception as err:
+            return jsonify({'err': str(err)})
 
 if __name__ == '__main__':
     app.run()

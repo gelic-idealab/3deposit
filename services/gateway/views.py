@@ -401,6 +401,7 @@ async def store_objects(request):
 
     ## TODO 
     ## build FormData object before passing to minio service 
+    ## or pass as raw json and change minio service handler
 
     if request.method == 'GET':
         try:

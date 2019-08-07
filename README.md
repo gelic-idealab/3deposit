@@ -30,7 +30,7 @@ Custom services can be added to support additional media types & endpoints.
 ![3deposit](./docs/3deposit-flow.png)
 
 ### Acknowledgements
-3deposit was developed in Grainger Engineering Library's IDEA Lab, as part of the [Mellon Foundation Immersive Scholar grant] (https://www.immersivescholar.org/). In addition to members of the grant cohort, the developers wish to thank the input and guidance from many others at the U of I, including:
+3deposit was developed in Grainger Engineering Library's IDEA Lab, as part of the [Mellon Foundation Immersive Scholar grant](https://www.immersivescholar.org/). In addition to members of the grant cohort, the developers wish to thank the input and guidance from many others at the U of I, including:
 
 * Undergraduate Library
 * Media Commons

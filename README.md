@@ -32,12 +32,12 @@ Custom services can be added to support additional media types & endpoints.
 ### Acknowledgements
 3deposit was developed in Grainger Engineering Library's IDEA Lab, as part of the [Mellon Foundation Immersive Scholar grant] (https://www.immersivescholar.org/). In addition to members of the grant cohort, the developers wish to thank the input and guidance from many others at the U of I, including:
 
-Undergraduate Library
-Media Commons
-CITL
-Library IT
-Engineering IT
-Research Data Services
-School of Information Sciences
-College of Engineering
-Carle Illinois College of Medicine
+* Undergraduate Library
+* Media Commons
+* CITL
+* Library IT
+* Engineering IT
+* Research Data Services
+* School of Information Sciences
+* College of Engineering
+* Carle Illinois College of Medicine

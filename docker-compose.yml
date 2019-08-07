@@ -69,6 +69,9 @@ services:
     volumes:
       - ./services/gateway/data:/gateway/data
     restart: always
+    env_file:
+      - keys.env
+
   
   reverse-proxy:
       container_name: reverse-proxy

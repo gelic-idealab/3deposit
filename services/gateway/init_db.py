@@ -1,6 +1,6 @@
 import time
 import logging
-
+import os
 import json
 
 from sqlalchemy import create_engine, MetaData
@@ -8,8 +8,6 @@ from sqlalchemy import create_engine, MetaData
 from db import forms, deposits, users, services, actions
 from settings import BASE_DIR, get_config
 from security import generate_password_hash
-
-import keys
 
 
 DSN = "postgresql://{user}:{password}@{host}:{port}/{database}"
@@ -66,7 +64,7 @@ def create_tables(engine):
 
 def drop_tables(engine):
     meta = MetaData()
-    meta.drop_all(bind=engine, tables=[forms, deposits, users, services])
+    meta.drop_all(bind=engine, tables=[forms, deposits, users, services, actions])
 
 
 def create_admin(engine):
@@ -113,27 +111,49 @@ def create_default_actions(engine):
 
 
 def create_default_services(engine):
+    env = os.environ
     with engine.connect() as conn:
         objects = [
             {
                 'name': 'minio',
                 "endpoint": 'http://minio-service:5000',
-                'config': {"auth": {"access_key": keys.MINIO_ACCESS_KEY, "secret_key": keys.MINIO_SECRET_KEY}}
+                'config': {
+                    "auth": {
+                        "access_key": env.get('MINIO_ACCESS_KEY'), 
+                        "secret_key": env.get('MINIO_SECRET_KEY')
+                    }
+                }
             },
             {
                 'name': 'sketchfab',
                 "endpoint": 'http://sketchfab-service:5000/models',
-                'config': {"auth": {"token": keys.SKETCHFAB_TOKEN}}
+                'config': {
+                    "auth": {
+                        "token": env.get('SKETCHFAB_TOKEN')
+                    }
+                }
             },
             {
                 'name': 'vimeo',
                 "endpoint": 'http://vimeo-service:5000/',
-                'config': {"auth": {"client_id": keys.VIMEO_CLIENT_ID, "access_token": keys.VIMEO_ACCESS_TOKEN, "client_secret": keys.VIMEO_CLIENT_SECRET}}
+                'config': {
+                    "auth": {
+                        "client_id": env.get('VIMEO_CLIENT_ID'), 
+                        "access_token": env.get('VIMEO_ACCESS_TOKEN'), 
+                        "client_secret": env.get('VIMEO_CLIENT_SECRET')
+                    }
+                }
             },
             {
                 'name': 'aws',
                 "endpoint": 'http://aws-service:5000',
-                'config': {"bucket_name": "new-3deposit", "auth": {"access_key": keys.AWS_ACCESS_KEY, "secret_key": keys.AWS_SECRET_KEY}}
+                'config': {
+                    "bucket_name": env.get('AWS_BUCKET_NAME'), 
+                    "auth": {
+                        "access_key": env.get('AWS_ACCESS_KEY'), 
+                        "secret_key": env.get('AWS_SECRET_KEY')
+                    }
+                }
             }
         ]
 

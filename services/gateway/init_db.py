@@ -68,16 +68,9 @@ def drop_tables(engine):
 
 
 def create_admin(engine):
-    username = 'admin'
-    password_hash = generate_password_hash('admin')
+    username = os.environ.get('PG_ADMIN_USERNAME')
+    password_hash = generate_password_hash(os.environ.get('PG_ADMIN_PASSWORD'))
     role = 'admin'
-    with engine.connect() as conn:
-        conn.execute(users.insert().values(username=username, password_hash=password_hash, role=role))
-
-def create_user(engine):
-    username = 'user'
-    password_hash = generate_password_hash('user')
-    role = 'user'
     with engine.connect() as conn:
         conn.execute(users.insert().values(username=username, password_hash=password_hash, role=role))
 
@@ -163,11 +156,9 @@ def create_default_services(engine):
 
 def main():
     logging.info(msg='running init_db, waiting for db container to become available')
-    # time.sleep(5)
     setup_db(USER_CONFIG['postgres'])
     create_tables(engine=user_engine) 
     create_admin(engine=user_engine)
-    create_user(engine=user_engine)
     create_default_actions(engine=user_engine)
     create_default_services(engine=user_engine)
     # drop_tables()

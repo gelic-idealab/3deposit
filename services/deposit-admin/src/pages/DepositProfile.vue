@@ -107,6 +107,9 @@ export default {
                     axios.patch("../../api/metadata", {location: null}, {params: {deposit_id: this.id}})
                 }
             })
+        },
+        downloadDeposit() {
+            axios.get("../../api/store/objects", {params: {deposit_id: this.id}})
         }
     }
 };

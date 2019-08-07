@@ -70,7 +70,7 @@ def handler():
             return jsonify({'err': str(err)})
 
     elif request.method == 'DELETE':
-        try:    
+        try:
             data = json.loads(request.form.get('data'))
             video_id = data.get('resource_id')
             url = '/videos/{}'.format(video_id)
@@ -78,6 +78,7 @@ def handler():
             return jsonify(r.json())
         except Exception as err:
             return jsonify({'err': str(err)})
+
 
 if __name__ == '__main__':
     app.run()

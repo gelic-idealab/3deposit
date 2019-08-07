@@ -1,6 +1,6 @@
 <template>
     <div class="card-columns">
-        <div class="card" v-for="d in deposits" :key="d.deposit_id">
+        <div class="card" v-for="d in availableCards" :key="d.deposit_id">
             <gallery-card 
                 :deposit="d"
             >
@@ -42,6 +42,13 @@ export default {
             axios.get("../api/gallery", {params: {filters: qs}})
             .then(response => {
                 this.deposits = response.data.deposits
+            })
+        }
+    },
+    computed: {
+        availableCards: function() {
+            return this.deposits.filter(function (d) {
+                return d.location
             })
         }
     },

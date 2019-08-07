@@ -196,6 +196,7 @@ export default {
     axios.get('../api/store/buckets')
     .then(response => {
       this.statsCards[0].value = response.data.obj_stats.get('bucket_size');
+      this.statsCards[1].value = response.data.obj_stats.get('');
     })
   }
 };

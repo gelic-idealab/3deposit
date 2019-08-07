@@ -2,7 +2,10 @@
 
 3deposit is a 3D content storage, publication, distribution, & management platform for academic libraries. Key features include a customizable deposit form, automated deposit metadata harvesting, batch deposits, configurable publication endpoints, file integrity checking, and a content 'gallery builder'. 3deposit aims to be extensible, portable, & compatible with existing content preservation systems. Ongoing support and features are planned, including federated content sharing between deployed instances. 
 
-![gallery](./docs/gallery-builder.png)
+![gallery-builder](./docs/gallery-builder.png)
+
+![deposit-profile](./docs/deposit-profile.png)
+
 
 ### Storage
 By default, 3deposit uses [Minio](https://github.com/minio/minio) for object storage. Instances can be configured to store objects locally or in a remote bucket. Remote buckets can be self-hosted with a MinIO server or with S3-compatbile providers, such as AWS. 

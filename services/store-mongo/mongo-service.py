@@ -75,10 +75,15 @@ def create_app():
                 deposit_id = config.get('deposit_id')
 
                 collection = database[COLLECTION_NAME]
-                update_values = json.loads(request.form.get('data'))
                 update_query = {
                     'deposit_id': deposit_id
                 }
+
+                values = json.loads(request.form.get('data'))
+                update_values = {}
+
+                for key in values.keys():
+                    update_values.update({f'deposit_metadata.{key}': values[key]})
 
                 result = collection.update_one(update_query, {'$set': update_values})
 

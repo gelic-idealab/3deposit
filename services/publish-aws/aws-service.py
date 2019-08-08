@@ -74,8 +74,8 @@ def index():
                 chunk_count = int(math.ceil(source_size / float(chunk_size)))
 
                 # Send the file parts, using FileChunkIO to create a file-like object
-                # that points to a certain byte range within the original file. We
-                # set bytes to never exceed the original file size.
+                # that points to a certain byte range within the original file.
+                # We set bytes to never exceed the original file size.
                 for i in range(chunk_count):
                     offset = chunk_size * i
                     bytes = min(chunk_size, source_size - offset)
@@ -100,7 +100,7 @@ def index():
             return jsonify({ 
                 'resource_id': deposit_id,
                 'location': f'https://{bucket_name}.s3.amazonaws.com/{index_path}'
-                })
+            })
 
         elif request.method == 'GET':
             resource_id = get_value(request, 'data', 'resource_id')
@@ -117,6 +117,17 @@ def index():
                 length += 1
 
             return jsonify({'metadata': obj_list, 'files': length})
+
+        elif request.method == 'DELETE':
+            resource_id = get_value(request, 'data', 'resource_id')
+            # for obj in b:
+            #     if resource_id == obj:
+            #         obj.delete
+
+            for key in b.list(prefix=resource_id):
+                key.delete()
+
+            return jsonify({'msg': 'Deleted object '+str(resource_id)+' successfully.'})
 
     except Exception as err:
         return jsonify({'err': str(err)})

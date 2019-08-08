@@ -1,7 +1,7 @@
 <template>
     <div>
         <template v-if="deposit.deposit_metadata.media_type==='vr'">
-            <a :href="deposit.location" target="_blank">
+            <a :href="deposit.deposit_metadata.location" target="_blank">
                 <img class="card-img-top" src="../../assets/img/vr.svg"/>
             </a>
         </template>
@@ -9,14 +9,14 @@
             <a :href="location">
                 <div class="embed-responsive embed-responsive-16by9">
                     <!-- <embed class="embed-responsive-item" :src="publish_metadata.thumbnails.images[2].url"/> -->
-                    <embed class="embed-responsive-item" :src="deposit.location"/>
+                    <embed class="embed-responsive-item" :src="deposit.deposit_metadata.location"/>
                 </div>
             </a>
         </template>
         <template v-else-if="deposit.deposit_metadata.media_type==='video'">
             <a :href="location">
                 <div class="embed-responsive embed-responsive-16by9">
-                    <embed class="embed-responsive-item" :src="deposit.location"/>
+                    <embed class="embed-responsive-item" :src="deposit.deposit_metadata.location"/>
                 </div>
             </a>
         </template>

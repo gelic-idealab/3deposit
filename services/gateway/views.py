@@ -452,7 +452,6 @@ async def publications(request):
         'Access-Control-Allow-Headers': 'content-type'
     }
 
-    # PATH = '/models'
     try:
         q = request.query
         data = {

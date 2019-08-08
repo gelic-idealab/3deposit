@@ -5,7 +5,7 @@
              
                 <div class="card mb-3 mr-9">
                     <div class="embed-responsive embed-responsive-16by9">
-                        <embed-card :location="deposit.location" class="embed-responsive-item"></embed-card>
+                        <embed-card :location="deposit.deposit_metadata.location" class="embed-responsive-item"></embed-card>
                     </div>
                     <div class="card-body">
                         <h5 class="card-title">{{ deposit.deposit_id }}</h5>
@@ -104,7 +104,7 @@ export default {
             axios.delete("../../api/publications", {params: {resource_id: this.deposit.resource_id, media_type: this.deposit.deposit_metadata.media_type}})
             .then(response => {
                 if(response.status === 200) {
-                    axios.patch("../../api/metadata", {location: null}, {params: {deposit_id: this.id}})
+                    axios.patch("../../api/metadata", {location: 'None'}, {params: {deposit_id: this.id}})
                 }
             })
         },

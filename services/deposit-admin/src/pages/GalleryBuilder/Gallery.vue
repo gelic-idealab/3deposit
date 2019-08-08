@@ -1,6 +1,6 @@
 <template>
     <div class="card-columns">
-        <div class="card" v-for="d in availableCards" :key="d.deposit_id">
+        <div class="card" v-for="d in deposits" :key="d.deposit_id">
             <gallery-card 
                 :deposit="d"
             >
@@ -18,12 +18,15 @@ import GalleryCard from "./GalleryCard.vue";
 export default {
     data () {
         return {
-            deposits: []
+            deposits: [],
+            sortBy: {
+                field: 'deposit_date',
+                ascending: false
+            }
         }
     },
     props: {
         column_count: Object,
-        sortBy: Object,
         filters: Array
     },
     components: {
@@ -45,29 +48,22 @@ export default {
             })
         }
     },
-    computed: {
-        availableCards: function() {
-            return this.deposits.filter(function (d) {
-                return d.location
-            })
-        }
-    },
     methods: {
-        // order(deposits) {
-        //      let sb = this.sortBy;
-        //      if (sb.field==='deposit_date') {
-        //         return deposits.slice().sort(function(a, b) {
-        //             var atime = new Date(a.deposit_date);
-        //             var btime = new Date(b.deposit_date);
-        //             if(sb.ascending===true) {
-        //                 return atime.getTime() - btime.getTime();
-        //             }
-        //             else {
-        //                 return btime.getTime() - atime.getTime(); 
-        //             }
-        //         });   
-        //     }
-        // }
+        order(deposits) {
+             let sb = this.sortBy;
+             if (sb.field==='deposit_date') {
+                return deposits.slice().sort(function(a, b) {
+                    var atime = new Date(a.deposit_date);
+                    var btime = new Date(b.deposit_date);
+                    if(sb.ascending===true) {
+                        return atime.getTime() - btime.getTime();
+                    }
+                    else {
+                        return btime.getTime() - atime.getTime(); 
+                    }
+                });   
+            }
+        }
     }
 }
 </script>

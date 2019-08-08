@@ -110,6 +110,11 @@ export default {
                 op: 'Equals',
                 value: ['model', 'vr', 'video']
             },
+            location_filter: {
+                key: 'location',
+                op: 'Excludes',
+                value: ['None']
+            },
             media_options: [
                 {
                     label: '3D Model',
@@ -134,16 +139,8 @@ export default {
         [DatePicker.name]: DatePicker,
         [TimeSelect.name]: TimeSelect
     },
-    created() {  
-    //     axios.get("../api/gallery")
-    //     .then(response => {
-    //         this.deposits = response.data.deposits
-    //     },
-    //     error => {
-    //         if (error.response.status === 401) {
-    //             window.location.href = '../api/login';
-    //     }
-    // });
+    mounted() {
+        this.applyFilter()
     },
     methods: {
         addFilter() {
@@ -168,12 +165,12 @@ export default {
                     formatted_date_filter.value[index][1] = Date.parse(value[1])/1000
                 })
 
-                this.all_filters = this.filters.concat([this.media_filter, formatted_date_filter])
+                this.all_filters = this.filters.concat([this.media_filter, formatted_date_filter, this.location_filter])
 
                 console.log("ALL_FILTERS:",this.all_filters)
             }
             else {
-                this.all_filters = this.filters.concat([this.media_filter])
+                this.all_filters = this.filters.concat([this.media_filter, this.location_filter])
             }
             // let qs = JSON.stringify(all_filters);
             // axios.get("../api/gallery", {params: {filters: qs}})

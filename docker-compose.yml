@@ -7,7 +7,6 @@ services:
     networks:
       - proxy 
     container_name: deposit-form
-    # command: npm run serve
     labels:
       - "traefik.enable=true"
       - "traefik.frontend.rule=PathPrefix:/"
@@ -16,7 +15,6 @@ services:
       - "traefik.docker.network=proxy"
       - "traefik.frontend.passHostHeader=true"
     restart: always
-
 
   postgres:
     container_name: postgres
@@ -34,19 +32,16 @@ services:
     networks:
       - proxy
     container_name: admin
-    # command: npm run serve
     labels:
       - "traefik.enable=true"
       - "traefik.backend=admin"
       - "traefik.port=80"
       - "traefik.docker.network=proxy"
-      # add trailing slash
       - "traefik.frontend.redirect.regex=^(.*)/admin$$"
       - "traefik.frontend.redirect.replacement=$$1/admin/"
       - "traefik.frontend.rule=PathPrefix:/admin;ReplacePathRegex: ^/admin/(.*) /$$1"
       - "traefik.frontend.passHostHeader=true"
     restart: always
-
 
   gateway:
     build: ./services/gateway/
@@ -96,9 +91,8 @@ services:
       - 9000:9000
     volumes:
       - ./services/store-minio/data:/data
-    environment:
-      MINIO_ACCESS_KEY: AKIAIOSFODNN7GRAINGER
-      MINIO_SECRET_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYGRAINGERKEY
+    env_file:
+      - keys.env
     command: server /data
     labels:
       - "traefik.enable=false" 
@@ -107,9 +101,6 @@ services:
   minio-service:
     build: ./services/store-minio/
     container_name: minio-service
-    # environment: 
-    #   FLASK_ENV: development
-    #   FLASK_APP: minio-service
     depends_on:
       - minio-server
     links: 
@@ -128,9 +119,8 @@ services:
     restart: always
     networks:
       - mongo_internal
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
+    env_file:
+      - keys.env
     volumes:
       - ./services/store-mongo/data:/data
     labels:
@@ -146,11 +136,11 @@ services:
       - mongo_internal
       - proxy
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: example
       ME_CONFIG_MONGODB_SERVER: mongo-server
     labels:
       - "traefik.enable=false" 
+    env_file:
+      - keys.env
 
   mongo-service:
     build: ./services/store-mongo/
@@ -162,11 +152,8 @@ services:
     networks:
       - mongo_internal
       - gateway_internal
-    environment:
-      MONGO_USERNAME: root
-      MONGO_PASSWORD: example
-      # FLASK_ENV: development
-      # FLASK_APP: mongo-service
+    env_file:
+      - keys.env
     command: pipenv run gunicorn -w 4 -b 0.0.0.0:5000 mongo-service:create_app()
     labels:
       - "traefik.enable=false"
@@ -177,9 +164,6 @@ services:
     container_name: sketchfab-service
     networks:
       - gateway_internal
-    # environment: 
-    #   FLASK_ENV: development
-    #   FLASK_APP: sketchfab-service
     command: pipenv run gunicorn -w 4 -b 0.0.0.0:5000 sketchfab-service:app
     labels:
       - "traefik.enable=false"
@@ -190,9 +174,6 @@ services:
     container_name: aws-service
     networks:
       - gateway_internal
-    # environment: 
-    #   FLASK_ENV: development
-    #   FLASK_APP: aws-service
     command: pipenv run gunicorn -w 4 -b 0.0.0.0:5000 aws-service:app
     labels:
       - "traefik.enable=false"
@@ -203,9 +184,6 @@ services:
     container_name: vimeo-service
     networks:
       - gateway_internal
-    # environment: 
-    #   FLASK_ENV: development
-    #   FLASK_APP: vimeo-service
     command: pipenv run gunicorn -w 4 -b 0.0.0.0:5000 vimeo-service:app
     labels:
       - "traefik.enable=false" 

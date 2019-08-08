@@ -16,8 +16,8 @@ def create_client(request):
     if not request:
         return False
 
-    username = os.environ.get('MONGO_USERNAME')
-    password = os.environ.get('MONGO_PASSWORD')
+    username = os.environ.get('MONGO_INITDB_ROOT_USERNAME')
+    password = os.environ.get('MONGO_INITDB_ROOT_PASSWORD')
 
     client = MongoClient(f'mongodb://{username}:{password}@mongo-server:27017/')
 

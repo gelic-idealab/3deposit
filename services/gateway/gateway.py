@@ -43,9 +43,9 @@ async def init_app(argv=None):
         logging.debug(msg=err)
         raise
 
-    # fernet_key = fernet.Fernet.generate_key()
-    fernet_key = b'B3xPG0rI5lX2lLk5HBWkf2l4CwBh33IfP0hGxG5FWqw='
-    secret_key = base64.urlsafe_b64decode(fernet_key)
+    # use key to sign cookie
+    env_key = base64.urlsafe_b64encode(bytes(os.environ.get('3DEPOSIT_SECRET_KEY'), 'utf-8'))
+    secret_key = base64.urlsafe_b64decode(env_key)
     setup_session(app, EncryptedCookieStorage(secret_key))
 
     aiohttp_jinja2.setup(

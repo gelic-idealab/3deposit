@@ -89,7 +89,7 @@ async def signup(request):
                 error = await validate_new_user_form(conn, form)
 
                 if error:
-                    return {'error': error}
+                    return {'error': error, 'token': token}
                 else:
                     username = form.get('username')
                     password = form.get('password')

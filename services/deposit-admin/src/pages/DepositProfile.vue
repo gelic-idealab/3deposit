@@ -109,7 +109,19 @@ export default {
             })
         },
         downloadDeposit() {
-            axios.get("../../api/store/objects", {params: {deposit_id: this.id}})
+            axios({
+                url: "../../api/store/objects",
+                method: 'GET',
+                params: {deposit_id: this.id},
+                responseType: 'blob'})
+            .then((response) => {
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', 'file.zip'); //or any other extension
+                document.body.appendChild(link);
+                link.click();
+            });
         }
     }
 };

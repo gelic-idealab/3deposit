@@ -405,21 +405,18 @@ async def store_objects(request):
     bucket_name = dict({'bucket_name': '3deposit'})
     config.update(bucket_name)
 
-    ## TODO 
-    ## build FormData object before passing to minio service 
-    ## or pass as raw json and change minio service handler
-
     if request.method == 'GET':
         try:
             data = request.query
             config.update({'deposit_id': data.get('deposit_id')})
-            payload = dict({'config': config})
-            async with new_request(method='GET', url=endpoint+PATH, json=payload) as resp:
+            fd = FormData()
+            fd.add_field('config', json.dumps(config), content_type='application/json')
+            async with new_request(method='GET', url=endpoint+PATH, data=fd) as resp:
                 try:
-                    resp_json = await resp.json()
+                    resp_bin = await resp.read()
                 except Exception as err:
                     return web.json_response({'err': str(err)})
-                return web.json_response({'resp': resp_json, 'payload': payload})
+                return web.Response(body=resp_bin)
         except Exception as err:
             return web.json_response({'err': str(err)})
 

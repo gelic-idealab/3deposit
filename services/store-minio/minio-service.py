@@ -1,7 +1,7 @@
 import os
 import json
 from json import JSONDecodeError
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_file, make_response
 from minio import Minio
 from minio.error import ResponseError, BucketAlreadyExists, NoSuchBucket, NoSuchKey, AccessDenied
 from minio.error import SignatureDoesNotMatch, InvalidBucketError, InvalidAccessKeyId, SignatureDoesNotMatch, BucketAlreadyOwnedByYou
@@ -107,7 +107,8 @@ def create_app():
                     for d in obj.stream(32*1024):
                         file_data.write(d)
 
-                return send_file(temp_obj_path, mimetype="application/octet-stream")
+                res = make_response(send_file(temp_obj_path, mimetype="application/octet-stream"))
+                return res
 
             except NoSuchKey as err:  # Handle deposit_id related error
                 return jsonify({"err": "Please provide a valid deposit_id",

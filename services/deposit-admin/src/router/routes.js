@@ -5,7 +5,7 @@ import NotFound from "@/pages/NotFoundPage.vue";
 // Admin pages
 import Dashboard from "@/pages/Dashboard.vue";
 import UserProfile from "@/pages/UserProfile.vue";
-import AddActionForm from '@/pages/AddActionForm.vue';
+import Actions from '@/pages/Actions.vue';
 import Deposits from "@/pages/Deposits.vue";
 import Services from "@/pages/Services.vue";
 import DepositProfile from "@/pages/DepositProfile.vue";
@@ -35,7 +35,7 @@ const routes = [
       {
         path: "/actions",
         name: "actions",
-        component: AddActionForm
+        component: Actions
       },
       {
         path: "/users",

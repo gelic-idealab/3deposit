@@ -8,7 +8,7 @@ DEPOSIT_ID = str(uuid4())
 
 querystring = {"resumableChunkNumber": "1", "resumableTotalChunks": "1", "deposit_id": DEPOSIT_ID}
 
-f = open('test360.mp4', 'rb')
+f = open('test360.zip', 'rb')
 files = {'file': f}
 
 
@@ -34,7 +34,7 @@ payload_dict = {
         },
         {
             'id': 'projection',
-            'value': 'pyramid'
+            'value': 'equirectangular'
         },
         {
             'id': 'stereo_format',

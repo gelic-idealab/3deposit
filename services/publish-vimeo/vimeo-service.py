@@ -3,6 +3,8 @@ import json
 import requests
 import vimeo
 from flask import Flask, request, jsonify
+import zipfile
+
 
 '''
 Flask app that takes in 360 video file, JSON data, and credentials 
@@ -42,16 +44,21 @@ def handler():
 
             file = request.files.get('file')
             if file and filename:
-                file.save(filename)
-
-                uri = client.upload(filename, data={
-                    'name': name,
-                    'description': description,
-                    'spatial.projection': projection,
-                    'spatial.stereo_format': stereo_format
-                })
-
+                fzip = filename+'.zip'
+                file.save(fzip)
+                with zipfile.ZipFile(fzip, 'r') as zip_ref:
+                    zip_ref.extract(filename)
+                try:
+                    uri = client.upload(filename, data={
+                        'name': name,
+                        'description': description,
+                        'spatial.projection': projection,
+                        'spatial.stereo_format': stereo_format
+                    })
+                except Exception as err:
+                    return jsonify({'resource_id': str(err)})
                 os.remove(filename)
+                os.remove(fzip)
                 resource_id = uri.split('/')[-1]
                 return jsonify({"resource_id": resource_id, "location": "https://player.vimeo.com/video/{}".format(resource_id)})
             else:

@@ -384,13 +384,13 @@ async def store_buckets(request):
 
 
 async def store_objects(request):
-    # username = await authorized_userid(request)
-    # async with request.app['db'].acquire() as conn:
-    #     if not username:
-    #         raise web.HTTPUnauthorized()
-    #     current_user = dict(await db.get_user_by_name(conn, username))
-    #     if current_user.get('role') != 'admin':
-    #         raise web.HTTPUnauthorized()
+    username = await authorized_userid(request)
+    async with request.app['db'].acquire() as conn:
+        if not username:
+            raise web.HTTPUnauthorized()
+        current_user = dict(await db.get_user_by_name(conn, username))
+        if current_user.get('role') != 'admin':
+            raise web.HTTPUnauthorized()
     PATH = '/object'
     async with request.app['db'].acquire() as conn:
         service_config = await get_service_config_by_action(conn=conn, action='store', media_type='default')
@@ -412,10 +412,10 @@ async def store_objects(request):
                 try:
                     resp_json = await resp.json()
                 except Exception as err:
-                    return web.json_response({'err': str(err), 'resp': await resp.text()})
+                    return web.json_response({'err': str(err)})
                 return web.json_response({'resp': resp_json, 'payload': payload})
         except Exception as err:
-            return web.json_response({'origin': 'gateway', 'err': str(err)})
+            return web.json_response({'err': str(err)})
 
     if request.method == 'POST':
         try:

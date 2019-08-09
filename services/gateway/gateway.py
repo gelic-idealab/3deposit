@@ -64,9 +64,9 @@ async def init_app(argv=None):
     setup_routes(app)
 
     # logging
+    logging.basicConfig(level=logging.INFO, filename='./data/gateway.log')
     logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-    logging.basicConfig(level=logging.DEBUG, filename='./data/gateway.log')
 
     return app
 

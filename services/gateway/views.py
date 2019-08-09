@@ -95,7 +95,7 @@ async def signup(request):
                     password = form.get('password')
                     email = form.get('email')
                     user = await db.create_user(conn=conn, username=username, password=password, email=email)
-                    logging.info(msg=f'User created: {user}')
+                    logging.info(msg=f'User created: {str(user)}')
                     return web.HTTPFound('login')
 
     return {'token': token}

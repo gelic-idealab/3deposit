@@ -178,7 +178,8 @@ async def create_user(conn, username, password, email, role='user'):
         .insert()
         .values(username=username, password_hash=password_hash, email=email, role=role)
     )
-    return result
+    user = await result.first()
+    return dict(user)
 
 async def delete_user(conn, username):
     result = await conn.execute(

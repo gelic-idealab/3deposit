@@ -5,18 +5,17 @@
     </div>
     <div>
       <div class="author">
-        <img class="avatar border-white" src="@/assets/img/faces/face-2.jpg" alt="...">
-        <h4 class="title">Chet Faker
+        <img class="avatar border-white" src="@/assets/img/faces/face-0.jpg" alt="...">
+        <h4 class="title">{{ current_user.username }}
           <br>
           <a href="#">
-            <small>@chetfaker</small>
+            <small>{{ current_user.email }}</small>
           </a>
         </h4>
       </div>
       <p class="description text-center">
-        "I like the way you work it
-        <br> No diggity
-        <br> I wanna bag it up"
+        <br> 
+        <br>
       </p>
     </div>
     <hr>
@@ -34,6 +33,9 @@
 </template>
 <script>
 export default {
+  props: {
+    current_user: Object
+  },
   data() {
     return {
       details: [
@@ -44,10 +46,6 @@ export default {
         {
           title: "2GB",
           subTitle: "Used"
-        },
-        {
-          title: "24,6$",
-          subTitle: "Spent"
         }
       ]
     };

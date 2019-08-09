@@ -79,17 +79,20 @@
 </template>
 <script>
 export default {
+  props: {
+    current_user: Object
+  },
   data() {
     return {
       user: {
-        company: "Paper Dashboard",
-        username: "michael23",
-        email: "",
-        lastName: "Faker",
-        address: "Melbourne, Australia",
-        city: "melbourne",
+        company: "University of Illinois",
+        username: this.current_user.username,
+        email: this.current_user.email,
+        lastName: "",
+        address: "",
+        city: "",
         postalCode: "",
-        aboutMe: `Oh so, your weak rhyme. You doubt I'll bother, reading into it.I'll probably won't, left to my own devicesBut that's the difference in our opinions.`
+        aboutMe: ""
       }
     };
   },

@@ -55,6 +55,7 @@ def setup_routes(app):
     app.router.add_post('/api/store/buckets', store_buckets)
     app.router.add_get('/api/store/objects', store_objects)
     app.router.add_post('/api/store/objects', store_objects)
+    app.router.add_delete('/api/store/objects', store_objects)
 
     # publication routes
     app.router.add_get('/api/publications', publications)

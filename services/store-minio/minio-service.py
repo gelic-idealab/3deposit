@@ -194,32 +194,20 @@ def create_app():
         # Deletes one object i.e. a file from the specified bucket only.
 
         elif request.method == 'DELETE':
-            # extract authentication details
-            if minio_keys(request):
-                auth = minio_keys(request)
-                if "err" in auth:
-                    return jsonify(auth)
-            else:
-                return jsonify({"err": "No authentication keys provided",
-                                "log": "No authentication keys provided"
-                            })
-
             try:
                 # get data from request payload
                 config = json.loads(request.form.get('config'))
-                data = json.loads(request.form.get('data'))
 
                 # extract bucket_name value
                 bucket_name = config.get('bucket_name')
 
                 # extract object specific deposit_id
-                deposit_id = data.get('deposit_id')
+                deposit_id = config.get('deposit_id')
 
                 minioClient = create_client(request)
 
                 if type(minioClient) == dict and 'err' in minioClient:
-                    return jsonify(minioClient)
-
+                    return jsonify(str(minioClient))
                 # Check whether requested object exists
                 error = minioClient.get_object(bucket_name, deposit_id)
 

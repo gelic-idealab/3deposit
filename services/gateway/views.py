@@ -441,6 +441,40 @@ async def store_objects(request):
         except Exception as err:
             return web.json_response({'origin': 'gateway', 'err': str(err)})
 
+    if request.method == 'DELETE':
+        try:
+            data = request.query
+            config.update({'deposit_id': data.get('deposit_id')})
+            fd = FormData()
+            fd.add_field('config', json.dumps(config), content_type='application/json')
+
+            # remove file from bucket
+            async with new_request(method='DELETE', url=endpoint+PATH, data=fd) as resp:
+                try:
+                    resp_json = await resp.json()
+                except Exception as err:
+                    return web.json_response({'err': str(err)})
+            
+            # remove etag from mongo
+            update = {
+                'etag': 'DELETED'
+            }
+
+            config = {
+                'deposit_id': data.get('deposit_id')
+            }
+
+            fd = FormData()
+            fd.add_field('data', json.dumps(update), content_type='application/json')
+            fd.add_field('config', json.dumps(config), content_type='application/json')
+
+            async with new_request(method='PATCH', url='http://mongo-service:5000/objects', data=fd) as resp:
+                resp_json.update(await resp.json())
+                return web.json_response(resp_json)
+
+        except Exception as err:
+            return web.json_response({'err': str(err)})
+
 
 """
 Relay endpoint to get/post to Model publication service

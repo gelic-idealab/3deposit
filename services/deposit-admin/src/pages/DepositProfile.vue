@@ -113,7 +113,8 @@ export default {
                 url: "../../api/store/objects",
                 method: 'GET',
                 params: {deposit_id: this.id},
-                responseType: 'blob'})
+                responseType: 'blob'
+            })
             .then((response) => {
                 const url = window.URL.createObjectURL(new Blob([response.data]));
                 const link = document.createElement('a');
@@ -122,9 +123,19 @@ export default {
                 document.body.appendChild(link);
                 link.click();
             });
+        },
+        deleteDeposit() {
+            axios({
+                url: "../../api/store/objects",
+                method: 'DELETE',
+                params: {deposit_id: this.id}
+            })
+            .then((response) => {
+                console.log(response.data)
+            });
         }
     }
-};
+}
 </script>
 
 

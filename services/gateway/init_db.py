@@ -74,8 +74,9 @@ def create_admin(engine):
     username = os.environ.get('3DEPOSIT_ADMIN_USERNAME')
     password_hash = generate_password_hash(os.environ.get('3DEPOSIT_ADMIN_PASSWORD'))
     role = 'admin'
+    email = os.environ.get('3DEPOSIT_ADMIN_EMAIL')
     with engine.connect() as conn:
-        conn.execute(users.insert().values(username=username, password_hash=password_hash, role=role))
+        conn.execute(users.insert().values(username=username, password_hash=password_hash, role=role, email=email))
 
 def create_default_actions(engine):
     with engine.connect() as conn:

@@ -70,29 +70,34 @@ async def logout(request):
 
 @aiohttp_jinja2.template('signup.html')
 async def signup(request):
-    username = await authorized_userid(request)
-    if not username:
+    # username = await authorized_userid(request)
+    # if not username:
+    #     raise web.HTTPUnauthorized()
+    token = request.query.get('token')
+    if token != '124c2f44158b48a2b3296a0e06cff052':
         raise web.HTTPUnauthorized()
-    async with request.app['db'].acquire() as conn:
-        current_user = dict(await db.get_user_by_name(conn, username))
-        if current_user.get('role') != 'admin':
-            raise web.HTTPUnauthorized()
-    if request.method == 'POST':
-        form = await request.post()
+    
+    else:
+    # async with request.app['db'].acquire() as conn:
+    #     current_user = dict(await db.get_user_by_name(conn, username))
+    #     if current_user.get('role') != 'admin':
+    #         raise web.HTTPUnauthorized()
+        if request.method == 'POST':
+            form = await request.post()
 
-        async with request.app['db'].acquire() as conn:
-            error = await validate_new_user_form(conn, form)
+            async with request.app['db'].acquire() as conn:
+                error = await validate_new_user_form(conn, form)
 
-            if error:
-                return {'error': error}
-            else:
-                username = form.get('username')
-                password = form.get('password')
-                user = await db.create_user(conn, username, password)
-                logging.info(msg=f'User created: {user}')
-                return web.HTTPFound('login')
+                if error:
+                    return {'error': error}
+                else:
+                    username = form.get('username')
+                    password = form.get('password')
+                    user = await db.create_user(conn, username, password)
+                    logging.info(msg=f'User created: {user}')
+                    return web.HTTPFound('login')
 
-    return {}
+    return {'token': token}
 
 
 

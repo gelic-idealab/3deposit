@@ -5,7 +5,7 @@
     {% if error %}<div class="error" style="color: red;"><strong>Error:</strong> {{ error }}</div>{% endif %}
 
 <div class="text-center row">
-    <form class="form-signin" action="/api/signup" method="post">
+    <form class="form-signin" action="/api/signup?token={{ token }}" method="post">
       <input class="form-control" id="username" name="username" type="username" value="" autofocus/>
       <input class="form-control" id="password" name="password" type="password" value=""/>
       <input class="form-control" id="confirm" name="confirm" type="password" value=""/>

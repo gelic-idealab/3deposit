@@ -1,6 +1,6 @@
 <template>
     <div class="card-columns">
-        <div class="card" v-for="d in deposits" :key="d.deposit_id">
+        <div class="card" v-for="d in order(deposits)" :key="d.deposit_id">
             <gallery-card 
                 :deposit="d"
             >
@@ -53,13 +53,13 @@ export default {
              let sb = this.sortBy;
              if (sb.field==='deposit_date') {
                 return deposits.slice().sort(function(a, b) {
-                    var atime = new Date(a.deposit_date);
-                    var btime = new Date(b.deposit_date);
+                    var atime = a.deposit_date;
+                    var btime = b.deposit_date;
                     if(sb.ascending===true) {
-                        return atime.getTime() - btime.getTime();
+                        return atime - btime;
                     }
                     else {
-                        return btime.getTime() - atime.getTime(); 
+                        return btime - atime; 
                     }
                 });   
             }

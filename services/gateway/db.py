@@ -171,12 +171,12 @@ async def get_user_by_name(conn, username):
     user_record = await result.first()
     return user_record
 
-async def create_user(conn, username, password, role='user'):
+async def create_user(conn, username, password, email, role='user'):
     password_hash = generate_password_hash(password)
     result = await conn.execute(
         users
         .insert()
-        .values(username=username, password_hash=password_hash, role=role)
+        .values(username=username, password_hash=password_hash, email=email, role=role)
     )
     return result
 

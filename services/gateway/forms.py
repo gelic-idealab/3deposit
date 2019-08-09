@@ -26,11 +26,14 @@ async def validate_login_form(conn, form):
 async def validate_new_user_form(conn, form):
 
     username = form['username']
+    email = form['email']
     password = form['password']
     confirm = form['confirm']
 
     if not username:
         return 'username is required'
+    if not email:
+        return 'email is required'
     if not password:
         return 'password is required'
     if not confirm:

@@ -93,7 +93,8 @@ async def signup(request):
                 else:
                     username = form.get('username')
                     password = form.get('password')
-                    user = await db.create_user(conn, username, password)
+                    email = form.get('email')
+                    user = await db.create_user(conn=conn, username=username, password=password, email=email)
                     logging.info(msg=f'User created: {user}')
                     return web.HTTPFound('login')
 

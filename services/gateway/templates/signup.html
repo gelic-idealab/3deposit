@@ -6,10 +6,12 @@
 
 <div class="text-center row">
     <form class="form-signin" action="/api/signup?token={{ token }}" method="post">
-      <input class="form-control" id="username" name="username" type="username" value="" autofocus/>
-      <input class="form-control" id="password" name="password" type="password" value=""/>
-      <input class="form-control" id="confirm" name="confirm" type="password" value=""/>
-
+      <p><img class="mb-4" src="https://raw.githubusercontent.com/Grainger-Engineering-Library/3deposit/master/services/deposit-form/src/assets/logo.png" width="144" height="144"></p>
+      <input class="form-control" id="username" name="username" type="username" placeholder="username" value="" autofocus/>
+      <br>
+      <input class="form-control" id="password" name="password" type="password" placeholder="password"value=""/>
+      <input class="form-control" id="confirm" name="confirm" type="password" placeholder="confirm password"value=""/>
+      <br>
       <button class="btn btn-lg btn-primary btn-block" type="submit" value="signup">Sign up</button>
     </form>
 </div>
@@ -49,12 +51,12 @@ body {
 .form-signin .form-control:focus {
   z-index: 2;
 }
-.form-signin input[type="username"] {
+.form-signin input[type="password"] {
   margin-bottom: -1px;
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
 }
-.form-signin input[type="password"] {
+.form-signin input[type="confirm"] {
   margin-bottom: 10px;
   border-top-left-radius: 0;
   border-top-right-radius: 0;

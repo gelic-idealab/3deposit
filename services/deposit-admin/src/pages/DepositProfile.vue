@@ -75,9 +75,7 @@ export default {
             pretty_date: '',
             deposit: {
                 deposit_metadata: {},
-                deposit_date: '',
-                location: '',
-                resource_id: ''
+                deposit_date: ''
             },
             publish_metadata: {},
             id: ''
@@ -95,7 +93,12 @@ export default {
         .then(response => {
             this.deposit = response.data;
             this.pretty_date = new Date(response.data.deposit_date * 1000);
-            axios.get("../../api/publications", {params: {resource_id: response.data.resource_id, media_type: response.data.deposit_metadata.media_type}})
+            axios.get("../../api/publications", {
+                params: {
+                    resource_id: response.data.deposit_metadata.resource_id, 
+                    media_type: response.data.deposit_metadata.media_type
+                }
+            })
             .then(response => {(this.publish_metadata = response.data)})
         })
     },

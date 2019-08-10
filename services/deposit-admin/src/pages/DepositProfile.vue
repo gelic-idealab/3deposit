@@ -104,7 +104,12 @@ export default {
     },
     methods: {
         unpublishDeposit() {
-            axios.delete("../../api/publications", {params: {resource_id: this.deposit.resource_id, media_type: this.deposit.deposit_metadata.media_type}})
+            axios.delete("../../api/publications", {
+                params: {
+                    resource_id: this.deposit.deposit_metadata.resource_id, 
+                    media_type: this.deposit.deposit_metadata.media_type
+                }
+            })
             .then(response => {
                 if(response.status === 200) {
                     axios.patch("../../api/metadata", {location: 'None'}, {params: {deposit_id: this.id}})

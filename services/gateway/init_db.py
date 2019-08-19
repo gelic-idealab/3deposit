@@ -13,7 +13,7 @@ from security import generate_password_hash
 DSN = "postgresql://{user}:{password}@{host}:{port}/{database}"
 
 ADMIN_DB_URL = DSN.format(
-    user=os.environ.get('PG_ADMIN_USERNAME'), 
+    user='postgres',
     password=os.environ.get('PG_ADMIN_PASSWORD'), 
     database='postgres',
     host='postgres', 

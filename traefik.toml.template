@@ -11,11 +11,11 @@ defaultEntryPoints = ["http", "https"]
   address = ":443"
     [entryPoints.https.tls]
       [[entryPoints.https.tls.certificates]]
-      certFile = "/etc/pki/tls/certs/3deposit.library.illinois.edu_2019.crt"
-      keyFile = "/etc/pki/tls/private/ 3deposit.library.illinois.edu_2019.key"
+      certFile = "<CHANGE ME!>"
+      keyFile = "<CHANGE ME!>"
 
 [docker]
 endpoint = "unix:///var/run/docker.sock"
-domain = "3deposit.library.illinois.edu"
+domain = "<CHANGE ME!>"
 watch = true
 exposedbydefault = false

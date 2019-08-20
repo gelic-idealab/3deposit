@@ -11,8 +11,8 @@ defaultEntryPoints = ["http", "https"]
   address = ":443"
     [entryPoints.https.tls]
       [[entryPoints.https.tls.certificates]]
-      certFile = "/etc/pki/tls/certs/3deposit.library.illinois.edu_2019.crt"
-      keyFile = "/etc/pki/tls/private/3deposit.library.illinois.edu_2019.key"
+      certFile = "/etc/traefik/tls/certs/3deposit.library.illinois.edu_2019.crt"
+      keyFile = "/etc/traefik/tls/private/3deposit.library.illinois.edu_2019.key"
 
 [docker]
 endpoint = "unix:///var/run/docker.sock"

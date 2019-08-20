@@ -52,8 +52,10 @@ def handler():
                     uri = client.upload(filename, data={
                         'name': name,
                         'description': description,
-                        'spatial.projection': projection,
-                        'spatial.stereo_format': stereo_format
+                          "spatial": {
+                              "projection": projection,
+                              "stereo_format": stereo_format
+                          }
                     })
                 except Exception as err:
                     return jsonify({'resource_id': str(err)})
@@ -70,7 +72,7 @@ def handler():
         try:
             data = json.loads(request.form.get('data'))
             video_id = data.get('resource_id')
-            url = '/videos/{}/pictures'.format(video_id)
+            url = 'https://api.vimeo.com/videos/{}'.format(video_id)
             r = client.get(url)
             return jsonify(r.json())
         except Exception as err:

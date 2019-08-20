@@ -78,6 +78,7 @@ services:
       volumes:
         - /var/run/docker.sock:/var/run/docker.sock
         - ./traefik.toml:/traefik.toml
+        - /etc/pki/tls/certs/:/certs/
       networks:
         - proxy
       restart: always

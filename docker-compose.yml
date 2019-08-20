@@ -74,11 +74,11 @@ services:
       command: --docker # --api
       ports:
         - "80:80"
+        - "443:443"
         # - "8080:8080" # The Web UI (enabled by --api)
       volumes:
         - /var/run/docker.sock:/var/run/docker.sock
         - ./traefik.toml:/traefik.toml
-        - /etc/pki/tls/certs/:/certs/
       networks:
         - proxy
       restart: always

@@ -74,7 +74,8 @@ async def signup(request):
     # if not username:
     #     raise web.HTTPUnauthorized()
     token = request.query.get('token')
-    if token != '124c2f44158b48a2b3296a0e06cff052':
+    env_token = os.environ.get('3DEPOSIT_SIGNUP_TOKEN')
+    if token != env_token:
         raise web.HTTPUnauthorized()
     
     else:

@@ -53,8 +53,8 @@ services:
     networks:
       - gateway_internal
       - proxy
-    # command: bash -c "pipenv run python init_db.py && pipenv run gunicorn gateway:init_app -w 4 -b 0.0.0.0:8080 --worker-class aiohttp.GunicornWebWorker"
-    command: bash -c "pipenv run gunicorn gateway:init_app -w 4 -b 0.0.0.0:8080 --worker-class aiohttp.GunicornWebWorker"
+    command: bash -c "pipenv run python init_db.py && pipenv run gunicorn gateway:init_app -w 4 -b 0.0.0.0:8080 --worker-class aiohttp.GunicornWebWorker"
+    # command: bash -c "pipenv run gunicorn gateway:init_app -w 4 -b 0.0.0.0:8080 --worker-class aiohttp.GunicornWebWorker"
     labels:
       - "traefik.enable=true"
       - "traefik.frontend.rule=PathPrefix:/api"
@@ -74,10 +74,13 @@ services:
       command: --docker # --api
       ports:
         - "80:80"
+        - "443:443"
         # - "8080:8080" # The Web UI (enabled by --api)
       volumes:
         - /var/run/docker.sock:/var/run/docker.sock
         - ./traefik.toml:/traefik.toml
+        # map host cert to container
+        - /etc/pki/tls/:/etc/traefik/tls/
       networks:
         - proxy
       restart: always

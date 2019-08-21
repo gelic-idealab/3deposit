@@ -1,8 +1,8 @@
 {
   "banner": {
-    "title": "Active Deposit Form",
+    "title": "Deposit & Publish 3D content",
     "description": "Use this form to upload your 3d models, 360 videos, and VR source code & projects",
-    "instructions": "Your files will be deposited into a Library repository and published to a third-party website. You will receive a confirmation email when your deposit is processed."
+    "instructions": "Your files will be deposited into a Library repository and published to a third-party website."
   },
   "fields": [
     {
@@ -44,6 +44,49 @@
         { "value": "o", "label": "Other" }
       ],
       "dependsOn": {}
+    },
+    {
+      "id": "object_title",
+      "label": "Object Title",
+      "type": "text",
+      "repeatable": false,
+      "required": true,
+      "value": [],
+      "placeholder": "Object Title",
+      "dependsOn": {}
+    },
+    {
+      "id": "projection",
+      "label": "Projection",
+      "type": "select",
+      "repeatable": false,
+      "required": true,
+      "value": [],
+      "options": [
+        { "value": "equirectangular", "label": "Equirectangular" }
+      ],
+      "dependsOn": {"id": "media_type", "value": "video"}
+    },
+    {
+      "id": "stereo_format",
+      "label": "Stereo Format",
+      "type": "select",
+      "repeatable": false,
+      "required": true,
+      "value": [],
+      "options": [
+        { "value": "mono", "label": "Mono" }
+      ],
+      "dependsOn": {"id": "media_type", "value": "video"}
+    },
+    {
+      "id": "filename",
+      "label": "File Name",
+      "type": "text",
+      "repeatable": false,
+      "required": true,
+      "value": [],
+      "dependsOn": {"id": "media_type", "value": "video"}
     }
   ]
 }

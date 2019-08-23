@@ -318,18 +318,7 @@ async def deposit_upload(request):
                                     f.write(c.read())
                                     os.remove(current_chunk)
                                     chunk_to_write += 1
-
-
-                    # if rcn == 1:
-                    #     with open('./data/{}'.format(did+'_partial'), 'wb') as f:
-                    #         b = await part.read()
-                    #         f.write(b)
-                    # elif rcn > 1:
-                    #     with open('./data/{}'.format(did+'_partial'), 'ab') as f:
-                    #         b = await part.read()
-                    #         f.write(b)
-                    # if rcn == rtc:
-                    #     os.rename('./data/{}'.format(did+'_partial'), './data/{}'.format(did))
+                                    
             return web.Response(status=200)
         except Exception as err:
             return web.json_response({'err': str(err)}, status=503)

@@ -298,23 +298,38 @@ async def deposit_upload(request):
         try:
             reader = await request.multipart()
             did = request.query['deposit_id']
-            rcn = int(request.query['resumableChunkNumber'])
-            rtc = int(request.query['resumableTotalChunks'])
+            rcn = request.query['resumableChunkNumber']
+            rtc = request.query['resumableTotalChunks']
             while True:
                 part = await reader.next()
                 if part is None:
                     break
                 if part.name == 'file':
-                    if rcn == 1:
-                        with open('./data/{}'.format(did+'_partial'), 'wb') as f:
-                            b = await part.read()
-                            f.write(b)
-                    elif rcn > 1:
-                        with open('./data/{}'.format(did+'_partial'), 'ab') as f:
-                            b = await part.read()
-                            f.write(b)
-                    if rcn == rtc:
-                        os.rename('./data/{}'.format(did+'_partial'), './data/{}'.format(did))
+                    chunk_file = f'./data/{did}_{rcn}'
+                    with open(chunk_file, 'wb') as f:
+                        b = await part.read()
+                        f.write(b)
+                    if int(rcn) == int(rtc):
+                        with open(f'./data/{did}', 'wb') as f:
+                            chunk_to_write = 1
+                            while chunk_to_write <= int(rtc):
+                                current_chunk = f'./data/{did}_{str(chunk_to_write)}'
+                                with open(current_chunk, 'rb') as c:
+                                    f.write(c.read())
+                                    os.remove(current_chunk)
+                                    chunk_to_write += 1
+
+
+                    # if rcn == 1:
+                    #     with open('./data/{}'.format(did+'_partial'), 'wb') as f:
+                    #         b = await part.read()
+                    #         f.write(b)
+                    # elif rcn > 1:
+                    #     with open('./data/{}'.format(did+'_partial'), 'ab') as f:
+                    #         b = await part.read()
+                    #         f.write(b)
+                    # if rcn == rtc:
+                    #     os.rename('./data/{}'.format(did+'_partial'), './data/{}'.format(did))
             return web.Response(status=200)
         except Exception as err:
             return web.json_response({'err': str(err)}, status=503)

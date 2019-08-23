@@ -317,7 +317,7 @@ async def deposit_upload(request):
                         os.rename('./data/{}'.format(did+'_partial'), './data/{}'.format(did))
             return web.Response(status=200)
         except Exception as err:
-            return web.json_response({'err': str(err)})
+            return web.json_response({'err': str(err)}, status=503)
     else:
         return web.Response(status=200)
 

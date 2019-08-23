@@ -35,38 +35,48 @@ def handler():
         try:
             # unpack payload
             data = json.loads(request.form.get('data'))
-            data = data.get('metadata')
-            name = data.get('object_title')
-            description = data.get('description')
-            filename = data.get('filename')
-            projection = data.get('projection')
-            stereo_format = data.get('stereo_format')
+            did = data.get('deposit_id')
+            metadata = data.get('metadata')
+            title = str(metadata.get('object_title'))
+            description = str(metadata.get('description'))
+            projection = str(metadata.get('projection'))
+            stereo_format = str(metadata.get('stereo_format'))
 
             file = request.files.get('file')
-            if file and filename:
-                fzip = filename+'.zip'
+            if file and did:
+                fzip = did
                 file.save(fzip)
+
                 with zipfile.ZipFile(fzip, 'r') as zip_ref:
+                    filename = zip_ref.namelist()[0]
                     zip_ref.extract(filename)
                 try:
                     uri = client.upload(filename, data={
-                        'name': name,
+                        'name': title,
                         'description': description,
-                          "spatial": {
-                              "projection": projection,
-                              "stereo_format": stereo_format
+                          'spatial': {
+                              'projection': projection,
+                              'stereo_format': stereo_format
                           }
                     })
                 except Exception as err:
-                    return jsonify({'resource_id': str(err)})
-                os.remove(filename)
-                os.remove(fzip)
-                resource_id = uri.split('/')[-1]
-                return jsonify({"resource_id": resource_id, "location": "https://player.vimeo.com/video/{}".format(resource_id)})
+                    return jsonify({'resource_id': str(err) + str(data), 'location': 'None'})
+
+                try:
+                    resource_id = uri.split('/')[-1]
+                    return jsonify({'resource_id': resource_id, 'location': 'https://player.vimeo.com/video/{}'.format(resource_id)})
+                except Exception as err:
+                    return jsonify({'resource_id': str(err), 'location': 'None'})
             else:
                 return jsonify({'err': 'No file provided'})
         except Exception as err:
-            return jsonify({'err': str(err)})
+            return jsonify({'resource_id': str(err), 'location': 'None'})
+            
+        finally:
+            if os.path.exists(filename):
+                os.remove(filename)
+            if os.path.exists(fzip):
+                os.remove(fzip)
 
     elif request.method == 'GET':
         try:

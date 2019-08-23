@@ -39,10 +39,6 @@ payload_dict = {
         {
             'id': 'stereo_format',
             'value': 'mono'
-        },
-        {
-            'id': 'filename',
-            'value': 'test360.mp4'
         }
     ]
 }

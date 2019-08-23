@@ -60,17 +60,17 @@ def handler():
                           }
                     })
                 except Exception as err:
-                    return jsonify({'resource_id': str(err) + str(data), 'location': 'None'})
+                    return jsonify({'resource_id': 'Error uploading: ' + str(err), 'location': 'None'})
 
                 try:
                     resource_id = uri.split('/')[-1]
                     return jsonify({'resource_id': resource_id, 'location': 'https://player.vimeo.com/video/{}'.format(resource_id)})
                 except Exception as err:
-                    return jsonify({'resource_id': str(err), 'location': 'None'})
+                    return jsonify({'resource_id': 'Error reading upload response: ' + str(err), 'location': 'None'})
             else:
                 return jsonify({'err': 'No file provided'})
         except Exception as err:
-            return jsonify({'resource_id': str(err), 'location': 'None'})
+            return jsonify({'resource_id': 'Error reading request data: ' + str(err), 'location': 'None'})
             
         finally:
             if os.path.exists(filename):

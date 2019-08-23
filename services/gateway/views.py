@@ -308,7 +308,9 @@ async def deposit_upload(request):
                 if part is None:
                     break
                 if part.name == 'file':
-                    chunk_file = f'./data/{did}_{rcn}'
+                    if not os.path.exists(f'./data/{did}_chunks/'):
+                        os.mkdir(f'./data/{did}_chunks/')
+                    chunk_file = f'./data/{did}_chunks/{rcn}'
                     with open(chunk_file, 'wb') as f:
                         b = await part.read()
                         f.write(b)

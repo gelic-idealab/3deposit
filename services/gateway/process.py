@@ -2,6 +2,8 @@ import os
 import db
 import logging
 import json
+from asyncio import create_task
+import shutil
 
 import db
 from aiopg.sa import create_engine
@@ -30,74 +32,81 @@ async def get_service_engine():
 Trigger function to begin storage operation with buffered deposit file
 """
 
-async def start_reassembling_chunks(did, rtc):
+async def start_reassembling_chunks(did):
     try:
-        if did and rtc:
-            with open(f'./data/{did}', 'wb') as f:
-                chunk_to_write = 1
-                while chunk_to_write <= int(rtc):
-                    current_chunk = f'./data/{did}_{str(chunk_to_write)}'
-                    with open(current_chunk, 'rb') as c:
-                        f.write(c.read())
-                        os.remove(current_chunk)
-                        chunk_to_write += 1
+        tmp_deposit_dir = f'./data/{did}_chunks/'
+        with open(f'./data/{did}', 'wb') as f:
+            chunk_to_write = 1
+            num_chunks = len(os.listdir(tmp_deposit_dir))
+            while chunk_to_write <= int(num_chunks):
+                current_chunk = tmp_deposit_dir+str(chunk_to_write)
+                with open(current_chunk, 'rb') as c:
+                    f.write(c.read())
+                    os.remove(current_chunk)
+                    chunk_to_write += 1
             return True
-        return False
     except Exception as err:
         logging.error(msg=f'start_reassembling_chunks err: {str(err)}')
         return False
+    finally:
+        shutil.rmtree(tmp_deposit_dir)
         
 
 async def start_deposit_processing_task(data):
     try:
-        logging.info(msg='start_deposit_processing_task'+str(data))
-        chunks_assembled = create_task(start_reassembling_chunks(did, rtc)
-        await chunks_assembled
-        engine = await get_service_engine()
         deposit_id = data.get('id')
-        media_type = data.get('media_type')
-        if deposit_id:
-            async with engine.acquire() as conn:
-                await db.add_deposit_by_id(conn, deposit_id)
-                etag = await trigger_store(conn, deposit_id)
-                mongo_id = await trigger_metadata(data)
-                publish_resp = await trigger_publish(conn, data)
-                await db.update_deposit_by_id(
-                    conn,
-                    deposit_id=deposit_id,
-                    etag=etag,
-                    mongo_id=mongo_id,
-                    resource_id=publish_resp.get('resource_id'),
-                    media_type=media_type,
-                    deposit_date=data.get('deposit_date')
-                )
 
-                data = {
-                    'location': publish_resp.get('location'),
-                    'resource_id': publish_resp.get('resource_id')
-                }
+        logging.info(msg='start_deposit_processing_task'+str(data))
+        assemble_chunks = create_task(start_reassembling_chunks(deposit_id))
+        chunks_assembled = await assemble_chunks
+        if chunks_assembled:
+            engine = await get_service_engine()
+            media_type = data.get('media_type')
+            if deposit_id:
+                async with engine.acquire() as conn:
+                    await db.add_deposit_by_id(conn, deposit_id)
+                    etag = await trigger_store(conn, deposit_id)
+                    mongo_id = await trigger_metadata(data)
+                    publish_resp = await trigger_publish(conn, data)
+                    await db.update_deposit_by_id(
+                        conn,
+                        deposit_id=deposit_id,
+                        etag=etag,
+                        mongo_id=mongo_id,
+                        resource_id=publish_resp.get('resource_id'),
+                        media_type=media_type,
+                        deposit_date=data.get('deposit_date')
+                    )
 
-                config = {
-                    'deposit_id': deposit_id
-                }
+                    data = {
+                        'location': publish_resp.get('location'),
+                        'resource_id': publish_resp.get('resource_id')
+                    }
 
-                fd = FormData()
-                fd.add_field('data', json.dumps(data), content_type='application/json')
-                fd.add_field('config', json.dumps(config), content_type='application/json')
+                    config = {
+                        'deposit_id': deposit_id
+                    }
 
-                async with new_request(method='PATCH', url='http://mongo-service:5000/objects', data=fd) as resp:
-                    resp_json = await resp.json()
-                    if resp_json.get('err'):
-                        logging.error(resp_json.get('err'))
-                    else:
-                        logging.info(resp_json.get('log'))
+                    fd = FormData()
+                    fd.add_field('data', json.dumps(data), content_type='application/json')
+                    fd.add_field('config', json.dumps(config), content_type='application/json')
 
-            if os.path.exists(TMP_FILE_LOCATION.format(deposit_id)):
-                os.remove(TMP_FILE_LOCATION.format(deposit_id))
+                    async with new_request(method='PATCH', url='http://mongo-service:5000/objects', data=fd) as resp:
+                        resp_json = await resp.json()
+                        if resp_json.get('err'):
+                            logging.error(resp_json.get('err'))
+                        else:
+                            logging.info(resp_json.get('log'))
 
-            return True
+                if os.path.exists(TMP_FILE_LOCATION.format(deposit_id)):
+                    os.remove(TMP_FILE_LOCATION.format(deposit_id))
 
+                return True
+
+            else:
+                return False
         else:
+            logging.error(msg=f'error assembling chunks')
             return False
 
     except Exception as err:

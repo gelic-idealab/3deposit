@@ -12,7 +12,7 @@ from aiohttp import request as new_request
 from aiohttp_security import remember, forget, authorized_userid
 
 from forms import validate_login_form, validate_new_user_form
-from process import get_service_config_by_action, start_deposit_processing_task
+from process import get_service_config_by_action, start_reassembling_chunks, start_deposit_processing_task
 
 
 def redirect(router, route_name):
@@ -294,6 +294,9 @@ async def deposit_form(request):
 
 
 async def deposit_upload(request):
+    headers = {
+        'Access-Control-Allow-Headers': 'content-type'
+    }
     if request.method == 'POST':
         try:
             reader = await request.multipart()
@@ -310,16 +313,10 @@ async def deposit_upload(request):
                         b = await part.read()
                         f.write(b)
                     if int(rcn) == int(rtc):
-                        with open(f'./data/{did}', 'wb') as f:
-                            chunk_to_write = 1
-                            while chunk_to_write <= int(rtc):
-                                current_chunk = f'./data/{did}_{str(chunk_to_write)}'
-                                with open(current_chunk, 'rb') as c:
-                                    f.write(c.read())
-                                    os.remove(current_chunk)
-                                    chunk_to_write += 1
-                                    
-            return web.Response(status=200)
+                        logging.info(msg=str(f'all_chunks_received for {did}'))
+                        return web.Response(status=200, headers=headers)
+                    return web.Response(status=200, headers=headers)
+
         except Exception as err:
             return web.json_response({'err': str(err)}, status=503)
     else:

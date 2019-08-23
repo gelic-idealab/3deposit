@@ -30,10 +30,29 @@ async def get_service_engine():
 Trigger function to begin storage operation with buffered deposit file
 """
 
+async def start_reassembling_chunks(did, rtc):
+    try:
+        if did and rtc:
+            with open(f'./data/{did}', 'wb') as f:
+                chunk_to_write = 1
+                while chunk_to_write <= int(rtc):
+                    current_chunk = f'./data/{did}_{str(chunk_to_write)}'
+                    with open(current_chunk, 'rb') as c:
+                        f.write(c.read())
+                        os.remove(current_chunk)
+                        chunk_to_write += 1
+            return True
+        return False
+    except Exception as err:
+        logging.error(msg=f'start_reassembling_chunks err: {str(err)}')
+        return False
+        
 
 async def start_deposit_processing_task(data):
     try:
         logging.info(msg='start_deposit_processing_task'+str(data))
+        chunks_assembled = create_task(start_reassembling_chunks(did, rtc)
+        await chunks_assembled
         engine = await get_service_engine()
         deposit_id = data.get('id')
         media_type = data.get('media_type')

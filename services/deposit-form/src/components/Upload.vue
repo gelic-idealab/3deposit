@@ -32,7 +32,7 @@ export default {
     let comp = this
     let r = new Resumable({ 
             target:'../api/form/upload',
-            chunkSize: 10*1024*1024, // 10MB
+            chunkSize: 100*1024*1024, // 100MB
             maxFileSize: 1000*10*1024*1024, // 10GB
             testChunks: false,
             query: {

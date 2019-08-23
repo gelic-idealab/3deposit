@@ -187,7 +187,7 @@ services:
     container_name: vimeo-service
     networks:
       - gateway_internal
-    command: pipenv run gunicorn -w 4 -b 0.0.0.0:5000 -t 120 vimeo-service:app
+    command: pipenv run gunicorn -w 4 -b 0.0.0.0:5000 -t 300 vimeo-service:app
     labels:
       - "traefik.enable=false" 
     restart: always

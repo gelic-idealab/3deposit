@@ -30,7 +30,7 @@ async def current_user_ctx_processor(request):
 
 async def init_app(argv=None):
 
-    app = web.Application(client_max_size=20*1024*1024) # max client payload of 20MB
+    app = web.Application(client_max_size=128*1024*1024) # max client payload of 128MB
 
     app['config'] = get_config(argv)
 

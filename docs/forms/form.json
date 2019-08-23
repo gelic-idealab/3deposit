@@ -25,7 +25,7 @@
       "type": "text",
       "repeatable": true,
       "required": true,
-      "value": [],
+      "value": [""],
       "placeholder": "Enter creator name",
       "dependsOn": {}
     },
@@ -51,8 +51,18 @@
       "type": "text",
       "repeatable": false,
       "required": true,
-      "value": [],
+      "value": [""],
       "placeholder": "Object Title",
+      "dependsOn": {}
+    },
+    {
+      "id": "description",
+      "label": "Object Description",
+      "type": "text",
+      "repeatable": false,
+      "required": true,
+      "value": [""],
+      "placeholder": "Description",
       "dependsOn": {}
     },
     {
@@ -77,15 +87,6 @@
       "options": [
         { "value": "mono", "label": "Mono" }
       ],
-      "dependsOn": {"id": "media_type", "value": "video"}
-    },
-    {
-      "id": "filename",
-      "label": "File Name",
-      "type": "text",
-      "repeatable": false,
-      "required": true,
-      "value": [],
       "dependsOn": {"id": "media_type", "value": "video"}
     }
   ]

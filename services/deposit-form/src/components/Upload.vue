@@ -32,7 +32,7 @@ export default {
     let comp = this
     let r = new Resumable({ 
             target:'../api/form/upload',
-            chunkSize: 100*1024*1024, // 100MB
+            chunkSize: 64*1024*1024, // 64MB
             maxFileSize: 1000*10*1024*1024, // 10GB
             testChunks: false,
             query: {
@@ -42,7 +42,7 @@ export default {
     r.assignBrowse(document.getElementById('add-file-btn'));
     r.on('fileAdded', function () {
         r.upload( function () {
-          console.log('uploading chunk')
+          // console.log('uploading chunk')
         });
         r.on('progress', function () {
           comp.uploadPercentage = r.progress()*100

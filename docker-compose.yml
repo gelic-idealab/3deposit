@@ -53,8 +53,8 @@ services:
     networks:
       - gateway_internal
       - proxy
-    command: bash -c "pipenv run python init_db.py && pipenv run gunicorn gateway:init_app -w 4 -b 0.0.0.0:8080 -t 120 --worker-class aiohttp.GunicornWebWorker"
-    # command: bash -c "pipenv run gunicorn gateway:init_app -w 4 -b 0.0.0.0:8080 -t 120 --worker-class aiohttp.GunicornWebWorker"
+    command: bash -c "pipenv run python init_db.py && pipenv run gunicorn gateway:init_app -w 4 -b 0.0.0.0:8080 -t 600 --worker-class aiohttp.GunicornWebWorker"
+    # command: bash -c "pipenv run gunicorn gateway:init_app -w 4 -b 0.0.0.0:8080 -t 300 --worker-class aiohttp.GunicornWebWorker"
     labels:
       - "traefik.enable=true"
       - "traefik.frontend.rule=PathPrefix:/api"
@@ -111,7 +111,7 @@ services:
     networks:
       - minio_internal
       - gateway_internal
-    command: pipenv run gunicorn -w 4 -b 0.0.0.0:5000 minio-service:create_app()
+    command: pipenv run gunicorn -w 4 -b 0.0.0.0:5000 -t 600 minio-service:create_app()
     labels:
       - "traefik.enable=false"
     restart: always
@@ -177,7 +177,7 @@ services:
     container_name: aws-service
     networks:
       - gateway_internal
-    command: pipenv run gunicorn -w 4 -b 0.0.0.0:5000 aws-service:app
+    command: pipenv run gunicorn -w 4 -b 0.0.0.0:5000 -t 600 aws-service:app
     labels:
       - "traefik.enable=false"
     restart: always
@@ -187,7 +187,7 @@ services:
     container_name: vimeo-service
     networks:
       - gateway_internal
-    command: pipenv run gunicorn -w 4 -b 0.0.0.0:5000 -t 300 vimeo-service:app
+    command: pipenv run gunicorn -w 4 -b 0.0.0.0:5000 -t 600 vimeo-service:app
     labels:
       - "traefik.enable=false" 
     restart: always

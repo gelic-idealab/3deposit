@@ -64,20 +64,40 @@ async def start_deposit_processing_task(data):
             media_type = data.get('media_type')
             if deposit_id:
                 async with engine.acquire() as conn:
+                    # insert deposit_id
                     await db.add_deposit_by_id(conn, deposit_id)
-                    etag = await trigger_store(conn, deposit_id)
-                    mongo_id = await trigger_metadata(data)
-                    publish_resp = await trigger_publish(conn, data)
                     await db.update_deposit_by_id(
                         conn,
                         deposit_id=deposit_id,
-                        etag=etag,
-                        mongo_id=mongo_id,
-                        resource_id=publish_resp.get('resource_id'),
                         media_type=media_type,
                         deposit_date=data.get('deposit_date')
                     )
 
+                    # update with etag
+                    etag = await trigger_store(conn, deposit_id)
+                    await db.update_deposit_by_id(
+                        conn,
+                        deposit_id=deposit_id,
+                        etag=etag
+                    )
+
+                    # update with mongo_id
+                    mongo_id = await trigger_metadata(data)
+                    await db.update_deposit_by_id(
+                        conn,
+                        deposit_id=deposit_id,
+                        mongo_id=mongo_id
+                    )
+
+                    # update with resource_id and location
+                    publish_resp = await trigger_publish(conn, data)
+                    await db.update_deposit_by_id(
+                        conn,
+                        deposit_id=deposit_id,
+                        resource_id=publish_resp.get('resource_id')                        
+                    )
+
+                    # add new fields to mongo doc
                     data = {
                         'location': publish_resp.get('location'),
                         'resource_id': publish_resp.get('resource_id')

@@ -1,11 +1,11 @@
-![GitHub tag (latest SemVer pre-release)](https://img.shields.io/github/tag-pre/Grainger-Engineering-Library/3deposit) ![GitHub release](https://img.shields.io/github/release-pre/Grainger-Engineering-Library/3deposit) ![GitHub](https://img.shields.io/github/license/Grainger-Engineering-Library/3deposit)
+![GitHub release](https://img.shields.io/github/release-pre/Grainger-Engineering-Library/3deposit) ![GitHub](https://img.shields.io/badge/license-NCSA-green)
 
 3deposit is a 3D-content storage, publication, distribution, & management platform for academic libraries. Key features include a customizable deposit form, automated deposit metadata harvesting, batch deposits, configurable publication endpoints, file integrity checking, and a content 'gallery builder'. 3deposit aims to be extensible, portable, & compatible with existing content preservation systems. Ongoing support and features are planned, including federated content sharing between deployed instances. 
 
 ![gallery-builder](./docs/gallery-builder.png)
 
 ### Storage
-By default, 3deposit uses [Minio](https://github.com/minio/minio) for object storage. Instances can be configured to store objects locally or in a remote bucket. Remote buckets can be self-hosted with a MinIO server or with S3-compatbile providers, such as AWS. 
+By default, 3deposit uses [MinIO](https://github.com/minio/minio) for object storage. Instances can be configured to store objects locally or in a remote bucket. Remote buckets can be self-hosted with a MinIO server or with S3-compatbile providers, such as AWS. 
 
 ### Publication
 3deposit natively supports three media types:
@@ -32,7 +32,7 @@ cd 3deposit
 docker-compose up --build
 ```
 
-### System
+### Data flow
 ![3deposit](./docs/3deposit-flow.png)
 
 _____

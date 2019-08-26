@@ -1,5 +1,6 @@
 import os
 import json
+import logging
 from json import JSONDecodeError
 from flask import Flask, request, jsonify, send_file, make_response
 from minio import Minio
@@ -9,6 +10,8 @@ from werkzeug.exceptions import BadRequestKeyError
 
 from unpack.unpack import get_value
 
+
+logging.basicConfig(level=logging.DEBUG, format='%(relativeCreated)6d %(threadName)s %(message)s')
 
 def minio_keys(request):
     if not request:
@@ -36,7 +39,7 @@ def minio_keys(request):
 def create_client(request):
     if not request:
         return False
-
+    logging.debug(msg='creating minio client')
     # try:
     minioClient = ''
     config = json.loads(request.form.get('config'))
@@ -132,6 +135,7 @@ def create_app():
         # Puts one object i.e. a file in the specified bucket only.
 
         elif request.method == 'POST':
+            logging.debug(msg='POST request received')
             # get data from request payload
             try:
                 config = json.loads(request.form.get('config'))
@@ -149,6 +153,8 @@ def create_app():
                 else:
                     return jsonify({"err": "Please provide a deposit_id",
                                     "log": str(err)})
+                
+                logging.debug(msg='Processing deposit: {}'.format(deposit_id))
 
                 # extract file & temp save to disk
                 file = request.files['file']
@@ -163,13 +169,13 @@ def create_app():
 
                 r = minioClient.fput_object(bucket_name, object_name=deposit_id, file_path=deposit_id, metadata=metadata)
                 # cleanup temp file
-
-                try:
-                    minioClient.get_object(bucket_name, deposit_id)
-                except ResponseError as err:
-                    return jsonify({"err": "This deposit_id is already registered. Please enter a new deposit_id.",
-                                    "log": str(err)})
-                os.remove(deposit_id)
+                logging.debug(msg='fput_object op returned: {}'.format(str(r)))
+                # try:
+                #     minioClient.get_object(bucket_name, deposit_id)
+                # except ResponseError as err:
+                #     return jsonify({"err": "This deposit_id is already registered. Please enter a new deposit_id.",
+                #                     "log": str(err)})
+                
                 return jsonify({"etag": r, "deposit_id": deposit_id, "metadata": metadata})
 
             except (NoSuchBucket, InvalidBucketError) as err:  # Handle bucket_name related errors
@@ -190,6 +196,10 @@ def create_app():
             except ResponseError as err:
                 return jsonify({"err": str(err),
                                 "log": str(err)})
+            
+            finally:
+                if os.path.exists(deposit_id):
+                    os.remove(deposit_id)
 
         # Deletes one object i.e. a file from the specified bucket only.
 

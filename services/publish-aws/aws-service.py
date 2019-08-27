@@ -96,7 +96,7 @@ def index():
                     'resource_id': deposit_id,
                     'location': f'https://{bucket_name}.s3.amazonaws.com/{index_path}'
                 })
-                
+
             except Exception as err:
                 return jsonify({'err': str(err)})
 
@@ -108,27 +108,32 @@ def index():
 
         elif request.method == 'GET':
             resource_id = get_value(request, 'data', 'resource_id')
-            obj_list = []
-            attr_list = ['metadata', 'content_type', 'etag', 'last_modified', 'md5', 'storage_class', 'size']
-            length = 0
+            if resource_id:
+                obj_list = []
+                attr_list = ['metadata', 'content_type', 'etag', 'last_modified', 'md5', 'storage_class', 'size']
+                length = 0
 
-            for obj in b.list(prefix=resource_id):
-                obj_metadata = {}
-                obj_metadata.update({'s3_key_name': obj.name})
-                for attr in attr_list:
-                    obj_metadata.update({attr: getattr(obj, attr)})
-                obj_list.append(obj_metadata)
-                length += 1
+                for obj in b.list(prefix=resource_id):
+                    obj_metadata = {}
+                    obj_metadata.update({'s3_key_name': obj.name})
+                    for attr in attr_list:
+                        obj_metadata.update({attr: getattr(obj, attr)})
+                    obj_list.append(obj_metadata)
+                    length += 1
 
-            return jsonify({'metadata': obj_list, 'files': length})
+                return jsonify({'metadata': obj_list, 'files': length})
+            else:
+                return jsonify({'metadata': 'No resource_id provided.', 'files': 0})
 
         elif request.method == 'DELETE':
             resource_id = get_value(request, 'data', 'resource_id')
+            if resource_id:
+                for key in b.list(prefix=resource_id):
+                    key.delete()
 
-            for key in b.list(prefix=resource_id):
-                key.delete()
-
-            return jsonify({'msg': 'Deleted object '+str(resource_id)+' successfully.'})
+                return jsonify({'msg': 'Deleted object '+str(resource_id)+' successfully.'})
+            else:
+                return jsonify({'msg': 'No resource_id provided.'})
 
     except Exception as err:
         return jsonify({'err': str(err)})

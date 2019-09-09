@@ -4,20 +4,32 @@
       <ul class="list-unstyled team-members">
         <li>
           <div class="row" v-for="user in users" :key="user.id">
-            <div class="col-3">
+            <div class="col-1">
               <div class="avatar">
                 <img :src="default_user_img" class="rounded img-fluid">
               </div>
             </div>
-            <div class="col-6">
+            <div class="col-1">
+              {{user.id}}
+            </div>
+            <div class="col-2">
               {{user.username}}
               <br>
               <span :class="getStatusClass(user.role)">
                 <small>{{user.role}}</small>
               </span>
             </div>
-
-            <div v-if="user.role != 'admin'" class="col-3">
+            <div class="col-4">
+              {{user.email}}
+            </div>  
+            <div class="col-2">
+              {{user.role}}
+            </div>
+            <!-- <div v-if="user.role != 'admin'" class="col"> -->
+            <div class="col-2">
+              <p-button @click.native="editUser(user.username)" type="primary" outline icon>
+                <i class="fa fa-edit"></i>
+              </p-button>
               <p-button @click.native="deleteUser(user.username)" type="danger" outline icon>
                 <i class="fa fa-trash"></i>
               </p-button>

@@ -4,6 +4,7 @@ import requests
 import vimeo
 from flask import Flask, request, jsonify
 import zipfile
+import logging
 
 
 '''
@@ -12,6 +13,10 @@ and publishes to Vimeo.
 '''
 
 app = Flask(__name__)
+
+# logging
+logging.basicConfig(level=logging.DEBUG, filename='service.log')
+logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 
 @app.route('/', methods=['POST', 'GET', 'DELETE'])
@@ -37,6 +42,9 @@ def handler():
             data = json.loads(request.form.get('data'))
             did = data.get('deposit_id')
             metadata = data.get('metadata')
+
+            logging.info('POST request for deposit_id: {}; metadata: {}'.format(did, str(metadata)))
+
             title = str(metadata.get('object_title'))
             description = str(metadata.get('description'))
             projection = str(metadata.get('projection'))
@@ -60,16 +68,19 @@ def handler():
                           }
                     })
                 except Exception as err:
+                    logging.error(str(err))
                     return jsonify({'resource_id': 'Error uploading: ' + str(err), 'location': 'None'})
 
                 try:
                     resource_id = uri.split('/')[-1]
                     return jsonify({'resource_id': resource_id, 'location': 'https://player.vimeo.com/video/{}'.format(resource_id)})
                 except Exception as err:
+                    logging.error(str(err))
                     return jsonify({'resource_id': 'Error reading upload response: ' + str(err), 'location': 'None'})
             else:
                 return jsonify({'err': 'No file provided'})
         except Exception as err:
+            logging.error(str(err))
             return jsonify({'resource_id': 'Error reading request data: ' + str(err), 'location': 'None'})
             
         finally:
@@ -86,6 +97,7 @@ def handler():
             r = client.get(url)
             return jsonify(r.json())
         except Exception as err:
+            logging.error(str(err))
             return jsonify({'err': str(err)})
 
     elif request.method == 'DELETE':
@@ -96,6 +108,7 @@ def handler():
             r = client.delete(url)
             return jsonify(r.json())
         except Exception as err:
+            logging.error(str(err))
             return jsonify({'err': str(err)})
 
 

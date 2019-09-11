@@ -7,15 +7,9 @@ services:
     container_name: metadata-service
     ports:
       - 5000:5000
-    networks:
-      - gateway_internal
     environment: 
       FLASK_ENV: development
       FLASK_APP: metadata-service
     command: pipenv run flask run --host=0.0.0.0
     labels:
       - "traefik.enable=false" 
-
-# networks:
-#     gateway_internal:
-#         external: false

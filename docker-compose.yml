@@ -3,7 +3,7 @@ version: '3'
 services:
 
   deposit-form:
-    build: ./services/deposit-form/
+    build: ./services/form/
     networks:
       - proxy 
     container_name: deposit-form
@@ -28,7 +28,7 @@ services:
     restart: always
 
   admin:
-    build: ./services/deposit-admin/
+    build: ./services/admin/
     networks:
       - proxy
     container_name: admin
@@ -102,7 +102,7 @@ services:
     restart: always
 
   minio-service:
-    build: ./services/store-minio/
+    build: ./services/minio/
     container_name: minio-service
     depends_on:
       - minio-server
@@ -146,7 +146,7 @@ services:
       - keys.env
 
   mongo-service:
-    build: ./services/store-mongo/
+    build: ./services/mongo/
     container_name: mongo-service
     depends_on:
       - mongo-server
@@ -163,7 +163,7 @@ services:
     restart: always
 
   sketchfab-service:
-    build: ./services/publish-sketchfab/
+    build: ./services/sketchfab/
     container_name: sketchfab-service
     networks:
       - gateway_internal
@@ -173,7 +173,7 @@ services:
     restart: always
 
   aws-service:
-    build: ./services/publish-aws/
+    build: ./services/aws/
     container_name: aws-service
     networks:
       - gateway_internal
@@ -183,7 +183,7 @@ services:
     restart: always
 
   vimeo-service:
-    build: ./services/publish-vimeo/
+    build: ./services/vimeo/
     container_name: vimeo-service
     networks:
       - gateway_internal

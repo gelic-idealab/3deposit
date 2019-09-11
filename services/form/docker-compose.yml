@@ -1,0 +1,20 @@
+version: '3'
+services:
+  deposit-form:
+    build: .
+    # ports:
+    #   - "8080:8080"
+    networks:
+      - proxy 
+    container_name: deposit-form
+    command: npm run serve
+    labels:
+      - "traefik.frontend.rule=Host:deposit-form.docker.localhost"
+      - "traefik.backend=deposit-form"
+      - "traefik.port=8080"
+      - "traefik.docker.network=proxy"
+
+networks:
+    proxy:
+        external: true
+    

@@ -1,0 +1,49 @@
+version: '3'
+
+services:
+  minio-server:
+    # ports: 
+    #    - "9000:9000"
+    container_name: minio-server
+    image: minio/minio:latest
+    networks:
+      - minio_internal
+    volumes:
+      - data1:/data
+    environment:
+      MINIO_ACCESS_KEY: AKIAIOSFODNN7GRAINGER
+      MINIO_SECRET_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYGRAINGERKEY
+    command: server /data
+    labels:
+      - "traefik.enable=false" 
+
+  minio-service:
+    build: .
+    container_name: minio-service
+    # ports: 
+    #   - "5000:5000"
+    environment: 
+      FLASK_ENV: development
+      FLASK_APP: minio-service
+    depends_on:
+      - minio-server
+    links: 
+      - minio-server
+    networks:
+      - minio_internal
+      - proxy
+    command: pipenv run flask run --host=0.0.0.0
+    labels:
+        - "traefik.frontend.rule=Host:minio.docker.localhost"
+        - "traefik.backend=minio-service"
+        - "traefik.port=5000"
+        - "traefik.docker.network=proxy"
+
+volumes:
+  data1:
+
+networks:
+    proxy:
+        external: true
+    minio_internal:
+        external: false

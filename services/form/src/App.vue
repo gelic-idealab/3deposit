@@ -15,9 +15,12 @@ import Banner from './components/Banner.vue'
 import Fields from './components/Fields.vue'
 // import FileProgress from './components/FileProgress.vue'
 import Upload from './components/Upload.vue'
-import 'bootstrap/dist/css/bootstrap.min.css'
+
 import axios from 'axios'
 import uuidv4 from 'uuid'
+
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 
 export default {

@@ -11,13 +11,15 @@
     "@vue/cli": "^3.5.5",
     "axios": "^0.18.0",
     "bootstrap": "^4.3.1",
+    "bootstrap-vue": "^2.0.0",
     "crypto-js": "^3.1.9-1",
     "jquery": "^3.4.0",
     "md5": "^2.2.1",
     "popper.js": "^1.14.7",
     "resumablejs": "^1.1.0",
     "uuid": "^3.3.2",
-    "vue": "^2.6.6"
+    "vue": "^2.6.10",
+    "vue-loader": "^15.7.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.5.0",
@@ -26,7 +28,7 @@
     "babel-eslint": "^10.0.1",
     "eslint": "^5.8.0",
     "eslint-plugin-vue": "^5.0.0",
-    "vue-template-compiler": "^2.5.21"
+    "vue-template-compiler": "^2.6.10"
   },
   "eslintConfig": {
     "root": true,

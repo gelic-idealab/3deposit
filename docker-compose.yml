@@ -93,7 +93,7 @@ services:
     ports:
       - 9000:9000
     volumes:
-      - ./services/store-minio/data:/data
+      - ./services/minio/data:/data
     env_file:
       - keys.env
     command: server /data
@@ -125,7 +125,7 @@ services:
     env_file:
       - keys.env
     volumes:
-      - ./services/store-mongo/data:/data
+      - ./services/mongo/data:/data
     labels:
       - "traefik.enable=false" 
     restart: always

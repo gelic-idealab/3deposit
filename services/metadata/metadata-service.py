@@ -4,6 +4,9 @@ import requests
 from flask import Flask, request, jsonify
 import logging
 
+import pymediainfo
+# https://pymediainfo.readthedocs.io/en/stable/
+
 
 '''
 Flask app that generates & harvests metadata from 3d media, 

@@ -11,7 +11,6 @@ from werkzeug.exceptions import BadRequestKeyError
 from unpack.unpack import get_value
 
 
-logging.basicConfig(level=logging.DEBUG, format='%(relativeCreated)6d %(threadName)s %(message)s')
 
 def minio_keys(request):
     if not request:
@@ -81,6 +80,23 @@ def create_client(request):
 
 def create_app():
     app = Flask(__name__)
+
+    # logging boilerplate
+    service_name = str(os.path.basename(__file__))
+    logfile = 'service.log'
+    logging.basicConfig(level=logging.DEBUG, filename=logfile)
+    logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+    logging.info(f'Starting {service_name}...')
+
+    @app.route('/log', methods=['GET'])
+    def log_handler():
+        try:
+            with open(logfile, 'r') as f:
+                resp = f.read()
+                return jsonify({'logfile': str(resp)})
+        except Exception as err:
+            return jsonify({'err': str(err)})
 
     # AT THIS ENDPOINT, EACH ACTION IS SPECIFIC TO AN OBJECT AT IT'S CORE
 

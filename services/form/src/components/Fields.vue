@@ -1,30 +1,26 @@
 <template>
   <div class="fields">
-    <div class="container">
     <div class="form-group">
 
-        <p v-if="errors.length">
+        <!-- <p v-if="errors.length">
           <ul>
             <div class="alert alert-danger" v-for="(error,index) in errors" :key="index">{{ error }}</div>
           </ul>
         </p>
-      
+       -->
       <div class="input-group mb-3" v-for="field in fields" :key="field.id">
         <template v-if="renderField(field)">
 
             <template v-if="field.type === 'text'">
-              <div class="col">
                 <div>
                   <h4>{{ field.label }}</h4>
-                  <button v-if="field.repeatable == true" type="button" class="btn btn ml-3 mb-3" v-on:click="addValue(field.value)">Add</button>
+                  <button v-if="field.repeatable == true" type="button" class="btn btn-primary ml-3" v-on:click="addValue(field.value)">Add</button>
                 </div>
-              </div>
-              <div class="col">
-                <div>
                   <transition-group name="fade" tag="ul">
                     <div class="input-group mb-3" v-for="(value, index) in field.value" :key="index">
                         <input :type="field.type" class="form-control input-lg" :class="fieldInvalid(field.id)"
                         v-model="field.value[index]" 
+                        v-on:input="clearError(field.id)"
                         >
                         <div class="input-group-append" v-if="index > 0">
                             <button type="button" class="btn btn-danger" 
@@ -32,13 +28,11 @@
                         </div>
                     </div>
                   </transition-group>
-                </div>
-              </div>
             </template>
 
             <template v-else-if="field.type === 'date'">
               <h4>{{field.label}}</h4>
-              <input class="form-control ml-3 mb-3" type="date" v-model="field.value" value="">
+              <input class="form-control ml-3 mb-3" type="date" v-model="field.value" value="" v-on:input="clearError(field.id)" :class="fieldInvalid(field.id)">
             </template>
 
             <template v-else-if="field.type === 'select'">
@@ -46,6 +40,7 @@
                   <select class="form-control ml-3 mb-3 input-lg"
                   v-model="field.value" 
                   :class="fieldInvalid(field.id)"
+                  v-on:input="clearError(field.id)"
                   >
                     <option v-for="option in field.options" :value="option.value" :key="option.value">
                     {{ option.label }} 
@@ -58,7 +53,6 @@
       <button type="button" class="btn btn-primary btn-lg btn-block" v-on:click="submitDeposit">Submit</button>
     </div>
     </div>
-  </div>
 </template>
 
 
@@ -77,6 +71,12 @@ export default {
     }
   },
   methods: {
+    clearError(id) {
+      var i = this.errors.indexOf(id)
+      if (i > -1) {
+        this.errors.splice(i, 1)
+      }
+    },
     formErrors() {
       console.log("formErrors called")
       let formErrors = []

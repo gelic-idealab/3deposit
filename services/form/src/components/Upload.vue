@@ -1,30 +1,28 @@
 <template>
-  <div class="container sticky-top" style="background-color: white">
-    <div class="large-12 medium-12 small-12 cell">
+  <div>
+    <b-button v-if="uploadPercentage == 0" size="lg" variant="primary" id="add-file-btn">
+      Add file
+    </b-button>
+    <template v-else-if="uploadPercentage < 100">
+      <b-button size="lg" variant="primary" id="uploading-file-btn">
+        <b-spinner></b-spinner>
+          {{ Math.round(uploadPercentage) }}%
+      </b-button>
+      <b-button size="lg" variant="info" id="pause-upload-btn" @click="pauseUpload">Pause Upload</b-button>
+      <b-button size="lg" variant="danger" id="cancel-upload-btn" @click="cancelUpload">Cancel Upload</b-button>
+    </template>
+    <b-button v-else-if="uploadPercentage == 100" size="lg" variant="success" id="uploaded-file-btn">
+      Upload Successful
+    </b-button>
 
-      <b-button v-if="uploadPercentage == 0" size="lg" variant="primary" id="add-file-btn">
-        Add file
-      </b-button>
-      <template v-else-if="uploadPercentage < 100">
-        <b-button size="lg" variant="primary" id="uploading-file-btn">
-          <b-spinner></b-spinner>
-            {{ Math.round(uploadPercentage) }}%
-        </b-button>
-        <b-button size="lg" variant="warning" id="pause-upload-btn" @click="pauseUpload">Pause Upload</b-button>
-        <b-button size="lg" variant="danger" id="cancel-upload-btn" @click="cancelUpload">Cancel Upload</b-button>
-      </template>
-      <b-button v-else-if="uploadPercentage == 100" size="lg" variant="success" id="uploaded-file-btn">
-        Upload Successful
-      </b-button>
-  
-      <br>
-      <!-- <div class="progress mt-3 mb-3">
-        <div class="progress-bar" role="progressbar" :style="{width: uploadPercentage+'%'}" aria-valuemin="0" aria-valuemax="100"></div>
-      </div> -->
-      <br>
-    </div>
+    <br>
+    <!-- <div class="progress mt-3 mb-3">
+      <div class="progress-bar" role="progressbar" :style="{width: uploadPercentage+'%'}" aria-valuemin="0" aria-valuemax="100"></div>
+    </div> -->
+    <!-- <br> -->
   </div>
 </template>
+
 
 <script>
 //   import axios from 'axios'
@@ -42,10 +40,10 @@ export default {
   },
   methods: {
     pauseUpload () {
-      this.$emit('pause')
+      this.r.pause();
     },
     cancelUpload () {
-      this.$emit('cancel')
+      this.r.cancel();
     }
   },
   mounted () {
@@ -67,14 +65,6 @@ export default {
       r.on('progress', function () {
         comp.uploadPercentage = r.progress()*100
       });
-    });
-    r.on('pause', function () {
-        r.pause( function () {
-          console.log("r.pause was called")
-        });
-    });
-    r.on('cancel', function () {
-      r.cancel();
     });
     comp.r = r;
   },

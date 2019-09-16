@@ -1,6 +1,5 @@
 import os
 import json
-import requests
 import logging
 import zipfile
 
@@ -16,9 +15,22 @@ handles POST requests with media payload, responds with metadata.
 
 app = Flask(__name__)
 
-# logging
-logging.basicConfig(level=logging.DEBUG, filename='service.log')
+# logging boilerplate
+service_name = str(os.path.basename(__file__))
+logfile = 'service.log'
+logging.basicConfig(level=logging.DEBUG, filename=logfile)
 logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+logging.info(f'Starting {service_name}...')
+
+@app.route('/log', methods=['GET'])
+def log_handler():
+    try:
+        with open(logfile, 'r') as f:
+            resp = f.read()
+            return jsonify({'logfile': str(resp)})
+    except Exception as err:
+        return jsonify({'err': str(err)})
 
 
 @app.route('/', methods=['POST', 'GET'])

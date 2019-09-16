@@ -1,67 +1,58 @@
 <template>
   <div class="fields">
-    <div class="container">
     <div class="form-group">
-      
+
+        <!-- <p v-if="errors.length">
+          <ul>
+            <div class="alert alert-danger" v-for="(error,index) in errors" :key="index">{{ error }}</div>
+          </ul>
+        </p>
+       -->
       <div class="input-group mb-3" v-for="field in fields" :key="field.id">
         <template v-if="renderField(field)">
 
+            <template v-if="field.type === 'text'">
+                <div>
+                  <h4>{{ field.label }}</h4>
+                  <button v-if="field.repeatable == true" type="button" class="btn btn-primary ml-3" v-on:click="addValue(field.value)">Add</button>
+                </div>
+                  <transition-group name="fade" tag="ul">
+                    <div class="input-group mb-3" v-for="(value, index) in field.value" :key="index">
+                        <input :type="field.type" class="form-control input-lg" :class="fieldInvalid(field.id)"
+                        v-model="field.value[index]" 
+                        v-on:input="clearError(field.id)"
+                        >
+                        <div class="input-group-append" v-if="index > 0">
+                            <button type="button" class="btn btn-danger" 
+                            v-on:click="removeValue(field.value, index)">Remove</button>
+                        </div>
+                    </div>
+                  </transition-group>
+            </template>
 
+            <template v-else-if="field.type === 'date'">
+              <h4>{{field.label}}</h4>
+              <input class="form-control ml-3 mb-3" type="date" v-model="field.value" value="" v-on:input="clearError(field.id)" :class="fieldInvalid(field.id)">
+            </template>
 
-        <template v-if="field.type === 'text'">
-          <div class="col-12">
-          <div>
-          <h4>{{ field.label }}</h4>
-          <button v-if="field.repeatable === true" type="button" class="btn btn-info ml-3 mb-3" v-on:click="addValue(field.value)">Add</button>
-          </div>
-          </div>
-          <div class="col-12">
-          <div>
-            <transition-group name="fade" tag="ul">
-              <div class="input-group mb-3" v-for="(value, index) in field.value" :key="index">
-                  <input :type="field.type" class="form-control input-lg"
-                  v-model="field.value[index]" 
+            <template v-else-if="field.type === 'select'">
+              <h4>{{ field.label }}</h4>
+                  <select class="form-control ml-3 mb-3 input-lg"
+                  v-model="field.value" 
+                  :class="fieldInvalid(field.id)"
+                  v-on:input="clearError(field.id)"
                   >
-                  <div class="input-group-append" v-if="index > 0">
-                      <button type="button" class="btn btn-danger btn-lg" 
-                      v-on:click="removeValue(field.value, index)">Remove</button>
-                  </div>
-              </div>
-              </transition-group>
-            </div>
-          </div>
+                    <option v-for="option in field.options" :value="option.value" :key="option.value">
+                    {{ option.label }} 
+                    </option> 
+                  </select>
+            </template>
+
         </template>
-
-        <template v-else-if="field.type === 'date'">
-          <h4>{{field.label}}</h4>
-          <input class="form-control ml-3 mb-3" type="date" v-model="field.value" value="">
-        </template>
-
-        <template v-else-if="field.type === 'select'">
-          <h4>{{ field.label }}</h4>
-              <select class="form-control ml-3 mb-3 input-lg"
-              v-model="field.value" 
-              >
-                <option v-for="option in field.options" :value="option.value" :key="option.value">
-                {{ option.label }} 
-                </option> 
-              </select>
-        </template>
-
-        
-        <!-- <template v-else-if="field.type === 'container'">
-          <div class="input-group mb-3 input-lg" v-for="(subfield, index) in field.subfields" :key="subfield.index">
-            <h4>{{ field.label }}</h4>
-              <input class="ml-3" type="checkbox" v-on:change.native="toggleCheckbox(field, index)" v-model="field.value">
-          </div>
-        </template> -->
-
-      </template>
       </div>
       <button type="button" class="btn btn-primary btn-lg btn-block" v-on:click="submitDeposit">Submit</button>
     </div>
     </div>
-  </div>
 </template>
 
 
@@ -74,7 +65,34 @@ export default {
     fields: Array,
     id: String
   },
+  data() {
+    return {
+      errors: []
+    }
+  },
   methods: {
+    clearError(id) {
+      var i = this.errors.indexOf(id)
+      if (i > -1) {
+        this.errors.splice(i, 1)
+      }
+    },
+    formErrors() {
+      console.log("formErrors called")
+      let formErrors = []
+      this.fields.forEach(f => {
+        if (f.required && (f.value.length == 0 || f.value[0] == "")) {
+          formErrors.push(f.id);
+          console.log(f.label, f.value);
+        }
+      })
+      return formErrors;
+    },
+    fieldInvalid(id) {
+      if (this.errors.includes(id)) {
+        return "is-invalid";
+      }
+    },
     addValue: function (valueList) {
       valueList.push('')
     },
@@ -103,23 +121,29 @@ export default {
       }
     },
     submitDeposit: function () {
-      axios({
-        url: '../api/form/submit',
-        data: {
-          'media_type': this.fields[0].value,
-          'form': this.fields, 
-          'id': this.id
-          },
-        method: 'post',
-        config: { headers: {'Content-Type': 'application/json' }}
-        })
-      .then(function(response) {
-        if (response.status === 200) {
-          window.location.href = "/";
-        } else {
-          (console.log(response));
-        }
-      });
+      this.errors = this.formErrors();
+      if (this.errors) {
+        console.log(this.errors)
+      }
+      else {
+        axios({
+          url: '../api/form/submit',
+          data: {
+            'media_type': this.fields[0].value,
+            'form': this.fields, 
+            'id': this.id
+            },
+          method: 'post',
+          config: { headers: {'Content-Type': 'application/json' }}
+          })
+        .then(function(response) {
+          if (response.status === 200) {
+            window.location.href = "/";
+          } else {
+            (console.log(response));
+          }
+        });
+      }
     }
   }
 }

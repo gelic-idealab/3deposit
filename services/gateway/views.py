@@ -328,8 +328,16 @@ async def deposit_upload(request):
             did = request.query['deposit_id']
             logging.info(f'Upload canceled for deposit_id: {did}, removing _chunks')
             tmp_deposit_dir = f'./data/{did}_chunks/'
-            shutil.rmtree(tmp_deposit_dir)
-            os.remove(tmp_deposit_dir)
+            empty = False
+            retry = 0
+            while not empty and retry < 5:
+                try:
+                    shutil.rmtree(tmp_deposit_dir)
+                    os.rmdir(tmp_deposit_dir)
+                    empty = True
+                except OSError:
+                    retry += 1
+                    continue
             return web.Response(status=204)
         except Exception as err:
             return web.json_response({'err': str(err)})

@@ -25,7 +25,7 @@
 
 
 <script>
-//   import axios from 'axios'
+import axios from 'axios'
 //   import CryptoJS from 'crypto-js'
 import Resumable from 'resumablejs'
 
@@ -44,6 +44,11 @@ export default {
     },
     cancelUpload () {
       this.r.cancel();
+      axios.delete('../api/form/upload', {
+        params: {
+          deposit_id: this.id
+          }
+      });
     }
   },
   mounted () {

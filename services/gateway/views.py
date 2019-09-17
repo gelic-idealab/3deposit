@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import logging
+import shutil
 from datetime import datetime
 from asyncio import create_task
 
@@ -321,9 +322,20 @@ async def deposit_upload(request):
 
         except Exception as err:
             return web.json_response({'err': str(err)}, status=503)
+
+    if request.method == 'DELETE':
+        try:
+            did = request.query['deposit_id']
+            logging.info(f'Upload canceled for deposit_id: {did}, removing _chunks')
+            tmp_deposit_dir = f'./data/{did}_chunks/'
+            shutil.rmtree(tmp_deposit_dir)
+            os.remove(tmp_deposit_dir)
+            return web.Response(status=204)
+        except Exception as err:
+            return web.json_response({'err': str(err)})
+
     else:
         return web.Response(status=200)
-
 
 async def deposit_submit(request):
     headers = {

@@ -21,8 +21,8 @@ services:
     image: postgres:10
     networks:
         - gateway_internal    
-    volumes:
-        - ./pg_data:/var/lib/postgresql
+    # volumes:
+    #     - ./pg_data:/var/lib/postgresql
     labels:
       - "traefik.enable=false"    
     restart: always
@@ -53,8 +53,8 @@ services:
     networks:
       - gateway_internal
       - proxy
-    command: bash -c "pipenv run python init_db.py && pipenv run gunicorn gateway:init_app -w 4 -b 0.0.0.0:8080 -t 600 --worker-class aiohttp.GunicornWebWorker"
-    # command: bash -c "pipenv run gunicorn gateway:init_app -w 4 -b 0.0.0.0:8080 -t 300 --worker-class aiohttp.GunicornWebWorker"
+    # command: bash -c "pipenv run python init_db.py && pipenv run gunicorn gateway:init_app -w 4 -b 0.0.0.0:8080 -t 600 --worker-class aiohttp.GunicornWebWorker"
+    command: bash -c "pipenv run gunicorn gateway:init_app -w 4 -b 0.0.0.0:8080 -t 300 --worker-class aiohttp.GunicornWebWorker"
     labels:
       - "traefik.enable=true"
       - "traefik.frontend.rule=PathPrefix:/api"

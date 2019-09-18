@@ -312,15 +312,18 @@ async def deposit_upload(request):
                     if not os.path.exists(f'./data/{did}_chunks/'):
                         os.mkdir(f'./data/{did}_chunks/')
                     chunk_file = f'./data/{did}_chunks/{rcn}'
-                    with open(chunk_file, 'wb') as f:
-                        b = await part.read()
-                        f.write(b)
+                    if not os.path.exists(chunk_file):
+                        with open(chunk_file, 'wb') as f:
+                            b = await part.read()
+                            f.write(b)
                     if int(rcn) == int(rtc):
                         logging.info(msg=str(f'all_chunks_received for {did}'))
                         return web.Response(status=200, headers=headers)
                     return web.Response(status=200, headers=headers)
             return web.Response(status=200, headers=headers)
+
         except Exception as err:
+            logging.error('deposit_upload error for deposit_id: {}, error: {}'.format(did, str(err)))
             return web.json_response({'err': str(err)}, status=503, headers=headers)
 
     if request.method == 'DELETE':

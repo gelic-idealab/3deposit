@@ -319,28 +319,25 @@ async def deposit_upload(request):
                         logging.info(msg=str(f'all_chunks_received for {did}'))
                         return web.Response(status=200, headers=headers)
                     return web.Response(status=200, headers=headers)
-
+            return web.Response(status=200, headers=headers)
         except Exception as err:
-            return web.json_response({'err': str(err)}, status=503)
+            return web.json_response({'err': str(err)}, status=503, headers=headers)
 
     if request.method == 'DELETE':
         try:
             did = request.query['deposit_id']
-            logging.info(f'Upload canceled for deposit_id: {did}, removing _chunks')
+            logging.info(f'Upload cancelled for deposit_id: {did}, removing _chunks')
             tmp_deposit_dir = f'./data/{did}_chunks/'
-            empty = False
-            retry = 0
-            while not empty and retry < 5:
+            while os.path.exists(tmp_deposit_dir):
                 try:
-                    shutil.rmtree(tmp_deposit_dir)
-                    os.rmdir(tmp_deposit_dir)
-                    empty = True
-                except OSError:
-                    retry += 1
-                    continue
+                    shutil.rmtree(tmp_deposit_dir, ignore_errors=True)
+                except Exception as err:
+                    logging.debug('shutil.rmtree error: ' + str(err))
+
             return web.Response(status=204)
+
         except Exception as err:
-            return web.json_response({'err': str(err)})
+            return web.json_response({'err': str(err)}, status=500)
 
     else:
         return web.Response(status=200)

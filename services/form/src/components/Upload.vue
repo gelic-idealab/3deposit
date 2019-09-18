@@ -58,6 +58,7 @@ export default {
             fileType: ['zip'],
             chunkSize: 64*1024*1024, // 64MB
             maxFileSize: 1000*10*1024*1024, // 10GB
+            xhrTimeout: 10000,
             testChunks: false,
             query: {
               deposit_id: this.id

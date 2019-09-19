@@ -1,8 +1,18 @@
 <template>
-  <div>
+  <div align="center">
+    <b-card
+      class="text-center mb-5"
+      header="Step 1: Upload"
+      style="max-width: 20rem;"
+    >
+      <b-card-text>
+        Select a .zip file to upload in the background while you complete the rest of the form. 
+      </b-card-text>
+
     <b-button v-if="uploadPercentage == 0" size="lg" variant="primary" id="add-file-btn">
       Add file
     </b-button>
+
     <template v-else-if="uploadPercentage < 100">
       <b-button size="lg" variant="primary" id="uploading-file-btn">
         <b-spinner></b-spinner>
@@ -11,11 +21,11 @@
       <b-button size="lg" variant="info" id="pause-upload-btn" @click="pauseUpload">Pause Upload</b-button>
       <b-button size="lg" variant="danger" id="cancel-upload-btn" @click="cancelUpload">Cancel Upload</b-button>
     </template>
+
     <b-button v-else-if="uploadPercentage == 100" size="lg" variant="success" id="uploaded-file-btn">
       Upload Successful
     </b-button>
-
-    <br>
+  </b-card>
     <!-- <div class="progress mt-3 mb-3">
       <div class="progress-bar" role="progressbar" :style="{width: uploadPercentage+'%'}" aria-valuemin="0" aria-valuemax="100"></div>
     </div> -->
@@ -79,3 +89,7 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+
+</style>

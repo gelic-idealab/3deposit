@@ -13,9 +13,9 @@
       "required": true,
       "value": [],
       "options": [
-        { "value": "model", "label": "3d Model" },
-        { "value": "video", "label": "360 Video" },
-        { "value": "vr", "label": "VR project" }
+        { "value": "model", "text": "3d Model" },
+        { "value": "video", "text": "360 Video" },
+        { "value": "vr", "text": "VR project" }
       ],
       "dependsOn": {}
     },
@@ -37,11 +37,11 @@
       "required": true,
       "value": [],
       "options": [
-        { "value": "u", "label": "Undergraduate" },
-        { "value": "g", "label": "Graduate" },
-        { "value": "f", "label": "Faculty" },
-        { "value": "s", "label": "Staff" },
-        { "value": "o", "label": "Other" }
+        { "value": "u", "text": "Undergraduate" },
+        { "value": "g", "text": "Graduate" },
+        { "value": "f", "text": "Faculty" },
+        { "value": "s", "text": "Staff" },
+        { "value": "o", "text": "Other" }
       ],
       "dependsOn": {}
     },
@@ -66,6 +66,15 @@
       "dependsOn": {}
     },
     {
+      "id": "create_date",
+      "label": "Date Created",
+      "type": "date",
+      "repeatable": false,
+      "required": true,
+      "value": "",
+      "dependsOn": {}
+    },
+    {
       "id": "projection",
       "label": "Projection",
       "type": "select",
@@ -73,7 +82,7 @@
       "required": true,
       "value": [],
       "options": [
-        { "value": "equirectangular", "label": "Equirectangular" }
+        { "value": "equirectangular", "text": "Equirectangular" }
       ],
       "dependsOn": {"id": "media_type", "value": "video"}
     },
@@ -85,7 +94,7 @@
       "required": true,
       "value": [],
       "options": [
-        { "value": "mono", "label": "Mono" }
+        { "value": "mono", "text": "Mono" }
       ],
       "dependsOn": {"id": "media_type", "value": "video"}
     }

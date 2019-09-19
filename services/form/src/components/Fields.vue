@@ -1,58 +1,48 @@
 <template>
-  <div class="fields">
-    <div class="form-group">
+  <b-form-group>
+    <div class="input-group mb-3" v-for="field in fields" :key="field.id">
+      <template v-if="renderField(field)">
 
-        <!-- <p v-if="errors.length">
-          <ul>
-            <div class="alert alert-danger" v-for="(error,index) in errors" :key="index">{{ error }}</div>
-          </ul>
-        </p>
-       -->
-      <div class="input-group mb-3" v-for="field in fields" :key="field.id">
-        <template v-if="renderField(field)">
-
-            <template v-if="field.type === 'text'">
-                <div>
-                  <h4>{{ field.label }}</h4>
-                  <button v-if="field.repeatable == true" type="button" class="btn btn-primary ml-3" v-on:click="addValue(field.value)">Add</button>
-                </div>
-                  <transition-group name="fade" tag="ul">
-                    <div class="input-group mb-3" v-for="(value, index) in field.value" :key="index">
-                        <input :type="field.type" class="form-control input-lg" :class="fieldInvalid(field.id)"
-                        v-model="field.value[index]" 
-                        v-on:input="clearError(field.id)"
-                        >
-                        <div class="input-group-append" v-if="index > 0">
-                            <button type="button" class="btn btn-danger" 
-                            v-on:click="removeValue(field.value, index)">Remove</button>
-                        </div>
-                    </div>
-                  </transition-group>
-            </template>
-
-            <template v-else-if="field.type === 'date'">
-              <h4>{{field.label}}</h4>
-              <input class="form-control ml-3 mb-3" type="date" v-model="field.value" value="" v-on:input="clearError(field.id)" :class="fieldInvalid(field.id)">
-            </template>
-
-            <template v-else-if="field.type === 'select'">
-              <h4>{{ field.label }}</h4>
-                  <select class="form-control ml-3 mb-3 input-lg"
-                  v-model="field.value" 
-                  :class="fieldInvalid(field.id)"
+          <template v-if="field.type === 'text'">
+              <div>
+                <h4>{{ field.label }}</h4>
+                <button v-if="field.repeatable == true" type="button" class="btn btn-primary" v-on:click="addValue(field.value)">Add {{field.label}}</button>
+              </div>
+              <transition-group name="fade" tag="ul">
+                <b-input-group v-for="(value, index) in field.value" :key="index" style="width:100%">
+                  <b-form-input :class="fieldInvalid(field.id)"
+                  v-model="field.value[index]" 
                   v-on:input="clearError(field.id)"
-                  >
-                    <option v-for="option in field.options" :value="option.value" :key="option.value">
-                    {{ option.label }} 
-                    </option> 
-                  </select>
-            </template>
+                  ></b-form-input>
+                  <b-input-group-append v-if="index > 0">
+                    <b-button variant="danger" 
+                    v-on:click="removeValue(field.value, index)">Remove</b-button>
+                  </b-input-group-append>
+                </b-input-group>
+              </transition-group>
+          </template>
 
-        </template>
-      </div>
-      <button type="button" class="btn btn-primary btn-lg btn-block" v-on:click="submitDeposit">Submit</button>
+          <template v-else-if="field.type === 'date'">
+            <h4>{{field.label}}</h4>
+            <b-form-input class="form-control ml-3 mb-3" type="date" v-model="field.value" value="" v-on:input="clearError(field.id)" :class="fieldInvalid(field.id)">
+          </template>
+
+          <template v-else-if="field.type === 'select'">
+            <h4>{{ field.label }}</h4>
+                <b-form-select class="form-control ml-3 mb-3 input-lg"
+                v-model="field.value" 
+                :options="field.options"
+                :class="fieldInvalid(field.id)"
+                v-on:input="clearError(field.id)"
+                ></b-form-select>
+          </template>
+
+      </template>
     </div>
-    </div>
+
+    <b-button block size="lg" variant="primary" v-on:click="submitDeposit">Submit Deposit</b-button>
+
+  </b-form-group>
 </template>
 
 
@@ -78,10 +68,9 @@ export default {
       }
     },
     formErrors() {
-      console.log("formErrors called")
       let formErrors = []
       this.fields.forEach(f => {
-        if (f.required && (f.value.length == 0 || f.value[0] == "")) {
+        if (f.required && this.renderField(f) && (f.value.length == 0 || f.value[0] == "")) {
           formErrors.push(f.id);
           console.log(f.label, f.value);
         }
@@ -122,7 +111,7 @@ export default {
     },
     submitDeposit: function () {
       this.errors = this.formErrors();
-      if (this.errors) {
+      if (this.errors.length > 0) {
         console.log(this.errors)
       }
       else {

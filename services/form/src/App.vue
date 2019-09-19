@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div class="container-fluid">
+    <div class="container">
       <img alt="logo" src="./assets/logo.png" height="128" width="128">
       <Banner v-bind:banner="form.banner"/>
       <!-- <FileProgress v-bind:id="id"/> -->

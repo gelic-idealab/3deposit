@@ -4,42 +4,51 @@ import subprocess
 import pprint
 import json
 
-m = mi.parse("test360_orig.mp4")
 
-md_dict = {}
-for (index, track) in enumerate(m.tracks):
+def get_mediainfo_metadata(media_file):
+    """
+    Function to extract the general video and audio metadata from a media file (e.g., MP4).
+    This function makes use of the MediaInfo library via the 'pymediainfo' Python package.
 
-    # print(index, track)
-    # if track.track_id == None:
-    #     temp_track_id = 0
-    # else:
-    #     temp_track_id = track.track_id
-    d = track.to_data()
-    # d = track.to_json()
+    # For Later:
+    May want to use "track_type, index" as keys later, since that would be useful to users
+    to see what type of track each index represents (e.g., "General 0," "Video 1," "Audio 2").
+        E.g.:   md_dict.update( { (temp_track_id, track.track_type) : d } )
 
-    # May want to use "track_type, index" as keys later, since that would be useful to users
-    # to see what type of track each index represents (e.g., "General 0," "Video 1," "Audio 2").
-    # md_dict.update( { (temp_track_id, track.track_type) : d } )
 
-    md_dict.update( { index : d } )
+    :param media_file: Path and filename of the media file (e.g., an MP4 file) from which
+                       to extract MediaInfo metadata.
 
-    # print(track.bit_rate, track.bit_rate_mode, track.codec)
+    :return md_dict: Dictionary of mediainfo metadata for the given media file, if existent.
+                     Otherwise, return None.
+    """
 
-# pprint.pprint(md_dict)
+    try:
+        m = mi.parse(media_file)
 
-# print(len(md_dict))
-# exit()
+        md_dict = {}
+
+        for (index, track) in enumerate(m.tracks):
+            d = track.to_data()
+            md_dict.update( { index : d } )
+
+        return md_dict
+
+    except:
+        return None
+
 
 def get_360_metadata(mp4_file, path_to_exif_toolkit):
     """
     Function to gather 360 spherical metadata from an MP4 file. This function uses the ExifTool
     kit/package created by Phil Harvey: https://www.sno.phy.queensu.ca/~phil/exiftool/
 
-    :param mp4_file: path and filename of a 360 MP4 file from which to extract metadata.
-    :param path_to_exif_toolkit: path to the ExifTool directory installed on your machine.
+    :param mp4_file: Path and filename of a 360 MP4 file from which to extract metadata.
+    :param path_to_exif_toolkit: Path to the ExifTool directory installed on your machine.
                                  Should be named something like, "Image-ExifTool-11.65".
 
-    :return spherical_data_dict: Dictionary of sphereical metadata parameters and their values.
+    :return spherical_data_dict: Dictionary of sphereical metadata parameters and their values
+                                 for the given MP4 file, if existent. Otherwise, returns None.
     """
 
     exiftool_exe = os.path.join(path_to_exif_toolkit, 'exiftool' )
@@ -68,29 +77,22 @@ def get_360_metadata(mp4_file, path_to_exif_toolkit):
     except:
         return None
 
-spherical_metadata = get_360_metadata('test360_orig.mp4', '/home/piehld/Dropbox/Work/GA_Grainger/IdeaLab/3deposit/services/metadata/Image-ExifTool-11.65')
 
-# print("\nSpherical Metadata:")
-# for s in spherical_metadata:
-#     print(s,spherical_metadata[s])
-#
-# spherical_metadata_json = json.dumps(spherical_metadata)
-# print(spherical_metadata_json)
-# print(type(spherical_metadata_json))
-# exit()
 
-md_dict.update( {len(md_dict) : spherical_metadata} )
+video_file_360 = 'test360_orig.mp4'
+exiftool_dir = '/home/piehld/Dropbox/Work/GA_Grainger/IdeaLab/3deposit/services/metadata/Image-ExifTool-11.65'
 
-# pprint.pprint(md_dict)
-# exit()
+mediainfo_metadata = get_mediainfo_metadata(video_file_360)
+spherical_metadata = get_360_metadata(video_file_360, exiftool_dir)
 
-md_json = json.dumps(md_dict)
-pprint.pprint(json.loads(md_json))
+metadata_dict = {}
 
-# for j in md_json:
-#     pprint.pprint(j)
-# exit()
-# for i in m_json:
-#     print(str(i))
+if mediainfo_metadata is not None:
+    metadata_dict.update( mediainfo_metadata )
 
-# print(str(m.to_json()))
+if spherical_metadata is not None:
+    metadata_dict.update( {len(metadata_dict) : spherical_metadata} ) # len(metadata_dict) determines the next key/index to use
+
+metadata_json = json.dumps(metadata_dict)
+
+pprint.pprint(json.loads(metadata_json))

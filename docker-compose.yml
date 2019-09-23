@@ -130,20 +130,20 @@ services:
       - "traefik.enable=false" 
     restart: always
 
-  mongo-express:
-    image: mongo-express
-    restart: always
-    ports:
-      - 8081:8081
-    networks:
-      - mongo_internal
-      - proxy
-    environment:
-      ME_CONFIG_MONGODB_SERVER: mongo-server
-    labels:
-      - "traefik.enable=false" 
-    env_file:
-      - keys.env
+  # mongo-express:
+  #   image: mongo-express
+  #   restart: always
+  #   ports:
+  #     - 8081:8081
+  #   networks:
+  #     - mongo_internal
+  #     - proxy
+  #   environment:
+  #     ME_CONFIG_MONGODB_SERVER: mongo-server
+  #   labels:
+  #     - "traefik.enable=false" 
+  #   env_file:
+  #     - keys.env
 
   mongo-service:
     build: ./services/mongo/

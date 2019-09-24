@@ -32,12 +32,13 @@ def log_handler():
     try:
         with open(logfile, 'r') as f:
             resp = f.read()
-            return jsonify({'logfile': str(resp)})
+        return jsonify({'log': str(resp)})
     except Exception as err:
+        logging.error(f'/log error: {str(err)}')
         return jsonify({'err': str(err)})
 
 
-@app.route('/models', methods=['POST', 'GET', 'DELETE'])
+@app.route('/', methods=['POST', 'GET', 'DELETE'])
 def models():
     # Posts the model to sketchfab.
     if request.method == 'POST':

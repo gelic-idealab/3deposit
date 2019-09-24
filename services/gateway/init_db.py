@@ -123,7 +123,7 @@ def create_default_services(engine):
             },
             {
                 'name': 'sketchfab',
-                "endpoint": 'http://sketchfab-service:5000/models',
+                "endpoint": 'http://sketchfab-service:5000',
                 'config': {
                     "auth": {
                         "token": env.get('SKETCHFAB_TOKEN')
@@ -132,7 +132,7 @@ def create_default_services(engine):
             },
             {
                 'name': 'vimeo',
-                "endpoint": 'http://vimeo-service:5000/',
+                "endpoint": 'http://vimeo-service:5000',
                 'config': {
                     "auth": {
                         "client_id": env.get('VIMEO_CLIENT_ID'), 

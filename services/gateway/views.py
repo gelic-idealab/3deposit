@@ -654,7 +654,7 @@ async def service_logs(request):
                         resp_json = await resp.json()
                     return web.json_response(resp_json)
             else:
-                return web.json_response('err': 'no service name provided')
+                return web.json_response({'err': 'no service name provided'})
 
 
         except Exception as err:

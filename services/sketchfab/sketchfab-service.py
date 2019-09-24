@@ -31,8 +31,9 @@ logging.info(f'Starting {service_name}...')
 def log_handler():
     try:
         with open(logfile, 'r') as f:
-            resp = f.read()
-        return jsonify({'log': str(resp)})
+            l = f.read()
+            ll = l.split('\n')
+        return jsonify({'log': ll})
     except Exception as err:
         logging.error(f'/log error: {str(err)}')
         return jsonify({'err': str(err)})

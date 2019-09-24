@@ -1,6 +1,12 @@
 <template>
     <div>
-        {{logs}}
+        <h3>Service Logs<h3>
+        <card style="background-color:black">
+            <code v-for="(l, index) in logs" :key="index">
+                <span style="color:lime">{{ index+1 }}</span>&emsp;{{ l }}
+                <br />
+            </code>
+        </card>    
     </div>
 </template>
 
@@ -13,7 +19,7 @@ export default {
     },
     data () {
         return {
-            logs: ""
+            logs: []
         }
     },
     mounted () {

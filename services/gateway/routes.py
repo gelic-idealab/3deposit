@@ -17,7 +17,8 @@ from views import (
     deposits,
     metadata,
     metadata_keys,
-    gallery
+    gallery,
+    service_logs
 )
 
 
@@ -39,10 +40,11 @@ def setup_routes(app):
     app.router.add_view('/api/users', users, name='users')
     app.router.add_view('/api/signup', signup, name='signup')
 
-    # service config routes
+    # service routes
     app.router.add_view('/api/services', services)
     app.router.add_view('/api/services/configs', services_configs)
     app.router.add_view('/api/services/actions', services_actions)
+    app.router.add_get('/api/logs', service_logs)
 
     # form routes
     app.router.add_get('/api/form', deposit_form)
@@ -71,3 +73,5 @@ def setup_routes(app):
 
     # gallery routes
     app.router.add_get('/api/gallery', gallery)
+
+

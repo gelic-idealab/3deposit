@@ -14,9 +14,24 @@ and publishes to Vimeo.
 
 app = Flask(__name__)
 
-# logging
-logging.basicConfig(level=logging.DEBUG, filename='service.log')
+# logging boilerplate
+service_name = str(os.path.basename(__file__))
+logfile = 'service.log'
+logging.basicConfig(level=logging.DEBUG, filename=logfile)
 logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+logging.info('Starting {}...'.format(service_name))
+
+@app.route('/log', methods=['GET'])
+def log_handler():
+    try:
+        with open(logfile, 'r') as f:
+            l = f.read()
+            ll = l.split('\n')
+        return jsonify({'log': ll})
+    except Exception as err:
+        logging.error('/log error: {}'.format(str(err)))
+        return jsonify({'err': str(err)})
 
 
 @app.route('/', methods=['POST', 'GET', 'DELETE'])

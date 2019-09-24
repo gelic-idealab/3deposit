@@ -630,3 +630,33 @@ async def metadata_keys(request):
 
         except Exception as err:
             return web.json_response({'err': str(err)})
+
+
+async def service_logs(request):
+    username = await authorized_userid(request)
+    async with request.app['db'].acquire() as conn:
+        if not username:
+            raise web.HTTPUnauthorized()
+        current_user = dict(await db.get_user_by_name(conn, username))
+        if current_user.get('role') != 'admin':
+            raise web.HTTPUnauthorized()
+
+    if request.method == 'GET':
+        try:
+            q = request.query
+            service = q.get('service')
+            if service:
+                service_config = await db.get_service_config(conn=conn, name=service)
+                logging.debug(f'service_logs called: {q}')
+                if service_config:
+                    endpoint = service_config.get('endpoint') + '/log'
+                    async with new_request(method='GET', url=endpoint) as resp:
+                        resp_json = await resp.json()
+                    return web.json_response(resp_json)
+            else:
+                return web.json_response({'err': 'no service name provided'})
+
+
+        except Exception as err:
+            logging.error(f'service_logs err: {str(err)}')
+            return web.json_response({'err': str(err)})

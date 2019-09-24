@@ -14,6 +14,7 @@ import GalleryBuilder from "@/pages/GalleryBuilder.vue";
 import GalleryEmbed from "@/pages/GalleryEmbed.vue";
 import Settings from "@/pages/Settings.vue";
 import Users from "@/pages/Settings/Users.vue";
+import ServiceProfile from "@/pages/ServiceProfile.vue";
 
 
 const routes = [
@@ -46,6 +47,11 @@ const routes = [
         path: "/services",
         name: "services",
         component: Services
+      },
+      {
+        path: "/services/:service", 
+        name: "service-profile", 
+        component: ServiceProfile
       },
       {
         path: "/deposits",

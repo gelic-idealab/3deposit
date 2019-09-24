@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h3>Service Logs<h3>
+        <h4>Service Logs</h4>
         <card style="background-color:black">
             <code v-for="(l, index) in logs" :key="index">
                 <span style="color:lime">{{ index+1 }}</span>&emsp;{{ l }}

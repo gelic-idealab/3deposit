@@ -17,7 +17,7 @@ export default {
         }
     },
     created () {
-        this.service = this.$route.params.service;
+        this.service = this.$route.params.id;
     }
 }
 </script>

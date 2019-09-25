@@ -7,7 +7,11 @@
       <div class="col-12">
         <card :title="tables.services.title" :subTitle="tables.services.subTitle">
           <div slot="raw-content" class="table-responsive">
-            <paper-table :data="tables.services.data" :columns="tables.services.columns">
+            <paper-table :data="tables.services.data" 
+                         :columns="tables.services.columns"
+                         linkField="name"
+                         pathName="service-profile"
+            >
 
             </paper-table>
           </div>

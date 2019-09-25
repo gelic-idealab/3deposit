@@ -49,7 +49,7 @@ const routes = [
         component: Services
       },
       {
-        path: "/services/:service", 
+        path: "/services/:id", 
         name: "service-profile", 
         component: ServiceProfile
       },

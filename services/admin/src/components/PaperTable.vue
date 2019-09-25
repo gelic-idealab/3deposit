@@ -11,7 +11,7 @@
         <td v-for="(column, index) in columns"
             :key="index"
             v-if="hasValue(item, column)">
-            <router-link v-if="isLink(column)" :to="{ name: 'deposit-profile', params: { id: itemValue(item,column) }}"> {{ itemValue(item,column) }}
+            <router-link v-if="isLink(column)" :to="{ name: pathName, params: { id: itemValue(item,column) }}"> {{ itemValue(item,column) }}
             </router-link>
             <a v-else>
               {{itemValue(item, column)}}
@@ -28,6 +28,9 @@ export default {
   props: {
     columns: Array,
     data: Array,
+    linkField: String,
+    linkValue: String,
+    pathName: String,
     type: {
       type: String, // striped | hover
       default: "striped"
@@ -54,7 +57,7 @@ export default {
       return item[column.toLowerCase()];
     },
     isLink(column) {
-      if(column == 'deposit_id') {
+      if(column == this.linkField) {
         return true
       }
     },

@@ -7,7 +7,11 @@
       <div class="col-12">
         <card :title="tables.deposits.title" :subTitle="tables.deposits.subTitle">
           <div slot="raw-content" class="table-responsive">
-            <paper-table :data="tables.deposits.data" :columns="tables.deposits.columns">
+            <paper-table :data="tables.deposits.data" 
+                         :columns="tables.deposits.columns"
+                         linkField="deposit_id"
+                         pathName="deposit-profile"
+            >
 
             </paper-table>
           </div>

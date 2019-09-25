@@ -3,6 +3,9 @@ from pymediainfo import MediaInfo as mi
 import subprocess
 import pprint
 import json
+import requests
+import logging
+import zipfile
 
 
 def get_mediainfo_metadata(media_file):
@@ -79,11 +82,18 @@ def get_360_metadata(mp4_file, path_to_exif_toolkit):
 
 
 
-video_file_360 = 'test360_orig.mp4'
+
+with zipfile.ZipFile('test360_orig.zip', 'r') as zip_ref:
+    filename_360_video = zip_ref.namelist()[0]
+    zip_ref.extract(filename_360_video)
+    print(filename_360_video)
+
+
+# filename_360_video = 'test360_orig.mp4'
 exiftool_dir = '/home/piehld/Dropbox/Work/GA_Grainger/IdeaLab/3deposit/services/metadata/Image-ExifTool-11.65'
 
-mediainfo_metadata = get_mediainfo_metadata(video_file_360)
-spherical_metadata = get_360_metadata(video_file_360, exiftool_dir)
+mediainfo_metadata = get_mediainfo_metadata(filename_360_video)
+spherical_metadata = get_360_metadata(filename_360_video, exiftool_dir)
 
 metadata_dict = {}
 

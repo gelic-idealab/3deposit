@@ -1,2 +1,0 @@
-./Image-ExifTool-11.65/exiftool -a -u -g1 360_VR_orig2.mp4
-

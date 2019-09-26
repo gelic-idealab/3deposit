@@ -644,18 +644,19 @@ async def service_logs(request):
     if request.method == 'GET':
         try:
             q = request.query
+            logging.debug(f'service_logs called: {q}')
             service = q.get('service')
             if service:
                 service_config = await db.get_service_config(conn=conn, name=service)
-                logging.debug(f'service_logs called: {q}')
                 if service_config:
                     endpoint = service_config.get('endpoint') + '/log'
                     async with new_request(method='GET', url=endpoint) as resp:
                         resp_json = await resp.json()
                     return web.json_response(resp_json)
+                else:
+                    return web.json_response({'err': 'no service config returned'})
             else:
                 return web.json_response({'err': 'no service name provided'})
-
 
         except Exception as err:
             logging.error(f'service_logs err: {str(err)}')

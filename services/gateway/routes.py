@@ -44,7 +44,7 @@ def setup_routes(app):
     app.router.add_view('/api/services', services)
     app.router.add_view('/api/services/configs', services_configs)
     app.router.add_view('/api/services/actions', services_actions)
-    app.router.add_get('/api/logs', service_logs)
+    app.router.add_get('/api/services/logs', service_logs)
 
     # form routes
     app.router.add_get('/api/form', deposit_form)

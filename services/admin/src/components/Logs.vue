@@ -23,7 +23,7 @@ export default {
         }
     },
     mounted () {
-        axios.get('../api/logs', {params: {'service': this.service}})
+        axios.get('../api/services/logs', {params: {'service': this.service}})
         .then(response => {
             this.logs = response.data.log
         })

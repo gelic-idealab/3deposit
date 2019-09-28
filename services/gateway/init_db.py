@@ -83,22 +83,22 @@ def create_default_actions(engine):
         objects = [
             {
                 'action': 'publish',
-                "media_type": 'video',
+                'media_type': 'video',
                 'service_name': 'vimeo'
             },
             {
                 'action': 'publish',
-                "media_type": 'model',
+                'media_type': 'model',
                 'service_name': 'sketchfab'
             },
             {
                 'action': 'store',
-                "media_type": 'default',
+                'media_type': 'default',
                 'service_name': 'minio'
             },
             {
                 'action': 'publish',
-                "media_type": 'vr',
+                'media_type': 'vr',
                 'service_name': 'aws'
             }
         ]
@@ -159,7 +159,6 @@ def create_default_services(engine):
 
 
 def main():
-    logging.info(msg='running init_db, waiting for db container to become available')
     setup_db(USER_CONFIG['postgres'])
     create_tables(engine=user_engine) 
     create_admin(engine=user_engine)

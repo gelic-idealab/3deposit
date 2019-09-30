@@ -5,7 +5,7 @@ services:
   deposit-form:
     build: ./services/form/
     networks:
-      - proxy 
+      - proxy
     container_name: deposit-form
     labels:
       - "traefik.enable=true"
@@ -20,11 +20,11 @@ services:
     container_name: postgres
     image: postgres:10
     networks:
-        - gateway_internal    
+        - gateway_internal
     # volumes:
     #     - ./pg_data:/var/lib/postgresql
     labels:
-      - "traefik.enable=false"    
+      - "traefik.enable=false"
     restart: always
 
   admin:
@@ -48,7 +48,7 @@ services:
     container_name: gateway
     links:
         - postgres
-    depends_on: 
+    depends_on:
         - postgres
     networks:
       - gateway_internal
@@ -67,7 +67,7 @@ services:
     env_file:
       - keys.env
 
-  
+
   reverse-proxy:
       container_name: reverse-proxy
       image: traefik:1.7
@@ -98,7 +98,7 @@ services:
       - keys.env
     command: server /data
     labels:
-      - "traefik.enable=false" 
+      - "traefik.enable=false"
     restart: always
 
   minio-service:
@@ -106,7 +106,7 @@ services:
     container_name: minio-service
     depends_on:
       - minio-server
-    links: 
+    links:
       - minio-server
     networks:
       - minio_internal
@@ -127,7 +127,7 @@ services:
     volumes:
       - ./services/mongo/data:/data
     labels:
-      - "traefik.enable=false" 
+      - "traefik.enable=false"
     restart: always
 
   # mongo-express:
@@ -141,7 +141,7 @@ services:
   #   environment:
   #     ME_CONFIG_MONGODB_SERVER: mongo-server
   #   labels:
-  #     - "traefik.enable=false" 
+  #     - "traefik.enable=false"
   #   env_file:
   #     - keys.env
 
@@ -150,7 +150,7 @@ services:
     container_name: mongo-service
     depends_on:
       - mongo-server
-    links: 
+    links:
       - mongo-server
     networks:
       - mongo_internal
@@ -189,8 +189,21 @@ services:
       - gateway_internal
     command: pipenv run gunicorn -w 4 -b 0.0.0.0:5000 -t 600 vimeo-service:app
     labels:
-      - "traefik.enable=false" 
+      - "traefik.enable=false"
     restart: always
+
+  metadata-service:
+    build: ./services/metadata/
+    container_name: metadata-service
+    networks:
+      - gateway_internal
+    env_file:
+      - keys.env
+    command: pipenv run gunicorn -w 4 -b 0.0.0.0:5000 metadata-service:app
+    labels:
+      - "traefik.enable=false"
+    restart: always
+
 
 networks:
     proxy:
@@ -201,4 +214,3 @@ networks:
         external: false
     mongo_internal:
         external: false
-

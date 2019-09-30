@@ -10,8 +10,6 @@ import pymediainfo
 from pymediainfo import MediaInfo as mi
 # https://pymediainfo.readthedocs.io/en/stable/
 
-import pprint
-
 
 '''
 Flask app that generates & harvests metadata from 3d media,
@@ -49,7 +47,8 @@ def handler():
                     zip_ref.extract(filename_360_video)
 
                 # extract metadata and return
-                exiftool_dir = '/home/piehld/Dropbox/Work/GA_Grainger/IdeaLab/3deposit/services/metadata/Image-ExifTool-11.65'
+                # exiftool_dir = '/path/to/exiftool/toplevel/directory/Image-ExifTool-11.65'
+                exiftool_dir = 'Image-ExifTool-11.65'
 
                 mediainfo_metadata = get_mediainfo_metadata(filename_360_video)
                 spherical_metadata = get_360_metadata(filename_360_video, exiftool_dir)
@@ -65,10 +64,8 @@ def handler():
                 if mediainfo_metadata is None and spherical_metadata is None:
                     return jsonify({"err": "No media metadata information was found for this file."})
 
-                metadata_json = json.dumps(metadata_dict)
-                # pprint.pprint(json.loads(metadata_json))
+                return jsonify({"deposit_id": did, "video_metadata": metadata_dict})
 
-                return jsonify({"deposit_id": did, "video_metadata": metadata_json})
 
         except Exception as err:
             logging.error(str(err))
@@ -77,8 +74,8 @@ def handler():
         finally:
             if os.path.exists(did):
                 os.remove(did)
-            if os.path.exists(filename):
-                os.remove(filename)
+            if os.path.exists(filename_360_video):
+                os.remove(filename_360_video)
 
 
 def get_mediainfo_metadata(media_file):

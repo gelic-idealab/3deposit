@@ -193,6 +193,7 @@ async def trigger_publish(conn, data):
 async def trigger_metadata(data):
     did = data.get('id')
     form = data.get('form')
+    media_type = data.get('media_type')
     form_data = extract_data_from_form(form)
     deposit_date = data.get('deposit_date')
     form_data.update({'deposit_date': deposit_date})
@@ -202,6 +203,20 @@ async def trigger_metadata(data):
     data.update({'deposit_date': deposit_date})
     data.update(deposit_id)
     data.update(deposit_metadata)
+
+    fd = FormData()
+    fd.add_field('data', json.dumps(data), content_type='application/json')
+
+    with open(TMP_FILE_LOCATION.format(did), 'rb') as f:
+        fd.add_field('file', f, filename=did, content_type='application/octet-stream')
+        if media_type == 'video':
+            async with new_request(method='POST', url='http://metadata-service:5000/', data=fd) as resp:
+                resp_json = await resp.json()
+                technical_metadata = resp_json.get('video_metadata')
+
+    if technical_metadata:
+        data.update({'technical_metadata': technical_metadata})
+
     fd = FormData()
     fd.add_field('data', json.dumps(data), content_type='application/json')
     async with new_request(method='POST', url='http://mongo-service:5000/objects', data=fd) as resp:

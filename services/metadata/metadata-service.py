@@ -56,6 +56,7 @@ def handler():
 
                 with zipfile.ZipFile(fzip, 'r') as zip_ref:
                     filename_360_video = zip_ref.namelist()[0]
+                    logging.debug(f'filename_360_video: {filename_360_video}')
                     zip_ref.extract(filename_360_video)
 
                 # extract metadata and return

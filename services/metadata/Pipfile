@@ -9,6 +9,7 @@ verify_ssl = true
 pymediainfo = "*"
 flask = "*"
 requests = "*"
+gunicorn = "*"
 
 [requires]
 python_version = "3.7"

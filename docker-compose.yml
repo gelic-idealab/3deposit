@@ -21,8 +21,8 @@ services:
     image: postgres:10
     networks:
         - gateway_internal
-    # volumes:
-    #     - ./pg_data:/var/lib/postgresql
+    volumes:
+        - ./pg_data:/var/lib/postgresql/data
     labels:
       - "traefik.enable=false"
     restart: always

@@ -10,8 +10,7 @@
 ## Vendor Conventions ##
 
 # Image-ExifTool
-- ^.t$
-- ^.pm$
+- Image-ExifTool-11.65/
 
 # Caches
 - (^|/)cache/

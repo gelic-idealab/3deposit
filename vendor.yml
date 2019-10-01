@@ -9,8 +9,8 @@
 
 ## Vendor Conventions ##
 
-# Perl
-- ^.perl$
+# Image-ExifTool
+- ^.t$
 
 # Caches
 - (^|/)cache/

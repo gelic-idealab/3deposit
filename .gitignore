@@ -3,3 +3,4 @@
 pg_data
 .DS_Store
 keys.env
+service.log

@@ -1,4 +1,5 @@
 .vscode
+.VSCodeCounter
 pg_data
 .DS_Store
 keys.env

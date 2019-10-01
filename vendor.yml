@@ -11,6 +11,7 @@
 
 # Image-ExifTool
 - ^.t$
+- ^.pm$
 
 # Caches
 - (^|/)cache/

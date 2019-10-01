@@ -198,6 +198,7 @@ async def trigger_metadata(data):
     deposit_date = data.get('deposit_date')
     form_data.update({'deposit_date': deposit_date})
     deposit_metadata = dict({'deposit_metadata': form_data})
+
     deposit_id = dict({'deposit_id': did})
     data = {}
     data.update({'deposit_date': deposit_date})
@@ -206,7 +207,6 @@ async def trigger_metadata(data):
 
     fd = FormData()
     fd.add_field('data', json.dumps(data), content_type='application/json')
-
     with open(TMP_FILE_LOCATION.format(did), 'rb') as f:
         fd.add_field('file', f, filename=did, content_type='application/octet-stream')
         if media_type == 'video':
@@ -214,8 +214,8 @@ async def trigger_metadata(data):
                 resp_json = await resp.json()
                 technical_metadata = resp_json.get('video_metadata')
 
-    if technical_metadata:
-        data.update({'technical_metadata': technical_metadata})
+            if technical_metadata:
+                data.update({'technical_metadata': technical_metadata})
 
     fd = FormData()
     fd.add_field('data', json.dumps(data), content_type='application/json')

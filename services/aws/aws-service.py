@@ -103,10 +103,13 @@ def index():
                         # Finish the upload
                         mp.complete_upload()
 
-                # walk until first html is found
+                # walk until index.html or first html is found
                 for f in fps:
                     source_path = f
-                    if source_path.endswith('.html'):
+                    if source_path.endswith('index.html'):
+                        index_path = source_path
+                        break
+                    elif source_path.endswith('.html'):
                         index_path = source_path
                         break
 

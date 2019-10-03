@@ -160,10 +160,15 @@ async def trigger_store(conn, did):
 
 
 def extract_data_from_form(form):
-    form_data = {}
-    for field in form:
-        form_data.update({field.get('id'): field.get('value')})
-    return form_data
+    try:
+        logging.debug(f'extract_data_from_form: {str(form)}')
+        form_data = {}
+        for field in form:
+            form_data.update({field.get('id'): field.get('value')})
+        return form_data
+    except Exception as err:
+        logging.error(f'extract_data_from_form error: {str(err)}; form_data: {str(form)}')
+        return None
 
 
 async def trigger_publish(conn, data):

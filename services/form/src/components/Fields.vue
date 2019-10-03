@@ -3,34 +3,46 @@
     <div class="input-group mb-3" v-for="field in fields" :key="field.id">
       <template v-if="renderField(field)">
 
-          <template v-if="field.type === 'text'">
+          <template v-if="field.type === 'text' && field.repeatable === true">
               <div>
                 <h4>{{ field.label }}</h4>
-                <button v-if="field.repeatable == true" type="button" class="btn btn-primary" v-on:click="addValue(field.value)">Add {{field.label}}</button>
+                <button v-if="field.repeatable === true" type="button" class="btn btn-primary" v-on:click="addValue(field.value)">Add {{field.label}}</button>
               </div>
               <transition-group name="fade" tag="ul">
-                <b-input-group v-for="(value, index) in field.value" :key="index" style="width:100%">
-                  <b-form-input :class="fieldInvalid(field.id)"
-                  v-model="field.value[index]" 
-                  v-on:input="clearError(field.id)"
-                  ></b-form-input>
+                <b-input-group v-for="(value, index) in field.value" :key="index">
+                  <b-form-input class="ml-3"
+                    :class="fieldInvalid(field.id)"
+                    v-model="field.value[index]" 
+                    v-on:input="clearError(field.id)">
+                  </b-form-input>
                   <b-input-group-append v-if="index > 0">
-                    <b-button variant="danger" 
-                    v-on:click="removeValue(field.value, index)">Remove</b-button>
+                    <b-button variant="danger" v-on:click="removeValue(field.value, index)">Remove</b-button>
                   </b-input-group-append>
                 </b-input-group>
               </transition-group>
           </template>
 
+          <template v-if="field.type === 'text' && field.repeatable === false">
+              <div>
+                <h4>{{ field.label }}</h4>
+              </div>
+              <b-form-input class="ml-3"
+                :class="fieldInvalid(field.id)"
+                v-model="field.value" 
+                v-on:input="clearError(field.id)">
+              </b-form-input>
+          </template>
+
           <template v-else-if="field.type === 'date'">
             <h4>{{field.label}}</h4>
-            <b-form-input class="form-control ml-3 mb-3" type="date" v-model="field.value" value="" v-on:input="clearError(field.id)" :class="fieldInvalid(field.id)">
+            <b-form-input class="form-control ml-3" type="date" v-model="field.value" v-on:input="clearError(field.id)" :class="fieldInvalid(field.id)">
           </template>
 
           <template v-else-if="field.type === 'select'">
             <h4>{{ field.label }}</h4>
-                <b-form-select class="form-control ml-3 mb-3 input-lg"
-                v-model="field.value" 
+                <b-form-select class="form-control ml-3 input-lg"
+                v-model="field.value"
+                :multiple="field.repeatable"
                 :options="field.options"
                 :class="fieldInvalid(field.id)"
                 v-on:input="clearError(field.id)"

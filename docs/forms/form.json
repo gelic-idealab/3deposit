@@ -11,7 +11,7 @@
       "type": "select",
       "repeatable": false,
       "required": true,
-      "value": [],
+      "value": "",
       "options": [
         { "value": "model", "text": "3d Model" },
         { "value": "video", "text": "360 Video" },
@@ -33,7 +33,7 @@
       "id": "creator_status",
       "label": "Creator Status",
       "type": "select",
-      "repeatable": false,
+      "repeatable": true,
       "required": true,
       "value": [],
       "options": [
@@ -51,7 +51,7 @@
       "type": "text",
       "repeatable": false,
       "required": true,
-      "value": [""],
+      "value": "",
       "placeholder": "Object Title",
       "dependsOn": {}
     },
@@ -61,7 +61,7 @@
       "type": "text",
       "repeatable": false,
       "required": true,
-      "value": [""],
+      "value": "",
       "placeholder": "Description",
       "dependsOn": {}
     },
@@ -80,7 +80,7 @@
       "type": "select",
       "repeatable": false,
       "required": true,
-      "value": [],
+      "value": "",
       "options": [
         { "value": "equirectangular", "text": "Equirectangular" }
       ],
@@ -92,7 +92,7 @@
       "type": "select",
       "repeatable": false,
       "required": true,
-      "value": [],
+      "value": "",
       "options": [
         { "value": "mono", "text": "Mono" }
       ],

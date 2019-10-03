@@ -21,8 +21,8 @@ services:
     image: postgres:10
     networks:
         - gateway_internal
-    volumes:
-        - ./pg_data:/var/lib/postgresql/data
+    # volumes:
+    #     - ./pg_data:/var/lib/postgresql/data
     labels:
       - "traefik.enable=false"
     restart: always
@@ -87,7 +87,7 @@ services:
 
   minio-server:
     container_name: minio-server
-    image: minio/minio:RELEASE.2019-08-07T01-59-21Z
+    image: minio/minio:RELEASE.2019-10-02T21-19-38Z
     networks:
       - minio_internal
     ports:

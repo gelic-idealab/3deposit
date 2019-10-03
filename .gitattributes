@@ -1,2 +1,3 @@
 *.t linguist-vendored
 *.pm linguist-vendored
+services/metadata/Image-ExifTool-11.65/* linguist-vendored

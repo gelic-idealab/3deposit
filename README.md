@@ -33,7 +33,7 @@ docker-compose up --build
 ```
 
 ### Data flow
-![3deposit](./docs/3deposit-flow.png)
+![3deposit](./docs/3deposit_UML.png)
 
 _____
 

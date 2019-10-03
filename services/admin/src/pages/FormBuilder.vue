@@ -1,9 +1,16 @@
 <template>
     <div>
+        <div v-show="saveSuccess" class="alert alert-success">
+            <button @click="saveSuccess = false" type="button" aria-hidden="true" class="close">×</button>
+            <span>
+                <b> Oh yeah - </b> form saved successfully</span>
+        </div>
+
         <vue-json-editor v-model="deposit_form.content" :show-btns="true" @json-save="saveForm"></vue-json-editor>
       <!-- <vue-json-pretty 
         :data="deposit_form">
       </vue-json-pretty> -->
+
     </div>
 </template>
 
@@ -18,7 +25,8 @@ export default {
             deposit_form: {
                 form_id: 'deposit_form',
                 content: {}
-            }
+            },
+            saveSuccess: false
         }
     },
     components: {
@@ -35,7 +43,9 @@ export default {
         saveForm() {
             axios.post('../api/form', this.deposit_form)
             .then(response => {
-                console.log(response.data)
+                if (response.status == 200) {
+                    this.saveSuccess = true;
+                }            
             })
         }
     }

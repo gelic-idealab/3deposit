@@ -2,6 +2,7 @@ import FormGroupInput from "./Inputs/formGroupInput.vue";
 
 import DropDown from "./Dropdown.vue";
 import PaperTable from "./PaperTable.vue";
+import ActionTable from "./ActionTable.vue";
 import Button from "./Button";
 
 import Card from "./Cards/Card.vue";
@@ -16,6 +17,7 @@ let components = {
   ChartCard,
   StatsCard,
   PaperTable,
+  ActionTable,
   DropDown,
   SidebarPlugin
 };
@@ -28,6 +30,7 @@ export {
   ChartCard,
   StatsCard,
   PaperTable,
+  ActionTable,
   DropDown,
   Button,
   SidebarPlugin

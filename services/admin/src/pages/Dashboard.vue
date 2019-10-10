@@ -83,15 +83,15 @@ export default {
     ChartCard
   },
   methods: {
-    convertSize: function(value) {
-      console.log('convertSize called: ', value)
-      switch(value) {
-        case value <= 1.0e+6:
-          return (value/1.0e+3).toString() + 'KB';
-        case value > 1.0e+6 && value <= 1.0e+9:
-          return (value/1.0e+6).toSring() + 'MB';
-        case value > 1.0e+9:
-          return (value/1.0e+9).toString() + 'GB';
+    convertSize(value) {
+      if (value <= 1.0e+6) {
+        return Math.round((value/1.0e+3)).toString() + 'KB'
+      }
+      if (value > 1.0e+6 && value <= 1.0e+9) {
+        return Math.round((value/1.0e+6)).toString() + 'MB'
+      }
+      if (value > 1.0e+9) {
+        return Math.round((value/1.0e+9)).toString() + 'GB'
       }
     }
   },
@@ -206,6 +206,8 @@ export default {
     };
   },
   mounted() {
+    // test with dummy value
+    // this.statsCards[0].value = this.convertSize(2161651300);
     axios.get('../api/store/buckets', {params: {'bucket_name': '3deposit'}})
     .then(response => {
       console.log(response);

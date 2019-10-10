@@ -376,9 +376,9 @@ async def store_buckets(request):
     async with request.app['db'].acquire() as conn:
         if not username:
             raise web.HTTPUnauthorized()
-        current_user = dict(await db.get_user_by_name(conn, username))
-        if current_user.get('role') != 'admin':
-            raise web.HTTPUnauthorized()
+        # current_user = dict(await db.get_user_by_name(conn, username))
+        # if current_user.get('role') != 'us':
+        #     raise web.HTTPUnauthorized()
     PATH = '/bucket'
     async with request.app['db'].acquire() as conn:
         service_config = await get_service_config_by_action(conn=conn, action='store', media_type='default')
@@ -393,9 +393,9 @@ async def store_buckets(request):
             async with new_request(method='GET', url=endpoint+PATH, data=fd) as resp:
                 try:
                     resp_json = await resp.json()
+                    return web.json_response(resp_json)
                 except Exception as err:
                     return web.json_response({'err': str(err), 'resp': await resp.text()})
-                return web.json_response({'resp': resp_json})
         except Exception as err:
             return web.json_response({'origin': 'gateway', 'err': str(err)})
 

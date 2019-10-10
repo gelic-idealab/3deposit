@@ -328,16 +328,19 @@ def create_app():
                             missing_ids.append(d)
 
                 else:
+                    bucket_size = 0
                     for obj in objects:
-                        ret_object = {"metadata": str(obj.metadata),
-                                      "deposit_id": str(obj.object_name),
-                                      "modified": str(obj.last_modified),
-                                      "etag": str(obj.etag),
-                                      "size": str(obj.size),
-                                      "content_type": str(obj.content_type)}
-                        objects_list.append(ret_object)
+                        bucket_size += obj.size
+                return jsonify({'bucket_size': bucket_size})
+                        # ret_object = {"metadata": str(obj.metadata),
+                        #               "deposit_id": str(obj.object_name),
+                        #               "modified": str(obj.last_modified),
+                        #               "etag": str(obj.etag),
+                        #               "size": str(obj.size),
+                        #               "content_type": str(obj.content_type)}
+                        # objects_list.append(ret_object)
 
-                return jsonify({"objects": objects_list, "object_stats": objects_stats, "missing deposit ids": missing_ids})
+                # return jsonify({"objects": objects_list, "object_stats": objects_stats, "missing deposit ids": missing_ids})
 
             except NoSuchBucket as err:  # Handle bucket_name related errors
                 return jsonify({"err": "Bucket does not exist.",

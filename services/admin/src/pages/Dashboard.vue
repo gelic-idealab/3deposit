@@ -82,6 +82,19 @@ export default {
     StatsCard,
     ChartCard
   },
+  methods: {
+    convertSize: function(value) {
+      console.log('convertSize called: ', value)
+      switch(value) {
+        case value <= 1.0e+6:
+          return (value/1.0e+3).toString() + 'KB';
+        case value > 1.0e+6 && value <= 1.0e+9:
+          return (value/1.0e+6).toSring() + 'MB';
+        case value > 1.0e+9:
+          return (value/1.0e+9).toString() + 'GB';
+      }
+    }
+  },
   /**
    * Chart data used to render stats, charts. Should be replaced with server data
    */
@@ -193,10 +206,11 @@ export default {
     };
   },
   mounted() {
-    axios.get('../api/store/buckets')
+    axios.get('../api/store/buckets', {params: {'bucket_name': '3deposit'}})
     .then(response => {
-      this.statsCards[0].value = response.data.obj_stats.get('bucket_size');
-      this.statsCards[1].value = response.data.obj_stats.get('');
+      console.log(response);
+      this.statsCards[0].value = this.convertSize(response.data.bucket_size);
+      // this.statsCards[1].value = response.data.obj_stats.get('');
     })
   }
 };

@@ -10,31 +10,63 @@ import time
 import trimesh
 
 
-print("last modified: %s" % time.ctime(os.path.getmtime(file)))
-print("created: %s" % time.ctime(os.path.getctime(file)))
+def main():
 
-(mode, ino, dev, nlink, uid, gid, size, atime, mtime, ctime) = os.stat(file)
-print("last modified: %s" % time.ctime(mtime))
+    # Will this return any subdirectories and their contents, if present?
+    # If so, will want to iterate over all of them and get the metadata for them
+    with zipfile.ZipFile('model2.zip', 'r') as zip_ref:
+        filename_list = zip_ref.namelist()
+        print(filename_list)
+        for fn in filename_list:
+            zip_ref.extract(fn)
+            # print(fn)
 
-file_stat_dict = {
-    "mode" : mode,
-    "ino" : ino,
-    "dev" : dev,
-    "nlink" : nlink,
-    "uid" : uid,
-    "gid" : gid,
-    "size" : size,  # in bytes
-    "atime" : time.ctime(atime),
-    "mtime" : time.ctime(mtime),
-    "ctime" : time.ctime(ctime),    # The “ctime” as reported by the operating system. On some systems (like Unix) is the time of the last metadata change, and, on others (like Windows), is the creation time (see platform documentation for details).
-    }
+    supported_3d_mesh_types = ['gltf','glb','obj','stl'] # add more
 
-file_ext = filename.split('.')[-1] # use this to "assume" filetype (since other general libraries for determing filetype tend to think that 3d files are just text files...)
+    all_file_metadata = {}
 
-os.stat_result(st_mode=33204, st_ino=5522179, st_dev=64513, st_nlink=1, st_uid=1000, st_gid=1000, st_size=28869, st_atime=1570141042, st_mtime=1562097398, st_ctime=1570141042)
+    for fn in filename_list:
+        # Clear previous properties
+        gltf_metadata = None
+        mesh_metadata = None
+        file_metadata = None
 
-print(["%s" % time.ctime(i) for i in (mode, ino, dev, nlink, uid, gid, size, atime, mtime, ctime)])
-# ['Thu Jan  1 03:13:24 1970', 'Thu Mar  5 15:56:19 1970', 'Thu Jan  1 11:55:13 1970', 'Wed Dec 31 18:00:01 1969', 'Wed Dec 31 18:16:40 1969', 'Wed Dec 31 18:16:40 1969', 'Thu Jan  1 02:01:09 1970', 'Thu Oct  3 17:17:22 2019', 'Tue Jul  2 14:56:38 2019', 'Thu Oct  3 17:17:22 2019']
+        file_metadata = get_3d_model_file_metadata(fn)
+
+        # May need to do this check for all files in the tree
+        if file_metadata["ext"] is not None:
+            if file_metadata["ext"].lower() == "gltf" or file_metadata["ext"].lower() == "glb":
+                gltf_metadata = get_3d_model_gltf_metadata(fn, file_metadata)
+
+            # Can either check if extension is in supported type list,
+            # OR simply TRY for all file to see if it can be loaded
+            # if file_metadata["ext"] in supported_3d_mesh_types:
+            #     mesh_metadata = get_3d_model_mesh_metadata(fn, file_metadata)
+
+            # if file_metadata["ext"] == "obj":
+            #     pass
+
+            # gltf_metadata = get_3d_model_gltf_metadata(fn)
+            # mesh_metadata = get_3d_model_mesh_metadata(fn)
+
+        metadata_dict = {}
+
+        if file_metadata is not None:
+            metadata_dict.update( {"General properties" : file_metadata} )
+
+        if gltf_metadata is not None:
+            metadata_dict.update( {"GLTF metadata" : gltf_metadata} )
+
+        # if mesh_metadata is not None:
+        #     metadata_dict.update( {"Mesh metadata" : mesh_metadata} )
+
+        all_file_metadata.update( {fn : metadata_dict} )
+
+    metadata_json = json.dumps(all_file_metadata)
+
+    pprint.pprint(json.loads(metadata_json))
+
+
 
 
 def get_3d_model_file_metadata(model_file):
@@ -44,25 +76,52 @@ def get_3d_model_file_metadata(model_file):
     :param model_file: Path and filename of the model file (e.g., an OBJ or GLB file) from which
                        to extract metadata.
 
-    :return file_md_dict: Dictionary of file metadata for the given media file; otherwise, return None.
+    :return file_info_dict: Dictionary of file metadata for the given media file; otherwise, return None.
     """
 
     try:
-        m = mi.parse(media_file)
 
-        md_dict = {}
+        (mode, ino, dev, nlink, uid, gid, size, atime, mtime, ctime) = os.stat(model_file)
+        # Example output:  os.stat_result(st_mode=33204, st_ino=5522179, st_dev=64513, st_nlink=1, st_uid=1000, st_gid=1000, st_size=28869, st_atime=1570141042, st_mtime=1562097398, st_ctime=1570141042)
+        # print("created: %s" % time.ctime(ctime))
+        # print("last modified: %s" % time.ctime(mtime))
 
-        for (index, track) in enumerate(m.tracks):
-            d = track.to_data()
-            md_dict.update( { index : d } )
+        file_info_dict = {
+            "mode" : mode,
+            "ino" : ino,
+            "dev" : dev,
+            "nlink" : nlink,
+            "uid" : uid,
+            "gid" : gid,
+            "size" : size,  # in bytes
+            "atime" : time.ctime(atime),    # time of last access
+            "mtime" : time.ctime(mtime),    # time of last modified
+            "ctime" : time.ctime(ctime),    # The “ctime” as reported by the operating system. On some systems (like Unix) is the time of the last metadata change, and, on others (like Windows), is the creation time (see platform documentation for details).
+            }
 
-        return md_dict
+        try:
+            filename = model_file.split('/')[-1]    # in case the full path is given, get just the file of interest name
+            file_ext = filename.split('.')[-1] # use this to "assume" filetype (since other general libraries for determing filetype tend to think that 3d files are just text files...)
+            file_info_dict.update({"ext":file_ext})
+
+        except:
+            print("No file extension found.")
+            file_info_dict.update({"ext":None})
+
+        # for k,v in file_info_dict.items():
+        #     print(k,v)
+
+        return file_info_dict
 
     except:
         return None
 
+    # for (index, track) in enumerate(m.tracks):
+    #     d = track.to_data()
+    #     md_dict.update( { index : d } )
 
-def get_3d_model_gltf_metadata(gltf_file):
+
+def get_3d_model_gltf_metadata(gltf_file, file_info_dict):
     """
 
     :param gltf_file: Path and filename of a 3D model in GLTF from which to extract metadata.
@@ -71,31 +130,41 @@ def get_3d_model_gltf_metadata(gltf_file):
                             for the given file, if existent. Otherwise, returns None.
     """
 
+    if file_info_dict["ext"].lower() == "gltf": # Get entire file info
 
-    output_360_info = str(get_360_info.stdout)
+        try:
+            with open(gltf_file, 'rb') as gltf:
+                gltf_data_dict = json.load(gltf)
 
-    try:
-        spherical_start = output_360_info.find('XMP-GSpherical') + len('XMP-GSpherical ----')
-        spherical_end = output_360_info.find('----', spherical_start)
-        spherical_data_extract = output_360_info[spherical_start : spherical_end]
-        spherical_data = spherical_data_extract.split('\\n')
-        spherical_data_clean = [i.replace(' ','') for i in spherical_data[1:-1]]
+            return gltf_data_dict
 
-        spherical_data_dict = {}
-        for s in spherical_data_clean:
-            s_k = s.split(':')[0]
-            s_v = s.split(':')[1]
-            spherical_data_dict.update( {s_k : s_v} )
-
-        spherical_data_dict.update( {"track_type" : "XMP-GSpherical"} )
-
-        return spherical_data_dict
-
-    except:
-        return None
+        except:
+            return None
 
 
-def get_3d_model_mesh_metadata(mesh_file):
+    elif file_info_dict["ext"].lower() == "glb": # Get header info
+
+        # Not sure if string search below will work for ALL glb files...
+        try:
+            with open(gltf_file, 'rb') as glb:
+                for l in glb:
+                    header_line = l
+                    break   # only need the first line
+
+            header_line_str = str(header_line)
+
+            json_start = header_line_str.find('JSON') + 4   # + 4 to get rid of 'JSON'
+            json_end = header_line_str.find('}]} ,', json_start) + 3    # + 3 to keep the '}]}'
+            json_data_extract = header_line_str[json_start : json_end]
+            gltf_data_dict = json.loads(json_data_extract)
+
+            return gltf_data_dict
+
+        except:
+            return None
+
+
+def get_3d_model_mesh_metadata(mesh_file, file_info_dict):
 
     """
     Function to extract the triangular mesh-related metadata from a 3D model file.
@@ -206,96 +275,22 @@ def get_3d_model_mesh_metadata(mesh_file):
         identifier_md5              voxelized
         intersection
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        >>>
-
-
     """
-    return None
+
+    try:
+        m = trimesh.load(mesh_file)
+
+    except:
+        return None
+
+    mesh_data_dict = {}
+
+    for a in dir(m):
+        if not a.startswith('__'):
+            mesh_data_dict.update( {a : getattr(a, d)})
+
+    return mesh_data_dict
 
 
-
-with zipfile.ZipFile('test360_orig.zip', 'r') as zip_ref:
-    filename_360_video = zip_ref.namelist()[0]
-    zip_ref.extract(filename_360_video)
-    print(filename_360_video)
-
-
-# filename_360_video = 'test360_orig.mp4'
-exiftool_dir = '/home/piehld/Dropbox/Work/GA_Grainger/IdeaLab/3deposit/services/metadata/Image-ExifTool-11.65'
-
-mediainfo_metadata = get_mediainfo_metadata(filename_360_video)
-spherical_metadata = get_360_metadata(filename_360_video, exiftool_dir)
-
-metadata_dict = {}
-
-if mediainfo_metadata is not None:
-    metadata_dict.update( mediainfo_metadata )
-
-if spherical_metadata is not None:
-    metadata_dict.update( {len(metadata_dict) : spherical_metadata} ) # len(metadata_dict) determines the next key/index to use
-
-metadata_json = json.dumps(metadata_dict)
-
-pprint.pprint(json.loads(metadata_json))
+if __name__ == "__main__":
+	main()

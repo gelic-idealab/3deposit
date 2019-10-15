@@ -21,28 +21,26 @@
             <option>vr</option>
           </select>
 
-          <!-- <div v-else-if="columnName(column) == 'service_name'"> -->
-          <select v-else-if="columnName(column) == 'service_name' && data[index].action == 'publish' && data[index].media_type == 'video'" v-model="data[item_index].service_name">
+          <select v-else-if="columnName(column) == 'service_name' && data[item_index].action == 'publish' && data[item_index].media_type == 'video'" v-model="data[item_index].service_name">
             <option>vimeo</option>
             <option>youtube</option>
           </select>
 
-          <select v-else-if="columnName(column) == 'service_name' && data[index].action == 'publish' && data[index].media_type == 'vr'" v-model="data[item_index].service_name">
+          <select v-else-if="columnName(column) == 'service_name' && data[item_index].action == 'publish' && data[item_index].media_type == 'vr'" v-model="data[item_index].service_name">
             <option>aws</option>
             <option>surge</option>
           </select>
           
-          <select v-else-if="columnName(column) == 'service_name' && data[index].action == 'store' && data[index].media_type == 'default'" v-model="data[item_index].service_name">
+          <select v-else-if="columnName(column) == 'service_name' && data[item_index].action == 'store' && data[item_index].media_type == 'default'" v-model="data[item_index].service_name">
             <option>minio</option>
           </select>
 
-          <select v-else-if="columnName(column) == 'service_name' && data[index].action == 'publish' && data[index].media_type == 'model'" v-model="data[item_index].service_name">
+          <select v-else-if="columnName(column) == 'service_name' && data[item_index].action == 'publish' && data[item_index].media_type == 'model'" v-model="data[item_index].service_name">
             <option>sketchfab</option>
           </select>
-          <!-- </div> -->
 
           <p v-else>
-            {{itemValue(item, column)}}
+            Invalid Combination
           </p>
         </td>
       </slot>

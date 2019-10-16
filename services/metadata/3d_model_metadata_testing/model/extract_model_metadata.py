@@ -12,9 +12,17 @@ import numpy as np
 
 def main():
 
+    ## Still to do/test
+    # Determine if animated or not, then say Yes or No
+    # Add sub-directory searching (or see if it can already do that, depending on how the files are included in the filename_list;
+        # For example, if they're like "./dir1/dir2/filename.txt", then don't need to worry about it I think...)
+    # Add counts of vertices and triangles
+    # Test different file types and animated models
+
+
     # Will this return any subdirectories and their contents, if present?
     # If so, will want to iterate over all of them and get the metadata for them
-    with zipfile.ZipFile('model2.zip', 'r') as zip_ref:
+    with zipfile.ZipFile('model.zip', 'r') as zip_ref:
         filename_list = zip_ref.namelist()
         print(filename_list)
         for fn in filename_list:
@@ -206,103 +214,6 @@ def get_3d_model_mesh_metadata(mesh_file, file_info_dict):
                [-5.37003582e-07,  1.21990603e-04,  4.54513592e-06],
                [ 8.76083403e-08,  4.54513592e-06,  1.48334150e-04]])
 
-        ### All attributes of dir(mesh):
-        apply_obb                   invert
-        apply_scale                 is_convex
-        apply_transform             is_empty
-        apply_translation           is_volume
-        area                        is_watertight
-        area_faces                  is_winding_consistent
-        body_count                  kdtree
-        bounding_box                mass
-        bounding_box_oriented       mass_properties
-        bounding_cylinder           md5
-        bounding_primitive          merge_vertices
-        bounding_sphere             metadata
-        bounds                      moment_inertia
-        center_mass                 nearest
-        centroid                    outline
-        compute_stable_poses        permutate
-        contains                    principal_inertia_components
-        convert_units               principal_inertia_transform
-        convex_decomposition        principal_inertia_vectors
-        convex_hull                 process
-        copy                        ray
-        crc                         referenced_vertices
-        density                     register
-        difference                  remove_degenerate_faces
-        edges                       remove_duplicate_faces
-        edges_face                  remove_infinite_values
-        edges_sorted                remove_unreferenced_vertices
-        edges_sorted_tree           rezero
-        edges_sparse                sample
-        edges_unique                scale
-        edges_unique_inverse        scene
-        edges_unique_length         section
-        euler_number                section_multiplane
-        eval_cached                 show
-        export                      slice_plane
-        extents                     smoothed
-        face_adjacency              split
-        face_adjacency_angles       subdivide
-        face_adjacency_convex       submesh
-        face_adjacency_edges        symmetry
-        face_adjacency_edges_tree   symmetry_axis
-        face_adjacency_projections  symmetry_section
-        face_adjacency_radius       to_dict
-        face_adjacency_span         triangles
-        face_adjacency_tree         triangles_center
-        face_adjacency_unshared     triangles_cross
-        face_angles                 triangles_tree
-        face_angles_sparse          union
-        face_attributes             units
-        face_normals                unmerge_vertices
-        faces                       update_faces
-        faces_sparse                update_vertices
-        faces_unique_edges          vertex_adjacency_graph
-        facets                      vertex_attributes
-        facets_area                 vertex_defects
-        facets_boundary             vertex_degree
-        facets_normal               vertex_faces
-        facets_on_hull              vertex_neighbors
-        facets_origin               vertex_normals
-        fill_holes                  vertices
-        fix_normals                 visual
-        identifier                  volume
-        identifier_md5              voxelized
-        intersection
-
-        Get all attributes (non-methods) and remove any that are specialized objects that can't be interpreted:
-            Attributes to remove:
-                visual
-                ray
-                permutate
-                nearest
-                kdtree
-                face_adjacency_edges_tree
-                edges_sorted_tree
-                convex_hull
-                bounding_sphere
-                bounding_primitive
-                bounding_cylinder
-                bounding_box
-                bounding_box_oriented
-
-            This leaves us with the following attribute list to gather:
-            mesh_attr_list = ['area', 'area_faces', 'body_count', 'bounds', 'center_mass', 'centroid', 'density', 'edges',
-                              'edges_face', 'edges_sorted', 'edges_sparse', 'edges_unique', 'edges_unique_inverse', 'edges_unique_length',
-                              'euler_number', 'extents', 'face_adjacency', 'face_adjacency_angles', 'face_adjacency_convex',
-                              'face_adjacency_edges', 'face_adjacency_projections', 'face_adjacency_radius', 'face_adjacency_span',
-                              'face_adjacency_unshared', 'face_angles', 'face_angles_sparse','face_attributes', 'face_normals', 'faces',
-                              'faces_sparse', 'faces_unique_edges', 'facets', 'facets_area', 'facets_boundary', 'facets_normal',
-                              'facets_on_hull', 'facets_origin', 'identifier', 'identifier_md5', 'is_convex', 'is_empty', 'is_volume',
-                              'is_watertight', 'is_winding_consistent', 'mass', 'mass_properties', 'metadata', 'moment_inertia',
-                              'principal_inertia_components', 'principal_inertia_transform', 'principal_inertia_vectors',
-                              'referenced_vertices', 'scale', 'symmetry', 'symmetry_axis', 'symmetry_section', 'triangles',
-                              'triangles_center', 'triangles_cross', 'units', 'vertex_adjacency_graph', 'vertex_attributes',
-                              'vertex_defects', 'vertex_degree', 'vertex_faces', 'vertex_neighbors', 'vertex_normals', 'vertices', 'volume']
-
-
     """
 
     try:
@@ -340,11 +251,9 @@ def get_3d_model_mesh_metadata(mesh_file, file_info_dict):
         pass
 
     if file_info_dict["ext"].lower() in ["gltf", "glb"]:
-    # if 'is_watertight' not in mesh_data_dict.keys():
         # Make a dump of the current mesh objects and analyze those
         mesh_dump = m.dump()
         for (index, obj) in enumerate(mesh_dump):
-            print(dir(obj))
             try:
                 mesh_data_dict.update( { "mesh object "+str(index) : get_mesh_obj_attrs(obj) } )
             except:

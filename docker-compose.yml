@@ -2,15 +2,15 @@ version: '3'
 
 services:
 
-  deposit-form:
+  form:
     build: ./services/form/
     networks:
       - proxy
-    container_name: deposit-form
+    container_name: form
     labels:
       - "traefik.enable=true"
       - "traefik.frontend.rule=PathPrefix:/"
-      - "traefik.backend=deposit-form"
+      - "traefik.backend=form"
       - "traefik.port=80"
       - "traefik.docker.network=proxy"
       - "traefik.frontend.passHostHeader=true"

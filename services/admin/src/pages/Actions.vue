@@ -4,23 +4,26 @@
       <div class="col-12">
         <card :title="tables.actions.title" :subTitle="tables.actions.subTitle">
           <div slot="raw-content" class="table-responsive">
-            <paper-table :data="tables.actions.data" :columns="tables.actions.columns"></paper-table>
+            <!-- <paper-table :data="tables.actions.data" :columns="tables.actions.columns"></paper-table> -->
+            <action-table :data="tables.actions.data" :columns="tables.actions.columns"></action-table>
           </div>
         </card>
       </div>
-    </div>  
+    </div>
     <add-action-form />
-  </div>   
+  </div>
 </template>
 <script>
-import { PaperTable } from "@/components";
+// import { PaperTable } from "@/components";
+import { ActionTable } from "@/components";
 import AddActionForm from './AddActionForm.vue';
 import axios from 'axios';
 
 export default {
   components: {
     AddActionForm,
-    PaperTable
+    ActionTable,
+    // PaperTable
   },
   mounted() {
     axios

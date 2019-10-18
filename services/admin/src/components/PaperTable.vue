@@ -13,6 +13,11 @@
             v-if="hasValue(item, column)">
             <router-link v-if="isLink(column)" :to="{ name: pathName, params: { id: itemValue(item,column) }}"> {{ itemValue(item,column) }}
             </router-link>
+            <select v-else-if="columnValue(column) == 'action'">
+              <option disabled value="">Please select one</option>
+              <option>publish</option>
+              <option>store</option>
+            </select>
             <a v-else>
               {{itemValue(item, column)}}
             </a>
@@ -25,6 +30,12 @@
 <script>
 export default {
   name: 'paper-table',
+  data() {
+    return {
+      'selected': '',
+      'options': ''
+    }
+  },
   props: {
     columns: Array,
     data: Array,
@@ -55,6 +66,9 @@ export default {
     },
     itemValue(item, column) {
       return item[column.toLowerCase()];
+    },
+    columnValue(column) {
+      return column.toLowerCase();
     },
     isLink(column) {
       if(column == this.linkField) {

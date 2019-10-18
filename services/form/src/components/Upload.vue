@@ -86,6 +86,13 @@ export default {
   },
   props: {
     id: String
+  },
+  watch: {
+    uploadPercentage: function () {
+      if (this.uploadPercentage == 100) {
+        this.$parent.finished_uploading = true;
+      }
+    }
   }
 }
 </script>

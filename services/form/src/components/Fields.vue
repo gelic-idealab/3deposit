@@ -123,10 +123,8 @@ export default {
     },
     submitDeposit: function () {
       this.errors = this.formErrors();
-      if (this.errors.length > 0) {
-        console.log(this.errors)
-      }
-      else {
+      console.log(this.$parent.finished_uploading)
+      if (this.errors.length == 0 && this.$parent.finished_uploading) {
         axios({
           url: '../api/form/submit',
           data: {

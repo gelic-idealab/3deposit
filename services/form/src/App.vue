@@ -35,6 +35,7 @@ export default {
   },
   data() {
     return {
+      finished_uploading: false,
       form: {"banner": {}, "fields": []},
       id: uuidv4()
     }

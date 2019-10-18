@@ -12,7 +12,7 @@ from aiohttp import request as new_request
 from settings import get_config
 
 
-TMP_FILE_LOCATION = './data/{}'
+TMP_FILE_LOCATION = './data/'
 
 async def get_service_engine():
     conf = get_config()['postgres']
@@ -34,8 +34,8 @@ Trigger function to begin storage operation with buffered deposit file
 
 async def start_reassembling_chunks(did):
     try:
-        tmp_deposit_dir = f'./data/{did}_chunks/'
-        with open(f'./data/{did}', 'wb') as f:
+        tmp_deposit_dir = TMP_FILE_LOCATION + f'{did}_chunks/'
+        with open(TMP_FILE_LOCATION + did, 'wb') as f:
             chunk_to_write = 1
             num_chunks = len(os.listdir(tmp_deposit_dir))
             while chunk_to_write <= int(num_chunks):
@@ -118,8 +118,8 @@ async def start_deposit_processing_task(data):
                         else:
                             logging.info(resp_json.get('log'))
 
-                if os.path.exists(TMP_FILE_LOCATION.format(deposit_id)):
-                    os.remove(TMP_FILE_LOCATION.format(deposit_id))
+                if os.path.exists(TMP_FILE_LOCATION + deposit_id):
+                    os.remove(TMP_FILE_LOCATION + deposit_id)
 
                 return True
 
@@ -143,7 +143,7 @@ async def trigger_store(conn, did):
     bucket_name = dict({'bucket_name': '3deposit'})
     config.update(bucket_name)
 
-    with open(TMP_FILE_LOCATION.format(did), 'rb') as f:
+    with open(TMP_FILE_LOCATION + did, 'rb') as f:
         try:
             deposit_id = dict({'deposit_id': did})
             fd = FormData()
@@ -188,7 +188,7 @@ async def trigger_publish(conn, data):
         endpoint = service_config.get('endpoint')
         config = service_config.get('config')
         fd.add_field('config', json.dumps(config), content_type='application/json')
-        with open(TMP_FILE_LOCATION.format(did), 'rb') as f:
+        with open(TMP_FILE_LOCATION + did, 'rb') as f:
             fd.add_field('file', f, filename=did, content_type='application/octet-stream')
             async with new_request(method='POST', url=endpoint, data=fd) as resp:
                 resp_json = await resp.json()
@@ -212,7 +212,7 @@ async def trigger_metadata(data):
 
     fd = FormData()
     fd.add_field('data', json.dumps(data), content_type='application/json')
-    with open(TMP_FILE_LOCATION.format(did), 'rb') as f:
+    with open(TMP_FILE_LOCATION + did, 'rb') as f:
         fd.add_field('file', f, filename=did, content_type='application/octet-stream')
         if media_type == 'video':
             async with new_request(method='POST', url='http://metadata-service:5000/', data=fd) as resp:

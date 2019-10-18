@@ -18,12 +18,13 @@
         <b-spinner></b-spinner>
           {{ Math.round(uploadPercentage) }}%
       </b-button>
-      <b-button size="lg" variant="info" id="pause-upload-btn" @click="pauseUpload">Pause Upload</b-button>
-      <b-button size="lg" variant="danger" id="cancel-upload-btn" @click="cancelUpload">Cancel Upload</b-button>
+      <b-button v-if="!paused" size="lg" variant="info" id="pause-upload-btn" @click="pauseUpload">Pause Upload</b-button>
+      <b-button v-else-if="paused" size="lg" variant="primary" id="resume-upload-btn" @click="resumeUpload">Resume Upload</b-button>
+      <b-button size="lg" variant="danger" id="cancel-upload-btn" @click="cancelUpload">X</b-button>
     </template>
 
-    <b-button v-else-if="uploadPercentage == 100" size="lg" variant="success" id="uploaded-file-btn">
-      Upload Successful
+    <b-button v-else-if="uploadPercentage == 100" size="lg" variant="warning" id="uploaded-file-btn" @click="cancelUpload">
+      Upload successful - click to cancel and re-upload
     </b-button>
   </b-card>
     <!-- <div class="progress mt-3 mb-3">
@@ -43,6 +44,7 @@ import Resumable from 'resumablejs'
 export default {
   data(){
     return {
+      paused: false,
       uploadPercentage: 0,
       checksum: '',
       r: {}
@@ -51,6 +53,11 @@ export default {
   methods: {
     pauseUpload () {
       this.r.pause();
+      this.paused = true;
+    },
+    resumeUpload () {
+      this.r.upload();
+      this.paused = false;
     },
     cancelUpload () {
       this.r.cancel();

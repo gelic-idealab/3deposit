@@ -2,6 +2,7 @@
 .VSCodeCounter
 pg_data
 .DS_Store
+keys.py
 keys.env
 *.log
 node_modules/

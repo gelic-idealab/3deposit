@@ -23,8 +23,19 @@ VR*           | AWS S3
 
 Custom services can be added to support additional media types & endpoints.
 
-### Service Configuration
-If you plan to use the publication feature, you will need accounts and API keys to authenticate with 3rd party sites. By default, these are Sketchfab, Vimeo, and Amazon S3. Client IDs and API keys for these services should be added to your instance's ```keys.env``` file before deployment. These values can also be added or changed in the admin dashboard. 
+#### Service Configuration
+To use the publication feature, you will need accounts and API keys to authenticate with 3rd party sites. By default, these are Sketchfab, Vimeo, and Amazon S3. Client IDs and API keys for these services should be added to your instance's ```keys.env``` file before deployment. 
+```
+SKETCHFAB_TOKEN=<TOKEN FROM SKETCHFAB ACCOUNT SETTINGS PAGE>
+VIMEO_CLIENT_ID=<ID FROM VIMEO API PAGE>
+VIMEO_ACCESS_TOKEN=<TOKEN FROM VIMEO API PAGE>
+VIMEO_CLIENT_SECRET=<SECRET FROM VIMEO API PAGE>
+AWS_ACCESS_KEY=<KEY FROM AWS SECRETS PAGE>
+AWS_SECRET_KEY=<KEY FROM AWS SECRETS PAGE>
+AWS_BUCKET_NAME=<NAME OF PUBLIC BUCKET>
+```
+
+These values can also be added or changed in the admin dashboard. 
 
 ### Deployment
 3deposit can be deployed with docker, using the docker-compose file found in the repo.

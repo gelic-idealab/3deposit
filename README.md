@@ -19,7 +19,7 @@ Type          | Endpoint
 360 videos    | Vimeo
 VR*           | AWS S3
 
-*Properly configured WebVR applications will be published to static hosting.
+*Properly configured applications will be published to static hosting and playble in-browser. The application must have an `index.html` entrypoint. WebVR applications (such as A-frame) are natively supported. Desktop applications (Unity, Unreal) should include precompiled builds for WebGL. 
 
 Custom services can be added to support additional media types & endpoints.
 

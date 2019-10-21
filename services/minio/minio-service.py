@@ -287,51 +287,59 @@ def create_app():
                 if type(minioClient) == dict and 'err' in minioClient:
                     return jsonify(minioClient)
 
-                deposit_id_list = []
-                obj_names = []
-                missing_ids = []
-                objects_list = []
+                # deposit_id_list = []
+                # obj_names = []
+                # missing_ids = []
+                # objects_list = []
 
                 config = json.loads(request.form.get('config'))
                 bucket_name = config.get('bucket_name')
-                deposit_id_list = config.get('deposit_id_list')
+                # deposit_id_list = config.get('deposit_id_list')
 
                 objects = minioClient.list_objects(bucket_name, recursive=True)
 
-                if deposit_id_list:
-                    objects_stats = {}
-                    bucket_total = bucket_size = bucket_max = 0
-                    for obj in objects:
-                        if obj.object_name not in deposit_id_list:
-                            continue
-                        ret_object = {"metadata": str(obj.metadata),
-                                      "deposit_id": str(obj.object_name),
-                                      "modified": str(obj.last_modified),
-                                      "etag": str(obj.etag),
-                                      "size": str(obj.size),
-                                      "content_type": str(obj.content_type)}
-                        objects_list.append(ret_object)
-                        bucket_total += 1
-                        bucket_size += obj.size
-                        if bucket_max < obj.size:
-                            bucket_max = obj.size
+                # if deposit_id_list:
+                #     objects_stats = {}
+                #     bucket_total = bucket_size = bucket_max = 0
+                #     for obj in objects:
+                #         if obj.object_name not in deposit_id_list:
+                #             continue
+                #         ret_object = {"metadata": str(obj.metadata),
+                #                       "deposit_id": str(obj.object_name),
+                #                       "modified": str(obj.last_modified),
+                #                       "etag": str(obj.etag),
+                #                       "size": str(obj.size),
+                #                       "content_type": str(obj.content_type)}
+                #         objects_list.append(ret_object)
+                #         bucket_total += 1
+                #         bucket_size += obj.size
+                #         if bucket_max < obj.size:
+                #             bucket_max = obj.size
 
-                        obj_names.append(str(obj.object_name))
-                    objects_stats.update({
-                        'bucket_total': bucket_total,
-                        'bucket_size': bucket_size,
-                        'bucket_max': bucket_max
-                    })
+                #         obj_names.append(str(obj.object_name))
+                #     objects_stats.update({
+                #         'bucket_total': bucket_total,
+                #         'bucket_size': bucket_size,
+                #         'bucket_max': bucket_max
+                #     })
 
-                    for i, d in enumerate(deposit_id_list):
-                        if d not in obj_names:
-                            missing_ids.append(d)
+                #     for i, d in enumerate(deposit_id_list):
+                #         if d not in obj_names:
+                #             missing_ids.append(d)
 
-                else:
-                    bucket_size = 0
-                    for obj in objects:
-                        bucket_size += obj.size
-                return jsonify({'bucket_size': bucket_size})
+                # else:
+                num_files = 0 
+                bucket_size = 0
+                largest_file_size = 0
+                for obj in objects:
+                    num_files += 1
+                    bucket_size += obj.size
+                    if obj.size > largest_file_size:
+                        largest_file_size = obj.size
+                return jsonify({
+                    'bucket_size': bucket_size,
+                    'num_files': num_files,
+                    'largest_file': largest_file_size})
                         # ret_object = {"metadata": str(obj.metadata),
                         #               "deposit_id": str(obj.object_name),
                         #               "modified": str(obj.last_modified),

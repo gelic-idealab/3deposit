@@ -124,15 +124,15 @@ export default {
           value: '',
           footerText: "In the last hour",
           footerIcon: "ti-timer"
-        },
-        {
-          type: "info",
-          icon: "ti-twitter-alt",
-          title: "Followers",
-          value: "+45",
-          footerText: "Updated now",
-          footerIcon: "ti-reload"
         }
+        // {
+        //   type: "info",
+        //   icon: "ti-twitter-alt",
+        //   title: "Followers",
+        //   value: "+45",
+        //   footerText: "Updated now",
+        //   footerIcon: "ti-reload"
+        // }
       ],
       usersChart: {
         data: {
@@ -212,7 +212,8 @@ export default {
     .then(response => {
       console.log(response);
       this.statsCards[0].value = this.convertSize(response.data.bucket_size);
-      // this.statsCards[1].value = response.data.obj_stats.get('');
+      this.statsCards[1].value = response.data.num_files;
+      this.statsCards[2].value = this.convertSize(response.data.largest_file);
     })
   }
 };

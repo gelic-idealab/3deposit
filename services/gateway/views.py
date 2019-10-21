@@ -377,7 +377,7 @@ async def store_buckets(request):
         if not username:
             raise web.HTTPUnauthorized()
         # current_user = dict(await db.get_user_by_name(conn, username))
-        # if current_user.get('role') != 'us':
+        # if current_user.get('role') != 'admin':
         #     raise web.HTTPUnauthorized()
     PATH = '/bucket'
     async with request.app['db'].acquire() as conn:

@@ -3,7 +3,7 @@
 
     <!--Stats cards-->
     <div class="row">
-      <div class="col-md-6 col-xl-3" v-for="stats in statsCards" :key="stats.title">
+      <div class="col-md-6 col-xl-2" v-for="stats in statsCards" :key="stats.title">
         <stats-card>
           <div class="icon-big text-center" :class="`icon-${stats.type}`" slot="header">
             <i :class="stats.icon"></i>
@@ -112,18 +112,18 @@ export default {
         {
           type: "success",
           icon: "ti-wallet",
-          title: "Number of Files",
+          title: "Deposits",
           value: '',
-          footerText: "Last day",
-          footerIcon: "ti-calendar"
+          footerText: "Updated now",
+          footerIcon: "ti-reload"
         },
         {
           type: "danger",
           icon: "ti-pulse",
           title: "Largest File",
           value: '',
-          footerText: "In the last hour",
-          footerIcon: "ti-timer"
+          footerText: "Updated now",
+          footerIcon: "ti-reload"
         }
         // {
         //   type: "info",
@@ -206,11 +206,8 @@ export default {
     };
   },
   mounted() {
-    // test with dummy value
-    // this.statsCards[0].value = this.convertSize(2161651300);
     axios.get('../api/store/buckets', {params: {'bucket_name': '3deposit'}})
     .then(response => {
-      console.log(response);
       this.statsCards[0].value = this.convertSize(response.data.bucket_size);
       this.statsCards[1].value = response.data.num_files;
       this.statsCards[2].value = this.convertSize(response.data.largest_file);

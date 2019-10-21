@@ -13,27 +13,30 @@ import numpy as np
 def main():
 
     ## Still to do/test
-    # Determine if animated or not, then say Yes or No
-    # Add sub-directory searching (or see if it can already do that, depending on how the files are included in the filename_list;
-        # For example, if they're like "./dir1/dir2/filename.txt", then don't need to worry about it I think...)
-    # Add counts of vertices and triangles
-    # Test different file types and animated models
+        # Determine if animated or not, then say Yes or No
+        # Test different file types and animated models
+
+    ## DONE:
+        # Add sub-directory searching (or see if it can already do that, depending on how the files are included in the filename_list;
+            # For example, if they're like "./dir1/dir2/filename.txt", then don't need to worry about it I think...)
+        # Add counts of vertices and triangles
 
 
-    # Will this return any subdirectories and their contents, if present?
-    # If so, will want to iterate over all of them and get the metadata for them
-    with zipfile.ZipFile('model.zip', 'r') as zip_ref:
+    # Will this return any subdirectories and their contents, if present? --- YES!
+    # If so, will want to iterate over all of them and get the metadata for them -- DONE!
+    with zipfile.ZipFile('test_subdir_file_tree.zip', 'r') as zip_ref:
         filename_list = zip_ref.namelist()
         print(filename_list)
         for fn in filename_list:
             zip_ref.extract(fn)
-            # print(fn)
 
     supported_3d_mesh_types = ['gltf','glb','obj','stl'] # add more
 
     all_file_metadata = {}
 
     for fn in filename_list:
+        # print(fn)
+
         # Clear previous properties
         gltf_metadata = None
         mesh_metadata = None
@@ -108,12 +111,26 @@ def get_3d_model_file_metadata(model_file):
             }
 
         try:
-            filename = model_file.split('/')[-1]    # in case the full path is given, get just the file of interest name
-            file_ext = filename.split('.')[-1] # use this to "assume" filetype (since other general libraries for determing filetype tend to think that 3d files are just text files...)
-            file_info_dict.update({"ext":file_ext})
+            file_info_dict.update({"file_tree_path":model_file})
+
+            if model_file.endswith('/'): # means it's a directory
+                dirname = model_file.split('/')[-2]
+                file_info_dict.update({"directory_name":dirname})
+                file_info_dict.update({"ext":None})
+
+            else:
+                filename = model_file.split('/')[-1]    # in case the full path is given, get just the file of interest name
+                file_info_dict.update({"filename":filename})
+                file_ext = filename.split('.')[-1] # use this to "assume" filetype (since other general libraries for determing filetype tend to think that 3d files are just text files...)
+                if file_ext != '':
+                    file_info_dict.update({"ext":file_ext})
+                else:
+                    file_info_dict.update({"ext":None})
 
         except:
-            print("No file extension found.")
+            print("Problem getting file path, name, and extension.")
+            file_info_dict.update({"file_tree_path":None})
+            file_info_dict.update({"filename":None})
             file_info_dict.update({"ext":None})
 
         # for k,v in file_info_dict.items():
@@ -237,6 +254,13 @@ def get_3d_model_mesh_metadata(mesh_file, file_info_dict):
                         if type(getattr(mesh, a)) == np.ndarray: # If it's a numpy array, but a small one, keep it (e.g., 'centroid')
                             if getattr(mesh, a).size <= 20:
                                 attr_dict.update( { a : str(getattr(mesh, a)) } )
+
+                        if a == 'triangles':
+                            attr_dict.update( { "num_triangles" : len(getattr(mesh, a)) } )
+
+                        if a == 'vertices':
+                            attr_dict.update( { "num_vertices" : len(getattr(mesh, a)) } )
+
                         else:
                             continue
                     except:

@@ -5,7 +5,7 @@
         <card :title="tables.actions.title" :subTitle="tables.actions.subTitle">
           <div slot="raw-content" class="table-responsive">
             <!-- <paper-table :data="tables.actions.data" :columns="tables.actions.columns"></paper-table> -->
-            <action-table :data="tables.actions.data" :columns="tables.actions.columns"></action-table>
+            <action-table :actionConfig="tables.actions.data" :columns="tables.actions.columns"></action-table>
           </div>
         </card>
       </div>

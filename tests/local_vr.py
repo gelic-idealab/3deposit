@@ -7,7 +7,7 @@ DEPOSIT_ID = str(uuid4())
 
 querystring = {"resumableChunkNumber": "1", "resumableTotalChunks": "1", "deposit_id": DEPOSIT_ID}
 
-f = open('a-frame.zip', 'rb')
+f = open('webgl.zip', 'rb')
 files = {'file': f}
 
 response = requests.request("POST", url, files=files, params=querystring)

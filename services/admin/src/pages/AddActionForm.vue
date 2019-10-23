@@ -55,6 +55,16 @@ export default {
     };
   },
   methods: {
+    unpublishDeposit() {
+      axios.delete(
+        "../api/services/actions", {
+          params: {
+              action: this.deposit.deposit_metadata.resource_id, 
+              media_type: this.deposit.deposit_metadata.media_type
+          }
+        }
+      )
+    },
     configureServiceForAction() {
       axios
       .post('../api/services/actions',this.action_config)

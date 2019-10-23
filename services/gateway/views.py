@@ -211,6 +211,7 @@ async def services_actions(request):
         current_user = dict(await db.get_user_by_name(conn, username))
         if current_user.get('role') != 'admin':
             raise web.HTTPUnauthorized()
+
     if request.method == 'GET':
         try:
             q = request.query
@@ -235,7 +236,7 @@ async def services_actions(request):
         except Exception as err:
             return web.json_response({'err': str(err)})
 
-    if request.method == 'POST':
+    elif request.method == 'POST':
         try:
             req = await request.json()
             async with request.app['db'].acquire() as conn:
@@ -247,6 +248,30 @@ async def services_actions(request):
                 if service:
                     return web.json_response({'res': service})
         except Exception as err:
+            return web.json_response({'err': str(err)})
+
+    elif request.method == 'DELETE':
+        try:
+            q = request.query
+            action = q.get('action')
+            media_type = q.get('media_type')
+            if q:
+                async with request.app['db'].acquire() as conn:
+                    service_name = await db.delete_action_service_name(conn, action=action, media_type=media_type)
+                    if service_name:
+                        return web.json_response({'service_name': service_name})
+                    else:
+                        return web.json_response(
+                            {'res': 'no service configured for {}, {}'.format(action, media_type)}
+                        )
+
+        #     async with request.app['db'].acquire() as conn:
+        #         services = await db.get_action_services(conn)
+        #         if services:
+        #             return web.json_response({'services': services})
+        #         else:
+        #             return web.json_response({'res': 'no action services'})
+        # except Exception as err:
             return web.json_response({'err': str(err)})
 
     else:

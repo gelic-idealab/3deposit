@@ -53,6 +53,13 @@
                 <i class="fa fa-refresh"></i>
           </p-button>
         </td>
+        <td>
+          <p-button type="danger"
+                    round
+                    @click.native.prevent="configureServiceForAction(item_index)" icon>
+                <i class="fa fa-trash"></i>
+          </p-button>
+        </td>
       </slot>
     </tr>
     </tbody>
@@ -86,7 +93,7 @@ export default {
       axios
       .post('../api/services/actions', this.actionConfig[index])
       .then(response => (console.log(response)));
-    }
+    },
   }
 }
 </script>

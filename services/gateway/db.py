@@ -281,6 +281,29 @@ async def set_service_config(conn, name, endpoint, config):
 
 
 # Action queries
+async def delete_action_service_name(conn, action, media_type, service_name):
+    logging.debug(msg='delete_action_service_name called with: {}, {}'.format(action, media_type, service_name))
+    result = await conn.execute(
+        actions
+        .delete()
+        .where(
+            and_(
+                    actions.c.action == action,
+                    actions.c.media_type == media_type,
+                    actions.c.service_name == service_name
+                )
+            )
+        )
+    service = await result.fetchone()
+    logging.debug(msg='service fetchone: {}'.format(str(service)))
+    if service:
+        logging.debug(msg='action service deleted: {}'.format(str(dict(service))))
+        service_name = service.get('service_name')
+        return str(service_name)
+    else:
+        return None
+
+
 async def get_action_service_name(conn, action, media_type='default'):
     logging.debug(msg='get_action_service_name called with: {}, {}'.format(action, media_type))
     result = await conn.execute(

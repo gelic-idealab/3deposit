@@ -29,8 +29,7 @@ def main():
 
     # all_model_metadata = unzip_and_extract_model_metadata('test_subdir_file_tree.zip')
     # all_model_metadata = unzip_and_extract_model_metadata('model_anim.zip')
-    all_model_metadata = unzip_and_extract_model_metadata('test_subdir_subzip_file_tree.zip')
-
+    all_model_metadata = unzip_and_extract_model_metadata('model_anim.zip')
 
     for k1 in all_model_metadata:
         print(k1)
@@ -102,13 +101,14 @@ def unzip_and_extract_model_metadata(model_zip_file):
             for k in subzip_metadata:
                 zipfile_root = '/'.join(file_metadata['file_tree_path'].split('/')[0:-1])
                 subzip_file_path = zipfile_root+'/'+k
-                print(subzip_file_path)
+                # print(subzip_file_path)
 
                 # print(fn+'/'+k)
                 all_file_metadata.update( {subzip_file_path : subzip_metadata[k]} )
 
-            metadata_json = json.dumps(all_file_metadata)
-            pprint.pprint(json.loads(metadata_json))
+            # metadata_json = json.dumps(all_file_metadata)
+            # pprint.pprint(json.loads(metadata_json))
+
 
     # metadata_json = json.dumps(all_file_metadata)
     #
@@ -273,7 +273,9 @@ def get_3d_model_mesh_metadata(mesh_file, file_info_dict):
     """
 
     try:
+        print("HERE 1")
         m = trimesh.load(mesh_file)
+        print("HERE 2")
 
     except:
         return None
@@ -311,18 +313,24 @@ def get_3d_model_mesh_metadata(mesh_file, file_info_dict):
 
     # if file_info_dict["ext"].lower() in ["obj", "stl"]:
     try:
+        print("HERE 3")
         mesh_data_dict.update( get_mesh_obj_attrs(m) )
+        print("HERE 4")
     except:
         pass
 
     if file_info_dict["ext"].lower() in ["gltf", "glb"]:
         # Make a dump of the current mesh objects and analyze those
-        # print("HERE 5")
-        # with open('ani_dump.out', 'wb') as o:
-        #     o.write(m.dump())
-        # print("HERE 6")
+        print("HERE 5")
+        with open('ani_dump.out', 'wb') as o:
+            o.write(m.dump())
+        print("HERE 6")
+        return mesh_data_dict
+        # exit()
+        # time.sleep(5)
 
         mesh_dump = m.dump()
+        print("HERE 6.5")
         for (index, obj) in enumerate(mesh_dump):
             try:
                 mesh_data_dict.update( { "mesh object "+str(index) : get_mesh_obj_attrs(obj) } )

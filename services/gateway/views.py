@@ -271,7 +271,7 @@ async def services_actions(request):
         #             return web.json_response({'services': services})
         #         else:
         #             return web.json_response({'res': 'no action services'})
-        # except Exception as err:
+        except Exception as err:
             return web.json_response({'err': str(err)})
 
     else:

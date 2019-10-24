@@ -17,7 +17,6 @@ aiohttp-security = "*"
 aiohttp-session = "*"
 bcrypt = "*"
 cryptography = "*"
-uvloop = "*"
 filechunkio = "*"
 gunicorn = "*"
 

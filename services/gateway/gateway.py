@@ -7,7 +7,6 @@ import jinja2
 from cryptography import fernet
 from psycopg2 import OperationalError
 
-import uvloop
 from aiohttp import web
 import aiohttp_jinja2
 from aiohttp_security import SessionIdentityPolicy

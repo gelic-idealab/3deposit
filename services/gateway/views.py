@@ -3,6 +3,7 @@ import logging
 import os
 import logging
 import shutil
+import hashlib
 from datetime import datetime
 from asyncio import create_task
 
@@ -329,6 +330,11 @@ async def deposit_upload(request):
             did = request.query['deposit_id']
             rcn = request.query['resumableChunkNumber']
             rtc = request.query['resumableTotalChunks']
+            client_checksums_string = request.query['checksums']
+            logging.debug(f'{did} request.query: {request.query}')
+            client_checksums_array = client_checksums_string.split(',')
+            client_chunk_checksum = client_checksums_array[int(rcn)-1]
+            logging.debug(f'{did} client_chunk_checksum for chunk {rcn}: {client_chunk_checksum}')
             while True:
                 part = await reader.next()
                 if part is None:
@@ -338,9 +344,18 @@ async def deposit_upload(request):
                         os.mkdir(f'./data/{did}_chunks/')
                     chunk_file = f'./data/{did}_chunks/{rcn}'
                     if not os.path.exists(chunk_file):
-                        with open(chunk_file, 'wb') as f:
-                            b = await part.read()
-                            f.write(b)
+                        b = await part.read()
+                        md5 = hashlib.md5()
+                        md5.update(b)
+                        checksum = md5.hexdigest()
+                        logging.info(f'{did} chunk number {rcn} hash: {checksum}')
+                        if checksum == client_chunk_checksum:
+                            with open(chunk_file, 'wb') as f:
+                                f.write(b)
+                        else:
+                            err = f'checksum failed for {did} chunk {rcn} with hash: {checksum}; expected {client_chunk_checksum}'
+                            logging.error(err)
+                            return web.json_response({'err': err}, status=417)
                     if int(rcn) == int(rtc):
                         logging.info(msg=str(f'all_chunks_received for {did}'))
                         return web.Response(status=200, headers=headers)

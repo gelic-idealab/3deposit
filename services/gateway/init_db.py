@@ -160,7 +160,7 @@ def create_default_services(engine):
 
 def main():
     setup_db(USER_CONFIG['postgres'])
-    create_tables(engine=user_engine) 
+    # create_tables(engine=user_engine) 
     create_admin(engine=user_engine)
     create_default_actions(engine=user_engine)
     create_default_services(engine=user_engine)

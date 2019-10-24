@@ -26,7 +26,7 @@
             <b-card-text v-if="!hashed">
               Computing file checksum
               <b-spinner></b-spinner>
-                {{ (currentChunk/chunks)*100 }}%
+                {{ Math.round((currentChunk/chunks)*100) }}%
             </b-card-text>
             <b-card-text v-else-if="hashed">
               File checksum computed
@@ -135,8 +135,13 @@ export default {
         var self = this;
 
         fileReader.onload = function (e) {
-          // console.log('read chunk nr', currentChunk, 'of', chunks);
           spark.append(e.target.result);                   // Append array buffer
+          var hash = spark.end();
+          checksums.push(hash);
+          spark.reset();
+          console.info('computed hash for chunk', currentChunk, hash);
+          currentChunk++;
+          self.currentChunk++;
 
           if (currentChunk < chunks) {
             loadNext();
@@ -153,13 +158,10 @@ export default {
         function loadNext() {
           var start = currentChunk * chunkSize,
               end = ((start + chunkSize) >= file.size) ? file.size : start + chunkSize;
+          
+          console.log('start', start, 'end', end)
 
           fileReader.readAsArrayBuffer(blobSlice.call(file, start, end));
-          var hash = spark.end();
-          checksums.push(hash);
-          console.info('computed hash for chunk', currentChunk, hash);
-          currentChunk++;
-          self.currentChunk++;
         }
         loadNext();
       }
@@ -177,6 +179,7 @@ export default {
             maxFileSize: comp.maxFileSize,
             // xhrTimeout: 10000,
             testChunks: false,
+            forceChunkSize: true,
             query: {
               deposit_id: this.id,
               checksums: comp.checksums

@@ -5,8 +5,8 @@
         v-model="file"
         id="add-file"
         :state="Boolean(file)"
-        placeholder="Choose a file or drop it here..."
-        drop-placeholder="Drop file here..."
+        placeholder="Choose a file..."
+        no-drop="true"
         v-on:input="handleFileAdd"
         accept=".zip"
       ></b-form-file>
@@ -20,11 +20,13 @@
             header-text-variant="white"
             align="center"
             class="text-center mb-5"
-            header="Deposit Checksum"
+            header="Hash"
             style="max-width: 20rem;"
           >
             <b-card-text v-if="!hashed">
               Computing file checksum
+              <b-spinner></b-spinner>
+                {{ (currentChunk/chunks)*100 }}%
             </b-card-text>
             <b-card-text v-else-if="hashed">
               File checksum computed
@@ -58,9 +60,10 @@
             header-text-variant="white"
             align="center"
             class="text-center mb-5"
-            header="Server checksum matches"
+            header="Confirm"
             style="max-width: 20rem;"
           >
+          <b-card-text>Server checksum matches</b-card-text>
           <b-button size="sm" variant="danger" id="uploaded-file-btn" @click="cancelUpload">
             Remove file and re-upload
           </b-button>
@@ -89,6 +92,8 @@ export default {
       uploadPercentage: 0,
       chunkSize: 64*1024*1024, // 64MB
       maxFileSize: 1000*10*1024*1024, // 10GB
+      chunks: 0,
+      currentChunk: 0,
       checksums: [],
       r: {}
     }
@@ -105,6 +110,7 @@ export default {
     },
     cancelUpload() {
       this.r.cancel();
+      this.file = 0;
       this.checksums = [];
       this.uploadPercentage = 0;
       this.hashed = false;
@@ -116,47 +122,50 @@ export default {
       });
     },
     hashFile() {
-      var blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice,
-        file = this.file,
-        chunkSize = this.chunkSize,
-        chunks = Math.ceil(file.size / chunkSize),
-        currentChunk = 0,
-        spark = new SparkMD5.ArrayBuffer(),
-        fileReader = new FileReader(),
-        checksums = this.checksums;
-      var self = this;
+      if (this.file) {
+        var blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice,
+          file = this.file,
+          hashing = this.hashing = true,
+          chunkSize = this.chunkSize,
+          chunks = this.chunks = Math.ceil(file.size / chunkSize),
+          currentChunk = this.currentChunk = 0,
+          spark = new SparkMD5.ArrayBuffer(),
+          fileReader = new FileReader(),
+          checksums = this.checksums;
+        var self = this;
 
-      fileReader.onload = function (e) {
-        // console.log('read chunk nr', currentChunk, 'of', chunks);
-        spark.append(e.target.result);                   // Append array buffer
+        fileReader.onload = function (e) {
+          // console.log('read chunk nr', currentChunk, 'of', chunks);
+          spark.append(e.target.result);                   // Append array buffer
 
-        if (currentChunk < chunks) {
-          loadNext();
-        } else {
-          self.hashed = true;
-          console.log('finished hashing');
+          if (currentChunk < chunks) {
+            loadNext();
+          } else {
+            self.hashed = true;
+            console.log('finished hashing');
+          }
+        };
+
+        fileReader.onerror = function () {
+          console.warn('oops, something went wrong.');
+        };
+
+        function loadNext() {
+          var start = currentChunk * chunkSize,
+              end = ((start + chunkSize) >= file.size) ? file.size : start + chunkSize;
+
+          fileReader.readAsArrayBuffer(blobSlice.call(file, start, end));
+          var hash = spark.end();
+          checksums.push(hash);
+          console.info('computed hash for chunk', currentChunk, hash);
+          currentChunk++;
+          self.currentChunk++;
         }
-      };
-
-      fileReader.onerror = function () {
-        console.warn('oops, something went wrong.');
-      };
-
-      function loadNext() {
-        var start = currentChunk * chunkSize,
-            end = ((start + chunkSize) >= file.size) ? file.size : start + chunkSize;
-
-        fileReader.readAsArrayBuffer(blobSlice.call(file, start, end));
-        var hash = spark.end();
-        checksums.push(hash);
-        console.info('computed hash for chunk', currentChunk, hash);
-        currentChunk++;
+        loadNext();
       }
-      loadNext();
     },
     handleFileAdd() {
       this.hashFile();
-      this.hashing = true;
     }
   },
   mounted() {
@@ -202,7 +211,7 @@ export default {
   transition: all .3s ease;
 }
 .slide-fade-leave-active {
-  transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+  transition: all .3s cubic-bezier(1.0, 0.5, 0.8, 1.0);
 }
 .slide-fade-enter, .slide-fade-leave-to
 /* .slide-fade-leave-active below version 2.1.8 */ {

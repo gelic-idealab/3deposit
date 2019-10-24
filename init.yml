@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+
+  postgres:
+    container_name: postgres
+    image: postgres:10
+    networks:
+        - gateway_internal
+    labels:
+      - "traefik.enable=false"
+
+  gateway:
+    build: ./services/gateway/
+    container_name: gateway
+    links:
+        - postgres
+    depends_on:
+        - postgres
+    networks:
+      - gateway_internal
+    command: bash -c "pipenv run python init_db.py"
+    volumes:
+      - ./services/gateway/data:/gateway/data
+    env_file:
+      - keys.env
+
+networks:
+    gateway_internal:
+        external: false

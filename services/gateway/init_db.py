@@ -44,30 +44,9 @@ def setup_db(config):
     conn.close()
 
 
-# def teardown_db(config):
-
-#     db_name = config['database']
-#     db_user = config['user']
-
-#     conn = admin_engine.connect()
-#     conn.execute("""
-#       SELECT pg_terminate_backend(pg_stat_activity.pid)
-#       FROM pg_stat_activity
-#       WHERE pg_stat_activity.datname = '%s'
-#         AND pid <> pg_backend_pid();""" % db_name)
-#     conn.execute("DROP DATABASE IF EXISTS %s" % db_name)
-#     conn.execute("DROP ROLE IF EXISTS %s" % db_user)
-#     conn.close()
-
-
 def create_tables(engine):
     meta = MetaData()
     meta.create_all(bind=engine, tables=[forms, deposits, users, services, actions])
-
-
-# def drop_tables(engine):
-#     meta = MetaData()
-#     meta.drop_all(bind=engine, tables=[forms, deposits, users, services, actions])
 
 
 def create_admin(engine):
@@ -160,12 +139,10 @@ def create_default_services(engine):
 
 def main():
     setup_db(USER_CONFIG['postgres'])
-    # create_tables(engine=user_engine) 
+    create_tables(engine=user_engine) 
     create_admin(engine=user_engine)
     create_default_actions(engine=user_engine)
     create_default_services(engine=user_engine)
-    # drop_tables()
-    # teardown_db(config)
 
 
 if __name__ == '__main__':

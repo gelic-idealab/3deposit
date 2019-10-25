@@ -16,7 +16,6 @@ from aiohttp_session import setup as setup_session
 from aiohttp_session.cookie_storage import EncryptedCookieStorage
 
 from db import close_pg, init_pg
-from settings import get_config, PACKAGE_NAME
 from auth import DBAuthorizationPolicy
 from routes import setup_routes
 
@@ -31,10 +30,7 @@ async def init_app(argv=None):
 
     app = web.Application(client_max_size=128*1024*1024) # max client payload of 128MB
 
-    app['config'] = get_config(argv)
-
     # create db connection on startup, close on exit
-    # app.on_startup.append(init_pg)
     try:
         db_pool = await init_pg(app)
         app.on_cleanup.append(close_pg)
@@ -49,7 +45,7 @@ async def init_app(argv=None):
 
     aiohttp_jinja2.setup(
         app,
-        loader=jinja2.PackageLoader(PACKAGE_NAME),
+        loader=jinja2.PackageLoader('gateway'),
         context_processors=[current_user_ctx_processor],
     )
 
@@ -69,16 +65,3 @@ async def init_app(argv=None):
 
     return app
 
-
-def main(argv):
-
-    # init & run app with args & config
-    app = init_app(argv)
-    config = get_config(argv)
-    web.run_app(app,
-                host=config['host'],
-                port=config['port'])
-
-
-if __name__ == '__main__':
-    main(sys.argv[1:])

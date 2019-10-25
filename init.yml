@@ -9,6 +9,8 @@ services:
         - gateway_internal
     labels:
       - "traefik.enable=false"
+    env_file:
+      - keys.env
 
   gateway:
     build: ./services/gateway/

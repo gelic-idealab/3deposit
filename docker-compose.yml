@@ -26,6 +26,8 @@ services:
     labels:
       - "traefik.enable=false"
     restart: always
+    env_file:
+      - keys.env
 
   admin:
     build: ./services/admin/

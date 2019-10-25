@@ -1,3 +1,4 @@
+import os
 import json
 import datetime
 import logging
@@ -8,8 +9,6 @@ from sqlalchemy import (
     Integer, String, DateTime, Boolean, JSON,
     and_
 )
-
-from settings import BASE_DIR, get_config
 
 
 __all__ = ['forms', 'deposits', 'users', 'services', 'actions']
@@ -69,15 +68,20 @@ class RecordNotFound(Exception):
 
 # Application database init & teardown
 async def init_pg(app):
-    conf = app['config']['postgres']
+
+    user_username = os.environ.get('POSTGRES_USER')
+    user_password = os.environ.get('POSTGRES_PASSWORD')
+    user_database = os.environ.get('POSTGRES_DB')
+    user_host = 'postgres'
+    user_port = '5432'
     engine = await aiopg.sa.create_engine(
-        database=conf['database'],
-        user=conf['user'],
-        password=conf['password'],
-        host=conf['host'],
-        port=conf['port'],
-        minsize=conf['minsize'],
-        maxsize=conf['maxsize'],
+        database=user_database,
+        user=user_username,
+        password=user_password,
+        host=user_host,
+        port=user_port,
+        minsize=1,
+        maxsize=5
     )
     app['db'] = engine
     return engine

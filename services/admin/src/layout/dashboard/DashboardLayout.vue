@@ -71,13 +71,15 @@ export default {
       current_user: {}
     }
   },
-  mounted() {
+  created() {
     axios.get('../api/user')
     .then(response => {
-      this.current_user = response.data.current_user;
+      if (response.status == 200) {
+        this.current_user = response.data.current_user;
+      }
     },
     error => {
-      if (error.response.status === 401) {
+      if (error) {
         window.location.href = '../api/login';
         }
     })

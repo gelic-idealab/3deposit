@@ -90,10 +90,9 @@ export default {
       hashed: false,
       paused: false,
       uploadPercentage: 0,
-      chunkSize: 64*1024*1024, // 64MB
+      chunkSize: 10*1024*1024, // 10MB
       maxFileSize: 1000*10*1024*1024, // 10GB
-      chunks: 0,
-      currentChunk: 0,
+      currentChunk: 1,
       checksums: [],
       r: {}
     }
@@ -123,27 +122,28 @@ export default {
     },
     hashFile() {
       if (this.file) {
-        var blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice,
-          file = this.file,
-          hashing = this.hashing = true,
-          chunkSize = this.chunkSize,
-          chunks = this.chunks = Math.ceil(file.size / chunkSize),
-          currentChunk = this.currentChunk = 0,
-          spark = new SparkMD5.ArrayBuffer(),
-          fileReader = new FileReader(),
-          checksums = this.checksums;
         var self = this;
+        var blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice,
+          file = self.file,
+          hashing = self.hashing = true,
+          hashed = self.hashed,
+          chunkSize = self.chunkSize,
+          chunks = self.chunks = Math.ceil(this.file.size / this.chunkSize),
+          currentChunk = self.currentChunk,
+          checksums = self.checksums,
+          spark = new SparkMD5.ArrayBuffer(),
+          fileReader = new FileReader();
 
         fileReader.onload = function (e) {
           spark.append(e.target.result);                   // Append array buffer
           var hash = spark.end();
           checksums.push(hash);
           spark.reset();
-          console.info('computed hash for chunk', currentChunk, hash);
+          console.info('computed hash for chunk', currentChunk, 'of', chunks, hash);
           currentChunk++;
-          self.currentChunk++;
 
-          if (currentChunk < chunks) {
+          if (currentChunk <= chunks) {
+            console.log('loading next chunk')
             loadNext();
           } else {
             self.hashed = true;
@@ -156,7 +156,7 @@ export default {
         };
 
         function loadNext() {
-          var start = currentChunk * chunkSize,
+          var start = (currentChunk-1) * chunkSize,
               end = ((start + chunkSize) >= file.size) ? file.size : start + chunkSize;
           
           console.log('start', start, 'end', end)
@@ -167,6 +167,7 @@ export default {
       }
     },
     handleFileAdd() {
+      console.log('file added, hashing...')
       this.hashFile();
     }
   },

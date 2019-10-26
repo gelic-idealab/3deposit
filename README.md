@@ -43,7 +43,7 @@ These values can also be added or changed in the admin dashboard.
 git clone https://github.com/Grainger-Engineering-Library/3deposit.git
 cd 3deposit/
 cp keys.template.env keys.env && cp traefik.template.toml traefik.toml
-
+{. . . add keys and certs to templates . . .}
 chmod +x init.sh
 ./init.sh
 ```

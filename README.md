@@ -38,12 +38,12 @@ AWS_BUCKET_NAME=<NAME OF PUBLIC BUCKET>
 These values can also be added or changed in the admin dashboard. 
 
 ### Deployment
-3deposit can be deployed with docker, using the docker-compose file found in the repo.
+3deposit is deployed with docker, using the docker-compose file found in the repo. Configure your instance using the templates and install using ```init.sh```.
 ```
 git clone https://github.com/Grainger-Engineering-Library/3deposit.git
 cd 3deposit/
 cp keys.template.env keys.env && cp traefik.template.toml traefik.toml
-{. . . add keys and certs to templates . . .}
+{ . . . add keys and certs to templates . . . }
 chmod +x init.sh
 ./init.sh
 ```

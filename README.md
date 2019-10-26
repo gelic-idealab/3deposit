@@ -44,7 +44,7 @@ git clone https://github.com/Grainger-Engineering-Library/3deposit.git
 cd 3deposit/
 cp keys.template.env keys.env && cp traefik.template.toml traefik.toml
 
-chmod -x init.sh
+chmod +x init.sh
 ./init.sh
 ```
 

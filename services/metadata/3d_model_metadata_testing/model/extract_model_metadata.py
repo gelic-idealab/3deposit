@@ -9,11 +9,9 @@ import zipfile
 import time
 import trimesh
 import numpy as np
-import sys
 
 
 def main():
-
     """
     ## Still to do/test
         # Set max allowable limit of number of unzip events to be 10 times (in case of a "compression bomb")
@@ -29,12 +27,10 @@ def main():
 
     """
 
-    zipped_model_file = './anitest/model_anim.zip'   # Path to zipped model file from which to gather metadata
-    base_model_file_path = './anitest/' # set as base directory, or '' if already in working base direcotry
-    # base_model_file_path = '/'.join(zipped_model_file.split('/')[0:-1])
-    print(zipped_model_file)
-    print(base_model_file_path)
-    exit()
+    zipped_model_file = './model_anim.zip'   # Path to zipped model file from which to gather metadata
+    base_model_file_path = '/'.join(zipped_model_file.split('/')[0:-1]) # set as base directory, or '' if already in working base direcotry
+    # print(zipped_model_file)
+    # print(base_model_file_path)
     # unzip_counter = 0   # counter of number of times unzip occurs, to prevent problem in case of file with too many layers of compression
 
     # all_model_metadata = unzip_and_extract_model_metadata('test_subdir_file_tree.zip')
@@ -42,35 +38,24 @@ def main():
 
     all_model_metadata = unzip_and_extract_model_metadata(zipped_model_file, base_model_file_path)
 
-    # all_model_metadata = unzip_and_extract_model_metadata('./anitest/model_anim.zip', '')     # USE THIS
-
     metadata_json = json.dumps(all_model_metadata)
     pprint.pprint(json.loads(metadata_json))
-
-
-    # for k1 in all_model_metadata:
-    #     print(k1)
-    #     for k2 in all_model_metadata[k1]:
-    #         print('\t',k2)
-    #         for k3 in all_model_metadata[k1][k2]:
-    #             print('\t\t',k3)
-    #
 
     return all_model_metadata
 
 
 def unzip_and_extract_model_metadata(model_zip_file, unzip_path):
-
-
-
+    """
     # Will this return any subdirectories and their contents, if present? --- YES!
     # If so, will want to iterate over all of them and get the metadata for them -- DONE!
+
+    """
+
     print("Exctracting file: ", model_zip_file)
     with zipfile.ZipFile(model_zip_file, 'r') as zip_ref:
         filename_list = zip_ref.namelist()
-        print(filename_list)
+        print("File list: ", filename_list)
         for fn in filename_list:
-            # print(fn)
             zip_ref.extract(fn, path=unzip_path)
 
     supported_3d_mesh_types = ['gltf','glb','obj','stl'] # add more
@@ -82,8 +67,6 @@ def unzip_and_extract_model_metadata(model_zip_file, unzip_path):
         fn_path = os.path.join(unzip_path, fn)
         print(fn_path)
 
-        # print(fn)
-
         # Clear previous properties
         gltf_metadata = None
         mesh_metadata = None
@@ -92,35 +75,17 @@ def unzip_and_extract_model_metadata(model_zip_file, unzip_path):
 
         file_metadata = get_3d_model_file_metadata(fn_path)
 
-        # May need to do this check for all files in the tree
         if file_metadata["ext"] is not None:
             if file_metadata["ext"].lower() == "gltf" or file_metadata["ext"].lower() == "glb":
-
                 gltf_metadata = get_3d_model_gltf_metadata(fn_path, file_metadata)
 
                 if gltf_metadata is not None:
-                    # print(gltf_metadata)
-                    # exit()
-                    # print(gltf_metadata['animated'])
-                    # exit()
                     if gltf_metadata['animated']:
-                        # print("HERE- ANIMATED")
                         animated = True
-                        # print("ANIMATED")
-                        # exit()
 
-            # if gltf_metadata is not None:
-            #     metadata_dict.update( {"GLTF metadata" : gltf_metadata} )
-
-            # Get mesh metadata for STILL objects only (animated files will overload system)
-            # Can either check if extension is in supported type list,
-            # OR simply TRY for all file to see if it can be loaded
+            # Check if extension is in supported type list (OR, could simply TRY for all file to see if it can be loaded)
             if file_metadata["ext"] in supported_3d_mesh_types:
                 mesh_metadata = get_3d_model_mesh_metadata(fn_path, file_metadata, animated)
-
-
-            # gltf_metadata = get_3d_model_gltf_metadata(fn)
-            # mesh_metadata = get_3d_model_mesh_metadata(fn)
 
         metadata_dict = {}
 
@@ -137,35 +102,15 @@ def unzip_and_extract_model_metadata(model_zip_file, unzip_path):
 
         # Now check if the file was a zipped file, and if so, recursively gather subzipped file metadata
         if file_metadata["ext"] == "zip":
-            # print(fn_path)
             zipfile_root = '/'.join(file_metadata['file_tree_path'].split('/')[0:-1])
-            # print(zipfile_root)
-            # exit()
             subzip_metadata = unzip_and_extract_model_metadata(fn_path, zipfile_root)
-            # exit()
             for subzip_file in subzip_metadata:
-                # print(subzip_file)
-                # zipfile_root = '/'.join(file_metadata['file_tree_path'].split('/')[0:-1])
-                # print(zipfile_root)
-                # exit()
-                # subzip_file_path = zipfile_root+'/'+subzip_file
-                # print(subzip_file_path)
-
-                # print(fn+'/'+k)
                 all_file_metadata.update( {subzip_file : subzip_metadata[subzip_file]} )
-                # pprint.pprint(all_file_metadata)
-                # exit()
-
-            # metadata_json = json.dumps(all_file_metadata)
-            # pprint.pprint(json.loads(metadata_json))
 
     # metadata_json = json.dumps(all_file_metadata)
-    #
     # pprint.pprint(json.loads(metadata_json))
 
     return all_file_metadata
-
-
 
 
 def get_3d_model_file_metadata(model_file):
@@ -179,11 +124,8 @@ def get_3d_model_file_metadata(model_file):
     """
 
     try:
-
         (mode, ino, dev, nlink, uid, gid, size, atime, mtime, ctime) = os.stat(model_file)
         # Example output:  os.stat_result(st_mode=33204, st_ino=5522179, st_dev=64513, st_nlink=1, st_uid=1000, st_gid=1000, st_size=28869, st_atime=1570141042, st_mtime=1562097398, st_ctime=1570141042)
-        # print("created: %s" % time.ctime(ctime))
-        # print("last modified: %s" % time.ctime(mtime))
 
         file_info_dict = {
             "mode" : mode,
@@ -222,15 +164,11 @@ def get_3d_model_file_metadata(model_file):
             file_info_dict.update({"filename":None})
             file_info_dict.update({"ext":None})
 
-        # for k,v in file_info_dict.items():
-        #     print(k,v)
-
         return file_info_dict
 
     except Exception as emsg:
         print("EXCEPTION:", str(emsg))
         return None
-
 
 
 def get_3d_model_gltf_metadata(gltf_file, file_info_dict):
@@ -243,43 +181,26 @@ def get_3d_model_gltf_metadata(gltf_file, file_info_dict):
     """
 
     if file_info_dict["ext"].lower() == "gltf": # Get entire file info
-        # print("HERE")
-        # exit()
         try:
             with open(gltf_file, 'rb') as gltf:
                 gltf_data_dict = json.load(gltf)
 
             if "animations" in gltf_data_dict.keys():
-                # print("ANIMATED")
                 gltf_data_dict.update({'animated':True})    # Add "animated" metadata field as True
-
                 # Remove super long metadata fields
                 long_metadata_fields = ['accessors', 'animations', 'meshes', 'nodes'] # For an example animated file, these were at least 1000 lines each (accessors was 15,000 lines)
                 for lmf in long_metadata_fields:
                     gltf_data_dict.pop(lmf)
-
             else:
-                # print("NOT ANIMATED")
                 gltf_data_dict.update({'animated':False})   # Add "animated" metadata field as False
-
-                # sys.exit(1)
-                # exit()
 
             return gltf_data_dict
 
         except Exception as emsg:
             print("EXCEPTION:", str(emsg))
-            # exit()
             return None
 
-        # print("HERE")
-        # print(gltf_data_dict.keys())
-        # exit()
-
-
-
     elif file_info_dict["ext"].lower() == "glb": # Get header info
-
         # Not sure if string search below will work for ALL glb files...
         try:
             with open(gltf_file, 'rb') as glb:
@@ -350,8 +271,8 @@ def get_3d_model_mesh_metadata(mesh_file, file_info_dict, is_animimated):
 
     try:
         m = trimesh.load(mesh_file)
-
-    except:
+    except Exception as emsg:
+        print("EXCEPTION:", str(emsg))
         return None
 
     mesh_data_dict = {}
@@ -359,10 +280,9 @@ def get_3d_model_mesh_metadata(mesh_file, file_info_dict, is_animimated):
     def get_mesh_obj_attrs(mesh, anim):
         attr_dict = {}
 
+        # Get all mesh metadata for STILL objects only (animated files will overload system)
         if not anim:    # For animations, this gets stuck when getting the "bounding_box_oriented" attribute
-            # print(dir(mesh))
             for a in dir(mesh):
-                # print(a)
                 if not a.startswith('_'):  # and a in mesh_attr_list:
                     try:
                         if not callable(getattr(mesh, a)):
@@ -389,7 +309,6 @@ def get_3d_model_mesh_metadata(mesh_file, file_info_dict, is_animimated):
             # List of reasonably-sized attributes to gather from animated GLTF models (as certain other attributes will cause the process to stall if you try to get them (e.g., all "bounding_" attrs))
             anim_attrs = ['bounds', 'camera', 'camera_transform', 'centroid', 'extents', 'is_empty', 'is_valid', 'metadata', 'scale', 'triangles', 'triangles_node', 'units']
             for a in anim_attrs:
-                # print(a)    # For animations, this gets stuck when getting the "bounding_box_oriented" attribute
                 try:
                     json.dumps( {a : getattr(mesh, a)} )   # Check to see if it can be serialized (e.g., not a numpy array or unfamiliar object)
                     attr_dict.update( {a : getattr(mesh, a)} )
@@ -408,27 +327,21 @@ def get_3d_model_mesh_metadata(mesh_file, file_info_dict, is_animimated):
                     except Exception:
                         continue
 
-
         return attr_dict
 
-    # if not is_animimated:
     try:
         mesh_data_dict.update( get_mesh_obj_attrs(m, is_animimated) )
     except Exception:
         pass
 
     if file_info_dict["ext"].lower() in ["gltf", "glb"] and not is_animimated:
-        # Make a dump of the current mesh objects and analyze those
-        # print("HERE 5")
-
+        # Make a dump of the current mesh objects and analyze those (Only for non-animated models!)
         mesh_dump = m.dump()
         for (index, obj) in enumerate(mesh_dump):
             try:
                 mesh_data_dict.update( { "mesh object "+str(index) : get_mesh_obj_attrs(obj, is_animimated) } )
             except Exception:
                 continue
-
-
 
     return mesh_data_dict
 

@@ -59,9 +59,14 @@ def models():
             # name = get_value(request, 'data', 'Creator Name')
             data = json.loads(request.form.get('data'))
             metadata = data.get('metadata')
-            name = metadata.get('Object Title')
-            logging.debug(msg='sketchfab name: {}'.format(name))
-            data = {'name': name}
+            name = metadata.get('object_title')
+            description = metadata.get('description')
+            data = {
+                'name': name,
+                'description': description,
+                'isInspectable': True,
+                'license': 'by'
+                }
             logging.debug('sketchfab values: {}, {}'.format(token, name))
 
             # data = {'name': post_data.get('name'),
@@ -82,6 +87,7 @@ def models():
                 return jsonify({'requestException': e})
             else:
                 response = r.json()
+                logging.debug(f'response: {response}')
                 uid = response.get('uid')
                 if os.path.exists('model.zip'):
                     os.remove('model.zip')

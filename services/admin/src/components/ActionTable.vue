@@ -56,7 +56,7 @@
         <td>
           <p-button type="danger"
                     round
-                    @click.native.prevent="configureServiceForAction(item_index)" icon>
+                    @click.native.prevent="deleteAction(item_index)" icon>
                 <i class="fa fa-trash"></i>
           </p-button>
         </td>
@@ -88,6 +88,11 @@ export default {
     isLink(column) {
       if(column == this.linkField)
           return true
+    },
+     deleteAction(index) {
+      axios.delete(
+        "../api/services/actions", this.actionConfig[index]
+        );
     },
     configureServiceForAction(index) {
       axios

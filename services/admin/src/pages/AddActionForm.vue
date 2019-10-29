@@ -21,7 +21,7 @@
 
         <div class="row">
           <div class="col-md-12">
-            <fg-input type="text"
+            <fg-input type="select"
                       label="Service Name"
                       placeholder="Service Name"
                       v-model="action_config.service_name">
@@ -55,16 +55,6 @@ export default {
     };
   },
   methods: {
-    unpublishDeposit() {
-      axios.delete(
-        "../api/services/actions", {
-          params: {
-              action: this.deposit.deposit_metadata.resource_id, 
-              media_type: this.deposit.deposit_metadata.media_type
-          }
-        }
-      )
-    },
     configureServiceForAction() {
       axios
       .post('../api/services/actions',this.action_config)

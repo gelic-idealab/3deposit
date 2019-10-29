@@ -286,7 +286,7 @@ async def set_service_config(conn, name, endpoint, config):
 
 # Action queries
 async def delete_action_service_name(conn, action, media_type, service_name):
-    logging.debug(msg='delete_action_service_name called with: {}, {}'.format(action, media_type, service_name))
+    logging.debug(msg='delete_action_service_name called with: {}, {}, {}'.format(action, media_type, service_name))
     result = await conn.execute(
         actions
         .delete()
@@ -299,7 +299,7 @@ async def delete_action_service_name(conn, action, media_type, service_name):
             )
         )
     service = await result.fetchone()
-    logging.debug(msg='service fetchone: {}'.format(str(service)))
+    logging.debug(msg='delete_action_service_name fetchone: {}'.format(str(service)))
     if service:
         logging.debug(msg='action service deleted: {}'.format(str(dict(service))))
         service_name = service.get('service_name')

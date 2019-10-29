@@ -256,22 +256,18 @@ async def services_actions(request):
             q = request.query
             action = q.get('action')
             media_type = q.get('media_type')
+            service_name = q.get('service_name')
             if q:
                 async with request.app['db'].acquire() as conn:
-                    service_name = await db.delete_action_service_name(conn, action=action, media_type=media_type)
+                    service_name = await db.delete_action_service_name(conn, action=action, media_type=media_type, service_name=service_name)
                     if service_name:
                         return web.json_response({'service_name': service_name})
                     else:
                         return web.json_response(
                             {'res': 'no service configured for {}, {}'.format(action, media_type)}
                         )
-
-        #     async with request.app['db'].acquire() as conn:
-        #         services = await db.get_action_services(conn)
-        #         if services:
-        #             return web.json_response({'services': services})
-        #         else:
-        #             return web.json_response({'res': 'no action services'})
+            else:
+                return web.json_response({'err': 'no query params'}, status=400)
         except Exception as err:
             return web.json_response({'err': str(err)})
 

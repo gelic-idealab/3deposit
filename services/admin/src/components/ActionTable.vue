@@ -91,8 +91,15 @@ export default {
     },
      deleteAction(index) {
       axios.delete(
-        "../api/services/actions", this.actionConfig[index]
-        );
+        "../api/services/actions", 
+        {
+          params: {
+            'action': this.actionConfig[index].action,
+            'media_type': this.actionConfig[index].media_type,
+            'service_name': this.actionConfig[index].service_name
+            }
+        }
+      );
     },
     configureServiceForAction(index) {
       axios

@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+import shutil
 import zipfile
 import subprocess
 import requests
@@ -123,7 +124,10 @@ def handler():
             if len(extracted_files_to_delete_later) > 0:
                 for fdel in extracted_files_to_delete_later:
                     if os.path.exists(fdel):
-                        os.remove(fzip)
+                        if os.path.isdir(fdel):
+                            shutil.rmtree(fdel)
+                        else:
+                            os.remove(fdel)
 
 
 def get_mediainfo_metadata(media_file):

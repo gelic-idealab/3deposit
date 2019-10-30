@@ -61,12 +61,14 @@ def handler():
                 fzip = did
                 file.save(fzip)
 
+                extracted_files_to_delete_later = []
+
                 if media_type == 'model':
                     zipped_model_file = fzip   # Path to zipped model file from which to gather metadata
                     # base_model_file_path = '/'.join(zipped_model_file.split('/')[0:-1]) # set as base directory, or '' if already in working base direcotry
                     base_model_file_path = ''
 
-                    all_model_metadata = unzip_and_extract_model_metadata(zipped_model_file, base_model_file_path)
+                    all_model_metadata = unzip_and_extract_model_metadata(zipped_model_file, base_model_file_path, extracted_files_to_delete_later)                    
                     logging.debug(f'all_model_metadata: {all_model_metadata}')
                     
                     all_keys = list(all_model_metadata.keys())
@@ -76,6 +78,7 @@ def handler():
                             all_model_metadata[k_new] = all_model_metadata.pop(k)
                     
                     logging.debug(f'all_model_metadata replaced: {all_model_metadata}')
+
                     return jsonify({"deposit_id": did, "technical_metadata": all_model_metadata})
 
 
@@ -84,6 +87,7 @@ def handler():
                         filename_360_video = zip_ref.namelist()[0]
                         logging.debug(f'filename_360_video: {filename_360_video}')
                         zip_ref.extract(filename_360_video)
+                        extracted_files_to_delete_later.append(filename_360_video)
 
                     exiftool_dir = 'Image-ExifTool-11.65'   # Example: exiftool_dir = '/path/to/exiftool/toplevel/directory/Image-ExifTool-11.65'
 
@@ -111,11 +115,15 @@ def handler():
             logging.error(str(err))
             return jsonify({'err': str(err)})
 
-        # finally:
-        #     if os.path.exists(did):
-        #         os.remove(did)
-        #     if os.path.exists(filename_360_video):
-        #         os.remove(filename_360_video)
+        finally:
+            if os.path.exists(did):
+                os.remove(did)
+            if os.path.exists(fzip):
+                os.remove(fzip)
+            if len(extracted_files_to_delete_later) > 0:
+                for fdel in extracted_files_to_delete_later:
+                    if os.path.exists(fdel):
+                        os.remove(fzip)
 
 
 def get_mediainfo_metadata(media_file):
@@ -192,13 +200,14 @@ def get_360_metadata(mp4_file, path_to_exif_toolkit):
 
 
 
-def unzip_and_extract_model_metadata(model_zip_file, unzip_path):
+def unzip_and_extract_model_metadata(model_zip_file, unzip_path, extracted_files_list):
     """
     Function to unzip a 3D model file and extract all of the metadata for each of the unzipped files
     (including further zip files within the original zip file).
 
     :param model_zip_file: Path and filename of zipped model file from which to extract metadata.
     :param unzip_path: Current working path to which the zipped file should be unzipped.
+    :param extracted_files_list: List of files that have been extracted (and to delete later)
 
     :reutrn all_file_metadata: Dictionary of all files in uncompressed zip file, along with the metadata
                                associated with each file, including model-specific metadata if the file
@@ -220,6 +229,7 @@ def unzip_and_extract_model_metadata(model_zip_file, unzip_path):
         logging.debug(fn)
         fn_path = os.path.join(unzip_path, fn)
         logging.debug(fn_path)
+        extracted_files_list.append(fn_path)
 
         # Clear previous properties
         gltf_metadata = None
@@ -257,7 +267,7 @@ def unzip_and_extract_model_metadata(model_zip_file, unzip_path):
         # Now check if the file was a zipped file, and if so, recursively gather subzipped file metadata
         if file_metadata["ext"] == "zip":
             zipfile_root = '/'.join(file_metadata['file_tree_path'].split('/')[0:-1])
-            subzip_metadata = unzip_and_extract_model_metadata(fn_path, zipfile_root)
+            subzip_metadata = unzip_and_extract_model_metadata(fn_path, zipfile_root, extracted_files_list)
             for subzip_file in subzip_metadata:
                 logging.debug('subzip iteration')
                 all_file_metadata.update( {subzip_file : subzip_metadata[subzip_file]} )

@@ -8,7 +8,7 @@ import time
 import trimesh
 import numpy as np
 from flask import Flask, request, jsonify
-import pymediainfo
+# import pymediainfo
 from pymediainfo import MediaInfo as mi
 # https://pymediainfo.readthedocs.io/en/stable/
 
@@ -19,6 +19,8 @@ handles POST requests with media payload, responds with metadata.
 '''
 
 app = Flask(__name__)
+
+filename_360_video = ''
 
 # logging boilerplate
 service_name = str(os.path.basename(__file__))
@@ -49,9 +51,9 @@ def handler():
             did = data.get('deposit_id')
             media_type = data.get('media_type')
 
-            deposit_form_metadata = data.get('metadata')
+            # deposit_form_metadata = data.get('metadata')
 
-            logging.info(f"POST request for deposit_id: {did}, data: {deposit_form_metadata}")
+            logging.info(f"POST request for deposit_id: {did}, data: {data}")
 
             # unzip file payload
             file = request.files.get('file')
@@ -59,13 +61,21 @@ def handler():
                 fzip = did
                 file.save(fzip)
 
-                if media_type == 'model'
+                if media_type == 'model':
                     zipped_model_file = fzip   # Path to zipped model file from which to gather metadata
                     # base_model_file_path = '/'.join(zipped_model_file.split('/')[0:-1]) # set as base directory, or '' if already in working base direcotry
                     base_model_file_path = ''
 
                     all_model_metadata = unzip_and_extract_model_metadata(zipped_model_file, base_model_file_path)
-
+                    logging.debug(f'all_model_metadata: {all_model_metadata}')
+                    
+                    all_keys = list(all_model_metadata.keys())
+                    for k in all_keys:
+                        if '.' in k:
+                            k_new = k.replace('.', '_')
+                            all_model_metadata[k_new] = all_model_metadata.pop(k)
+                    
+                    logging.debug(f'all_model_metadata replaced: {all_model_metadata}')
                     return jsonify({"deposit_id": did, "technical_metadata": all_model_metadata})
 
 
@@ -101,11 +111,11 @@ def handler():
             logging.error(str(err))
             return jsonify({'err': str(err)})
 
-        finally:
-            if os.path.exists(did):
-                os.remove(did)
-            if os.path.exists(filename_360_video):
-                os.remove(filename_360_video)
+        # finally:
+        #     if os.path.exists(did):
+        #         os.remove(did)
+        #     if os.path.exists(filename_360_video):
+        #         os.remove(filename_360_video)
 
 
 def get_mediainfo_metadata(media_file):
@@ -195,10 +205,10 @@ def unzip_and_extract_model_metadata(model_zip_file, unzip_path):
                                is of a model type (e.g., gltf, glb, obj, stl).
     """
 
-    print("Exctracting file: ", model_zip_file)
+    logging.info(f'Exctracting file: {model_zip_file}')
     with zipfile.ZipFile(model_zip_file, 'r') as zip_ref:
         filename_list = zip_ref.namelist()
-        print("File list: ", filename_list)
+        logging.info(f'File list: {filename_list}')
         for fn in filename_list:
             zip_ref.extract(fn, path=unzip_path)
 
@@ -207,9 +217,9 @@ def unzip_and_extract_model_metadata(model_zip_file, unzip_path):
     all_file_metadata = {}
 
     for fn in filename_list:
-        print(fn)
+        logging.debug(fn)
         fn_path = os.path.join(unzip_path, fn)
-        print(fn_path)
+        logging.debug(fn_path)
 
         # Clear previous properties
         gltf_metadata = None
@@ -249,8 +259,10 @@ def unzip_and_extract_model_metadata(model_zip_file, unzip_path):
             zipfile_root = '/'.join(file_metadata['file_tree_path'].split('/')[0:-1])
             subzip_metadata = unzip_and_extract_model_metadata(fn_path, zipfile_root)
             for subzip_file in subzip_metadata:
+                logging.debug('subzip iteration')
                 all_file_metadata.update( {subzip_file : subzip_metadata[subzip_file]} )
 
+    logging.debug(f'all_file_metadata: {all_file_metadata}')
     return all_file_metadata
 
 
@@ -299,8 +311,8 @@ def get_3d_model_file_metadata(model_file):
                     file_info_dict.update({"ext":None})
 
         except Exception as emsg:
-            print("EXCEPTION:", str(emsg))
-            print("Problem getting file path, name, and extension.")
+            logging.error("EXCEPTION:", str(emsg))
+            # print("Problem getting file path, name, and extension.")
             file_info_dict.update({"file_tree_path":None})
             file_info_dict.update({"filename":None})
             file_info_dict.update({"ext":None})
@@ -308,7 +320,7 @@ def get_3d_model_file_metadata(model_file):
         return file_info_dict
 
     except Exception as emsg:
-        print("EXCEPTION:", str(emsg))
+        logging.error("EXCEPTION:", str(emsg))
         return None
 
 

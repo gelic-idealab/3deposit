@@ -1,44 +1,11 @@
 <template>
-  <card class="card" title="Deposit Action Form">
-    <div>
-      <form @submit.prevent>
-        <div class="row">
-          <div class="col-md-6">
-            <fg-input type="text"
-                      label="Action Name"
-                      placeholder="Paper dashboard"
-                      v-model="action_config.action">
-            </fg-input>
-          </div>
-          <div class="col-md-6">
-            <fg-input type="text"
-                      label="Media Type"
-                      placeholder="Media Type"
-                      v-model="action_config.media_type">
-            </fg-input>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-md-12">
-            <fg-input type="select"
-                      label="Service Name"
-                      placeholder="Service Name"
-                      v-model="action_config.service_name">
-            </fg-input>
-          </div>
-        </div>
-        <div class="text-center">
-          <p-button type="info"
-                    round
-                    @click.native.prevent="configureServiceForAction">
-            Update Action
-          </p-button>
-        </div>
-        <div class="clearfix"></div>
-      </form>
-    </div>
-  </card>
+  <div class="text-center">
+    <p-button type="info"
+              round
+              @click.native.prevent="configureServiceForAction">
+      Add Action
+    </p-button>
+  </div>
 </template>
 <script>
 import axios from 'axios'

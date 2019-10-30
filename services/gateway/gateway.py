@@ -62,7 +62,4 @@ async def init_app(argv=None):
     logging.basicConfig(level=logging.DEBUG, filename='./data/gateway.log')
     logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-
     return app
-    #
-

@@ -1,6 +1,6 @@
 import os
-import json
-import datetime
+# import json
+# import datetime
 import logging
 import aiopg.sa
 from security import generate_password_hash
@@ -10,11 +10,9 @@ from sqlalchemy import (
     and_
 )
 
-
 __all__ = ['forms', 'deposits', 'users', 'services', 'actions']
 
 meta = MetaData()
-
 deposits = Table(
     'deposits', meta,
 
@@ -158,8 +156,8 @@ async def get_users(conn):
         user_objects = []
         for u in user_list:
             u_obj = {}
-            for (i,k) in enumerate(column_keys):
-                u_obj.update(dict({k:u[i]}))
+            for (i, k) in enumerate(column_keys):
+                u_obj.update(dict({k: u[i]}))
             user_objects.append(u_obj)
         return user_objects
     else:
@@ -175,6 +173,7 @@ async def get_user_by_name(conn, username):
     user_record = await result.first()
     return user_record
 
+
 async def create_user(conn, username, password, email, role='user'):
     password_hash = generate_password_hash(password)
     result = await conn.execute(
@@ -184,6 +183,7 @@ async def create_user(conn, username, password, email, role='user'):
     )
     user = await result.first()
     return dict(user)
+
 
 async def delete_user(conn, username):
     result = await conn.execute(
@@ -243,8 +243,8 @@ async def get_services(conn):
         service_objects = []
         for s in service_list:
             s_obj = {}
-            for (i,k) in enumerate(column_keys):
-                s_obj.update(dict({k:s[i]}))
+            for (i, k) in enumerate(column_keys):
+                s_obj.update(dict({k: s[i]}))
             service_objects.append(s_obj)
         return service_objects
     else:
@@ -308,15 +308,16 @@ async def delete_action_service_name(conn, action, media_type, service_name):
         return None
 
 
-async def get_action_service_name(conn, action, media_type='default'):
-    logging.debug(msg='get_action_service_name called with: {}, {}'.format(action, media_type))
+async def get_action_service_name(conn, action, service_name, media_type='default'):
+    logging.debug(msg='get_action_service_name called with: {}, {}, {}'.format(action, media_type, service_name))
     result = await conn.execute(
         actions
         .select()
         .where(
             and_(
                 actions.c.action == action,
-                actions.c.media_type == media_type
+                actions.c.media_type == media_type,
+                actions.c.service_name == service_name
                 )
             )
         )
@@ -332,15 +333,15 @@ async def get_action_service_name(conn, action, media_type='default'):
 
 async def set_action_service_name(conn, action, media_type, service_name):
     logging.debug(msg='set_action_service_name called with: {}, {}: {}'.format(action, media_type, service_name))
-    current_service = await get_action_service_name(conn, action, media_type)
+    current_service = await get_action_service_name(conn, action, service_name, media_type)
     if current_service:
         await conn.execute(
             actions
             .update()
             .where(
                     and_(
-                    actions.c.action == action,
-                    actions.c.media_type == media_type
+                        actions.c.action == action,
+                        actions.c.media_type == media_type
                     )
                 )
             # .where(actions.c.media_type == media_type)
@@ -367,7 +368,7 @@ async def get_action_services(conn):
         service_objects = []
         for s in service_list:
             s_obj = {}
-            for (i,k) in enumerate(column_keys):
+            for (i, k) in enumerate(column_keys):
                 s_obj.update(dict({k:s[i]}))
             service_objects.append(s_obj)
         return service_objects

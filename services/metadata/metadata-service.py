@@ -159,7 +159,8 @@ def get_mediainfo_metadata(media_file):
 
         return md_dict
 
-    except:
+    except Exception as err:
+        logging.error(err)
         return None
 
 

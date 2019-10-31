@@ -109,7 +109,7 @@ def handler():
                     return jsonify({"deposit_id": did, "technical_metadata": metadata_dict})
 
                 elif media_type == 'vr':
-                    pass
+                    return jsonify({"deposit_id": did, 'technical_metadata': None})
 
 
         except Exception as err:

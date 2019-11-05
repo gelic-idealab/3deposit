@@ -118,11 +118,13 @@ def unzip_and_extract_vr_metadata(vr_zip_file, unzip_path, extracted_files_list)
             subdir_sum_size = 0
             for f in os.walk(fn):
                 num_sub_files += len(f[2])
-                # subdir_sum_size += sum(os.path.getsize(f_i) for f_i in f[2])
+                for fi in f[2]:
+                    fi_path = os.path.join(f[0],fi)
+                    subdir_sum_size += os.path.getsize(fi_path)
             print("NUMBER FILES:", num_sub_files)
-            # print("SUB-DIRECTORY SIZE:", subdir_sum_size)
+            print("SUB-DIRECTORY SIZE:", subdir_sum_size)
             main_sub_directories[fn].update( {"File count":num_sub_files} )
-            # main_sub_directories[fn].update( {"Directory size (bytes)":subdir_sum_size} )
+            main_sub_directories[fn].update( {"Directory size (bytes)":subdir_sum_size} )
 
 
     app_package_metadata.update( {"File count" : f_count} )
@@ -131,7 +133,10 @@ def unzip_and_extract_vr_metadata(vr_zip_file, unzip_path, extracted_files_list)
     app_package_metadata.update( {"Main sub-directories" : main_sub_directories} )
 
     pprint.pprint(app_package_metadata)
-    exit()
+    # exit()
+
+    if app_package_metadata is not None:
+        all_file_metadata.update( {"VR application package_metadata" : app_package_metadata} )
 
 
     for fn in filename_list:

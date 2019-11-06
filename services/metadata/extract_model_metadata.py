@@ -1,228 +1,60 @@
 import os
-import json
-import logging
-import shutil
-import zipfile
+from pymediainfo import MediaInfo as mi
 import subprocess
+import pprint
+import json
 import requests
+import logging
+import zipfile
 import time
 import trimesh
 import numpy as np
-from flask import Flask, request, jsonify
-# import pymediainfo
-from pymediainfo import MediaInfo as mi
-# https://pymediainfo.readthedocs.io/en/stable/
 
 
-'''
-Flask app that generates & harvests metadata from 3d media,
-handles POST requests with media payload, responds with metadata.
-'''
-
-app = Flask(__name__)
-
-filename_360_video = ''
-
-# logging boilerplate
-service_name = str(os.path.basename(__file__))
-logfile = 'service.log'
-logging.basicConfig(level=logging.DEBUG, filename=logfile)
-logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-logging.info(f'Starting {service_name}...')
-
-@app.route('/log', methods=['GET'])
-def log_handler():
-    try:
-        with open(logfile, 'r') as f:
-            resp = f.read()
-            return jsonify({'logfile': str(resp)})
-    except Exception as err:
-        return jsonify({'err': str(err)})
-
-
-@app.route('/', methods=['POST', 'GET'])
-def handler():
-
-    if request.method == 'POST':
-
-        try:
-            # unpack request data
-            data = json.loads(request.form.get('data'))
-            did = data.get('deposit_id')
-            media_type = data.get('media_type')
-
-            # deposit_form_metadata = data.get('metadata')
-
-            logging.info(f"POST request for deposit_id: {did}, data: {data}")
-
-            # unzip file payload
-            file = request.files.get('file')
-            if file and did:
-                fzip = did
-                file.save(fzip)
-
-                extracted_files_to_delete_later = []
-
-                if media_type == 'model':
-                    zipped_model_file = fzip   # Path to zipped model file from which to gather metadata
-                    # base_model_file_path = '/'.join(zipped_model_file.split('/')[0:-1]) # set as base directory, or '' if already in working base direcotry
-                    base_model_file_path = ''
-
-                    all_model_metadata = unzip_and_extract_model_metadata(zipped_model_file, base_model_file_path, extracted_files_to_delete_later)                    
-                    logging.debug(f'all_model_metadata: {all_model_metadata}')
-                    
-                    all_keys = list(all_model_metadata.keys())
-                    for k in all_keys:
-                        if '.' in k:
-                            k_new = k.replace('.', '_')
-                            all_model_metadata[k_new] = all_model_metadata.pop(k)
-                    
-                    logging.debug(f'all_model_metadata replaced: {all_model_metadata}')
-
-                    return jsonify({"deposit_id": did, "technical_metadata": all_model_metadata})
-
-
-                elif media_type == 'video':
-                    with zipfile.ZipFile(fzip, 'r') as zip_ref:
-                        filename_360_video = zip_ref.namelist()[0]
-                        logging.debug(f'filename_360_video: {filename_360_video}')
-                        zip_ref.extract(filename_360_video)
-                        extracted_files_to_delete_later.append(filename_360_video)
-
-                    exiftool_dir = 'Image-ExifTool-11.65'   # Example: exiftool_dir = '/path/to/exiftool/toplevel/directory/Image-ExifTool-11.65'
-
-                    mediainfo_metadata = get_mediainfo_metadata(filename_360_video)
-                    spherical_metadata = get_360_metadata(filename_360_video, exiftool_dir)
-
-                    metadata_dict = {}
-
-                    if mediainfo_metadata is not None:
-                        metadata_dict.update( mediainfo_metadata )
-
-                    if spherical_metadata is not None:
-                        metadata_dict.update( {len(metadata_dict) : spherical_metadata} ) # len(metadata_dict) determines the next key/index to use
-
-                    if mediainfo_metadata is None and spherical_metadata is None:
-                        return jsonify({"err": "No media metadata information was found for this file."})
-
-                    return jsonify({"deposit_id": did, "technical_metadata": metadata_dict})
-
-                elif media_type == 'vr':
-                    return jsonify({"deposit_id": did, 'technical_metadata': None})
-
-
-        except Exception as err:
-            logging.error(str(err))
-            return jsonify({'err': str(err)})
-
-        finally:
-            if os.path.exists(did):
-                os.remove(did)
-            if os.path.exists(fzip):
-                os.remove(fzip)
-            if len(extracted_files_to_delete_later) > 0:
-                for fdel in extracted_files_to_delete_later:
-                    if os.path.exists(fdel):
-                        if os.path.isdir(fdel):
-                            shutil.rmtree(fdel)
-                        else:
-                            os.remove(fdel)
-
-
-def get_mediainfo_metadata(media_file):
+def main():
     """
-    Function to extract the general video and audio metadata from a media file (e.g., MP4).
-    This function makes use of the MediaInfo library via the 'pymediainfo' Python package.
+    ## Still to do/test
+        # Set max allowable limit of number of unzip events to be 10 times (in case of a "compression bomb")
+        # Test different file types and animated models
 
-    # For Later:
-    May want to use "track_type, index" as keys later, since that would be useful to users
-    to see what type of track each index represents (e.g., "General 0," "Video 1," "Audio 2").
-        E.g.:   md_dict.update( { (temp_track_id, track.track_type) : d } )
+    ## DONE:
+        # If zip file contains more zip files, then unzip them as well (e.g., this is present in the animated zip)
+        # Add sub-directory searching (or see if it can already do that, depending on how the files are included in the filename_list;
+            # For example, if they're like "./dir1/dir2/filename.txt", then don't need to worry about it I think...)
+        # Add counts of vertices and triangles
+        # Determine if animated or not, then say Yes or No
+            # If so, then only get subset of mesh metadata from model file, to prevent stalling or overloading system
 
-
-    :param media_file: Path and filename of the media file (e.g., an MP4 file) from which
-                       to extract MediaInfo metadata.
-
-    :return md_dict: Dictionary of mediainfo metadata for the given media file, if existent.
-                     Otherwise, return None.
     """
 
-    try:
-        m = mi.parse(media_file)
+    zipped_model_file = './model_anim.zip'   # Path to zipped model file from which to gather metadata
+    base_model_file_path = '/'.join(zipped_model_file.split('/')[0:-1]) # set as base directory, or '' if already in working base direcotry
+    # print(zipped_model_file)
+    # print(base_model_file_path)
+    # unzip_counter = 0   # counter of number of times unzip occurs, to prevent problem in case of file with too many layers of compression
 
-        md_dict = {}
+    # all_model_metadata = unzip_and_extract_model_metadata('test_subdir_file_tree.zip')
+    # all_model_metadata = unzip_and_extract_model_metadata('test_subdir_subzip_file_tree.zip')
 
-        for (index, track) in enumerate(m.tracks):
-            d = track.to_data()
-            md_dict.update( { index : d } )
+    all_model_metadata = unzip_and_extract_model_metadata(zipped_model_file, base_model_file_path)
 
-        return md_dict
+    metadata_json = json.dumps(all_model_metadata)
+    pprint.pprint(json.loads(metadata_json))
 
-    except Exception as err:
-        logging.error(err)
-        return None
+    return all_model_metadata
 
 
-def get_360_metadata(mp4_file, path_to_exif_toolkit):
+def unzip_and_extract_model_metadata(model_zip_file, unzip_path):
     """
-    Function to gather 360 spherical metadata from an MP4 file. This function uses the ExifTool
-    kit/package created by Phil Harvey: https://www.sno.phy.queensu.ca/~phil/exiftool/
+    # Will this return any subdirectories and their contents, if present? --- YES!
+    # If so, will want to iterate over all of them and get the metadata for them -- DONE!
 
-    :param mp4_file: Path and filename of a 360 MP4 file from which to extract metadata.
-    :param path_to_exif_toolkit: Path to the ExifTool directory installed on your machine.
-                                 Should be named something like, "Image-ExifTool-11.65".
-
-    :return spherical_data_dict: Dictionary of sphereical metadata parameters and their values
-                                 for the given MP4 file, if existent. Otherwise, returns None.
     """
 
-    exiftool_exe = os.path.join(path_to_exif_toolkit, 'exiftool' )
-
-    get_360_info = subprocess.run( [exiftool_exe, "-a", "-u", "-g1", mp4_file], stdout=subprocess.PIPE)
-
-    output_360_info = str(get_360_info.stdout)
-
-    try:
-        spherical_start = output_360_info.find('XMP-GSpherical') + len('XMP-GSpherical ----')
-        spherical_end = output_360_info.find('----', spherical_start)
-        spherical_data_extract = output_360_info[spherical_start : spherical_end]
-        spherical_data = spherical_data_extract.split('\\n')
-        spherical_data_clean = [i.replace(' ','') for i in spherical_data[1:-1]]
-
-        spherical_data_dict = {}
-        for s in spherical_data_clean:
-            s_k = s.split(':')[0]
-            s_v = s.split(':')[1]
-            spherical_data_dict.update( {s_k : s_v} )
-
-        spherical_data_dict.update( {"track_type" : "XMP-GSpherical"} )
-
-        return spherical_data_dict
-
-    except:
-        return None
-
-
-
-def unzip_and_extract_model_metadata(model_zip_file, unzip_path, extracted_files_list):
-    """
-    Function to unzip a 3D model file and extract all of the metadata for each of the unzipped files
-    (including further zip files within the original zip file).
-
-    :param model_zip_file: Path and filename of zipped model file from which to extract metadata.
-    :param unzip_path: Current working path to which the zipped file should be unzipped.
-    :param extracted_files_list: List of files that have been extracted (and to delete later)
-
-    :reutrn all_file_metadata: Dictionary of all files in uncompressed zip file, along with the metadata
-                               associated with each file, including model-specific metadata if the file
-                               is of a model type (e.g., gltf, glb, obj, stl).
-    """
-
-    logging.info(f'Exctracting file: {model_zip_file}')
+    print("Exctracting file: ", model_zip_file)
     with zipfile.ZipFile(model_zip_file, 'r') as zip_ref:
         filename_list = zip_ref.namelist()
-        logging.info(f'File list: {filename_list}')
+        print("File list: ", filename_list)
         for fn in filename_list:
             zip_ref.extract(fn, path=unzip_path)
 
@@ -231,10 +63,9 @@ def unzip_and_extract_model_metadata(model_zip_file, unzip_path, extracted_files
     all_file_metadata = {}
 
     for fn in filename_list:
-        logging.debug(fn)
+        print(fn)
         fn_path = os.path.join(unzip_path, fn)
-        logging.debug(fn_path)
-        extracted_files_list.append(fn_path)
+        print(fn_path)
 
         # Clear previous properties
         gltf_metadata = None
@@ -272,23 +103,24 @@ def unzip_and_extract_model_metadata(model_zip_file, unzip_path, extracted_files
         # Now check if the file was a zipped file, and if so, recursively gather subzipped file metadata
         if file_metadata["ext"] == "zip":
             zipfile_root = '/'.join(file_metadata['file_tree_path'].split('/')[0:-1])
-            subzip_metadata = unzip_and_extract_model_metadata(fn_path, zipfile_root, extracted_files_list)
+            subzip_metadata = unzip_and_extract_model_metadata(fn_path, zipfile_root)
             for subzip_file in subzip_metadata:
-                logging.debug('subzip iteration')
                 all_file_metadata.update( {subzip_file : subzip_metadata[subzip_file]} )
 
-    logging.debug(f'all_file_metadata: {all_file_metadata}')
+    # metadata_json = json.dumps(all_file_metadata)
+    # pprint.pprint(json.loads(metadata_json))
+
     return all_file_metadata
 
 
 def get_3d_model_file_metadata(model_file):
     """
     Function to extract the general file metadata from a model file (e.g., size, date modified, etc.).
-    Note that this does not even need to actually be a "model" file. It can be any file (or directory).
 
-    :param model_file: Path and filename of the file from which to extract generic metadata.
+    :param model_file: Path and filename of the model file (e.g., an OBJ or GLB file) from which
+                       to extract metadata.
 
-    :return file_info_dict: Dictionary of file metadata for the given file; otherwise, return None.
+    :return file_info_dict: Dictionary of file metadata for the given media file; otherwise, return None.
     """
 
     try:
@@ -326,8 +158,8 @@ def get_3d_model_file_metadata(model_file):
                     file_info_dict.update({"ext":None})
 
         except Exception as emsg:
-            logging.error("EXCEPTION:", str(emsg))
-            # print("Problem getting file path, name, and extension.")
+            print("EXCEPTION:", str(emsg))
+            print("Problem getting file path, name, and extension.")
             file_info_dict.update({"file_tree_path":None})
             file_info_dict.update({"filename":None})
             file_info_dict.update({"ext":None})
@@ -335,19 +167,14 @@ def get_3d_model_file_metadata(model_file):
         return file_info_dict
 
     except Exception as emsg:
-        logging.error("EXCEPTION:", str(emsg))
+        print("EXCEPTION:", str(emsg))
         return None
 
 
 def get_3d_model_gltf_metadata(gltf_file, file_info_dict):
     """
-    Function to get the GLTF/GLB-related metadata from a GLTF or GLB file. In a GLTF file,
-    this is the data contained within the GLTF file itself. In the case of a GLB file, this
-    is the header information from the file (which, by no coincidence, is essentially the
-    same as the data in its corresponding GLTF file.)
 
     :param gltf_file: Path and filename of a 3D model in GLTF from which to extract metadata.
-    :param file_info_dict: Dictionary of generic file metadata for the file.
 
     :return gltf_data_dict: Dictionary of GLTF metadata parameters and their values
                             for the given file, if existent. Otherwise, returns None.
@@ -440,12 +267,6 @@ def get_3d_model_mesh_metadata(mesh_file, file_info_dict, is_animimated):
                [-5.37003582e-07,  1.21990603e-04,  4.54513592e-06],
                [ 8.76083403e-08,  4.54513592e-06,  1.48334150e-04]])
 
-
-    :param mesh_file: 3D object file from which to extract metadata.
-    :param file_info_dict: Dictionary of generic file metadata for the file.
-    :param is_animimated: Boolean indicating if the model file is animated or not.
-
-    :return mesh_data_dict: Dictionary containing all of the mesh-related metadata for the file.
     """
 
     try:
@@ -525,5 +346,5 @@ def get_3d_model_mesh_metadata(mesh_file, file_info_dict, is_animimated):
     return mesh_data_dict
 
 
-if __name__ == '__main__':
-    app.run()
+if __name__ == "__main__":
+	main()

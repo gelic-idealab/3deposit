@@ -189,6 +189,8 @@ services:
     labels:
       - "traefik.enable=false"
     restart: always
+    volumes:
+      - ./services/metadata:/app
 
 
 networks:

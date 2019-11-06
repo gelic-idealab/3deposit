@@ -212,19 +212,18 @@ async def trigger_metadata(data):
     data.update({'deposit_date': deposit_date})
     data.update(deposit_id)
     data.update(deposit_metadata)
-    data.update({'media_type': media_type})
 
     fd = FormData()
     fd.add_field('data', json.dumps(data), content_type='application/json')
     with open(TMP_FILE_LOCATION + did, 'rb') as f:
         fd.add_field('file', f, filename=did, content_type='application/octet-stream')
-        async with new_request(method='POST', url='http://metadata-service:5000/', data=fd) as resp:
-            resp_json = await resp.json()
-            technical_metadata = resp_json.get('technical_metadata')
+        if media_type == 'video':
+            async with new_request(method='POST', url='http://metadata-service:5000/', data=fd) as resp:
+                resp_json = await resp.json()
+                technical_metadata = resp_json.get('video_metadata')
 
-        if technical_metadata:
-            logging.debug(f'technical_metadata: {technical_metadata}')
-            data.update({'technical_metadata': technical_metadata})
+            if technical_metadata:
+                data.update({'technical_metadata': technical_metadata})
 
     fd = FormData()
     fd.add_field('data', json.dumps(data), content_type='application/json')

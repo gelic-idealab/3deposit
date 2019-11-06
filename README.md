@@ -1,6 +1,6 @@
 ![GitHub release](https://img.shields.io/github/release-pre/Grainger-Engineering-Library/3deposit) ![License](https://img.shields.io/badge/license-NCSA-green)
 
-3deposit is a 3D-content storage, publication, and management platform for academic libraries. Key features include a customizable deposit form, automated deposit metadata harvesting, batch deposits, configurable publication endpoints, file integrity checking, and a content 'gallery builder'. 3deposit aims to be extensible, portable, & compatible with existing content preservation systems. Ongoing support and features are planned, including federated content sharing between deployed instances. 
+3deposit is a 3D-content storage, publication, distribution, & management platform for academic libraries. Key features include a customizable deposit form, automated deposit metadata harvesting, batch deposits, configurable publication endpoints, file integrity checking, and a content 'gallery builder'. 3deposit aims to be extensible, portable, & compatible with existing content preservation systems. Ongoing support and features are planned, including federated content sharing between deployed instances. 
 
 ![gallery-builder](./docs/gallery-builder.png)
 

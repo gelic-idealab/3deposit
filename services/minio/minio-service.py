@@ -180,8 +180,7 @@ def create_app():
 
                 # extract bucket_name value
                 bucket_name = config.get('bucket_name')
-                if not minioClient.bucket_exists(bucket_name):
-                    minioClient.make_bucket(bucket_name)
+                minioClient.bucket_exists(bucket_name)
 
                 metadata = {}
                 metadata['BUCKET_NAME'] = bucket_name
@@ -189,7 +188,12 @@ def create_app():
                 r = minioClient.fput_object(bucket_name, object_name=deposit_id, file_path=deposit_id, metadata=metadata)
                 # cleanup temp file
                 logging.debug(msg='fput_object op returned: {}'.format(str(r)))
-
+                # try:
+                #     minioClient.get_object(bucket_name, deposit_id)
+                # except ResponseError as err:
+                #     return jsonify({"err": "This deposit_id is already registered. Please enter a new deposit_id.",
+                #                     "log": str(err)})
+                
                 return jsonify({"etag": r, "deposit_id": deposit_id, "metadata": metadata})
 
             except (NoSuchBucket, InvalidBucketError) as err:  # Handle bucket_name related errors
@@ -267,19 +271,63 @@ def create_app():
         # Get metadata of all or a list of objects in a specific bucket
 
         if request.method == 'GET':
-            logging.info(f'/bucket GET: {request.form}')
+            # get keys from request args
+
+            if minio_keys(request):
+                auth = minio_keys(request)
+                if "err" in auth:
+                    return jsonify(auth)
+            else:
+                return jsonify({"err": "No authentication keys provided."})
 
             try:
+                # select endpoint
                 minioClient = create_client(request)
 
                 if type(minioClient) == dict and 'err' in minioClient:
                     return jsonify(minioClient)
 
+                # deposit_id_list = []
+                # obj_names = []
+                # missing_ids = []
+                # objects_list = []
+
                 config = json.loads(request.form.get('config'))
                 bucket_name = config.get('bucket_name')
+                # deposit_id_list = config.get('deposit_id_list')
 
                 objects = minioClient.list_objects(bucket_name, recursive=True)
 
+                # if deposit_id_list:
+                #     objects_stats = {}
+                #     bucket_total = bucket_size = bucket_max = 0
+                #     for obj in objects:
+                #         if obj.object_name not in deposit_id_list:
+                #             continue
+                #         ret_object = {"metadata": str(obj.metadata),
+                #                       "deposit_id": str(obj.object_name),
+                #                       "modified": str(obj.last_modified),
+                #                       "etag": str(obj.etag),
+                #                       "size": str(obj.size),
+                #                       "content_type": str(obj.content_type)}
+                #         objects_list.append(ret_object)
+                #         bucket_total += 1
+                #         bucket_size += obj.size
+                #         if bucket_max < obj.size:
+                #             bucket_max = obj.size
+
+                #         obj_names.append(str(obj.object_name))
+                #     objects_stats.update({
+                #         'bucket_total': bucket_total,
+                #         'bucket_size': bucket_size,
+                #         'bucket_max': bucket_max
+                #     })
+
+                #     for i, d in enumerate(deposit_id_list):
+                #         if d not in obj_names:
+                #             missing_ids.append(d)
+
+                # else:
                 num_files = 0 
                 bucket_size = 0
                 largest_file_size = 0
@@ -291,8 +339,16 @@ def create_app():
                 return jsonify({
                     'bucket_size': bucket_size,
                     'num_files': num_files,
-                    'largest_file': largest_file_size
-                    })
+                    'largest_file': largest_file_size})
+                        # ret_object = {"metadata": str(obj.metadata),
+                        #               "deposit_id": str(obj.object_name),
+                        #               "modified": str(obj.last_modified),
+                        #               "etag": str(obj.etag),
+                        #               "size": str(obj.size),
+                        #               "content_type": str(obj.content_type)}
+                        # objects_list.append(ret_object)
+
+                # return jsonify({"objects": objects_list, "object_stats": objects_stats, "missing deposit ids": missing_ids})
 
             except NoSuchBucket as err:  # Handle bucket_name related errors
                 return jsonify({"err": "Bucket does not exist.",

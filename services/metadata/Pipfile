@@ -10,8 +10,6 @@ pymediainfo = "*"
 flask = "*"
 requests = "*"
 gunicorn = "*"
-trimesh = "*"
-pillow = "*"
 
 [requires]
 python_version = "3.7"

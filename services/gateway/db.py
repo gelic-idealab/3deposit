@@ -308,8 +308,8 @@ async def delete_action_service_name(conn, action, media_type, service_name):
         return None
 
 
-async def get_action_service_name(conn, action, service_name, media_type='default'):
-    logging.debug(msg='get_action_service_name called with: {}, {}, {}'.format(action, media_type, service_name))
+async def get_action_service_name(conn, action, media_type='default'):
+    logging.debug(msg='get_action_service_name called with: {}, {}'.format(action, media_type))
     result = await conn.execute(
         actions
         .select()
@@ -317,7 +317,6 @@ async def get_action_service_name(conn, action, service_name, media_type='defaul
             and_(
                 actions.c.action == action,
                 actions.c.media_type == media_type,
-                actions.c.service_name == service_name
                 )
             )
         )

@@ -408,20 +408,20 @@ Endpoints are scoped for objects and buckets
 
 
 async def store_buckets(request):
-    username = await authorized_userid(request)
-    async with request.app['db'].acquire() as conn:
-        if not username:
-            raise web.HTTPUnauthorized()
-        # current_user = dict(await db.get_user_by_name(conn, username))
-        # if current_user.get('role') != 'admin':
-        #     raise web.HTTPUnauthorized()
-    PATH = '/bucket'
-    async with request.app['db'].acquire() as conn:
-        service_config = await get_service_config_by_action(conn=conn, action='store', media_type='default')
-    config = service_config.get('config')
-    endpoint = service_config.get('endpoint')
-    if request.method == 'GET':
-        try:
+    try:
+        username = await authorized_userid(request)
+        async with request.app['db'].acquire() as conn:
+            if not username:
+                raise web.HTTPUnauthorized()
+            # current_user = dict(await db.get_user_by_name(conn, username))
+            # if current_user.get('role') != 'admin':
+            #     raise web.HTTPUnauthorized()
+        PATH = '/bucket'
+        async with request.app['db'].acquire() as conn:
+            service_config = await get_service_config_by_action(conn=conn, action='store', media_type='default')
+        config = service_config.get('config')
+        endpoint = service_config.get('endpoint')
+        if request.method == 'GET':
             data = request.query
             config.update({'bucket_name': data.get('bucket_name')})
             fd = FormData()
@@ -432,11 +432,9 @@ async def store_buckets(request):
                     return web.json_response(resp_json)
                 except Exception as err:
                     return web.json_response({'err': str(err), 'resp': await resp.text()})
-        except Exception as err:
-            return web.json_response({'origin': 'gateway', 'err': str(err)})
 
-    if request.method == 'POST':
-        try:
+
+        if request.method == 'POST':
             data = await request.json()
             fd = FormData()
             fd.add_field('config', json.dumps(config), content_type='application/json')
@@ -445,8 +443,10 @@ async def store_buckets(request):
             async with new_request(method='POST', url=endpoint+PATH, data=fd) as resp:
                 resp_json = await resp.json()
                 return web.json_response({'resp': resp_json})
-        except Exception as err:
-            return web.json_response({'origin': 'gateway', 'err': str(err)})
+            
+    except Exception as err:
+        logging.error(f'store_buckets error: {str(err)}')
+        return web.json_response({'err': str(err)})
 
 
 async def store_objects(request):

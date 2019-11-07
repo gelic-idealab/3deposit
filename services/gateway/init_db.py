@@ -8,6 +8,8 @@ from sqlalchemy import create_engine, MetaData
 from db import forms, deposits, users, services, actions
 from security import generate_password_hash
 
+time.sleep(5)
+
 
 ### Create user_engine from keys.env values
 user_username = os.environ.get('POSTGRES_USER')

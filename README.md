@@ -65,3 +65,5 @@ _____
 * School of Information Sciences
 * College of Engineering
 * Carle Illinois College of Medicine
+
+3deposit gratefully uses the [fine software of Phil Harvey](https://www.sno.phy.queensu.ca/~phil/exiftool/) as well as the [MediaInfo](https://mediaarea.net/en/MediaInfo) library, Copyright (c) 2002-2019 MediaArea.net SARL, for 360 video metadata extraction.

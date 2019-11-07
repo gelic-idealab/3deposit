@@ -3,6 +3,7 @@ from views import (
     login,
     logout,
     signup,
+    success,
     current_user,
     users,
     deposit_form,
@@ -51,6 +52,7 @@ def setup_routes(app):
     app.router.add_post('/api/form', deposit_form)
     app.router.add_view('/api/form/upload', deposit_upload)
     app.router.add_view('/api/form/submit', deposit_submit)
+    app.router.add_view('/api/form/success', success, name='success')
 
     # storage routes
     app.router.add_get('/api/store/buckets', store_buckets)

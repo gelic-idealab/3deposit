@@ -104,6 +104,10 @@ async def signup(request):
     return {'token': token}
 
 
+@aiohttp_jinja2.template('success.html')
+async def success(request):
+    return {}
+
 
 async def current_user(request):
     username = await authorized_userid(request)
@@ -392,7 +396,7 @@ async def deposit_submit(request):
             data.update(deposit_date)
             deposit_processed = create_task(start_deposit_processing_task(data))
             if deposit_processed:
-                return web.Response(status=200, headers=headers)
+                return web.json_response({'success': True})
             else:
                 return web.Response(status=418, headers=headers)
         except Exception as err:

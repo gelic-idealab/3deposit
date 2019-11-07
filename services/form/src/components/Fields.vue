@@ -136,8 +136,8 @@ export default {
           config: { headers: {'Content-Type': 'application/json' }}
           })
         .then(function(response) {
-          if (response.status === 200) {
-            window.location.href = "/";
+          if (response.data.success === true) {
+            window.location.href = "/api/form/success";
           } else {
             (console.log(response));
           }

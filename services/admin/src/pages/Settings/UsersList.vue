@@ -30,7 +30,7 @@
               <p-button @click.native="editUser(user.username)" type="primary" outline icon>
                 <i class="fa fa-edit"></i>
               </p-button>
-              <p-button @click.native="deleteUser(user.username)" type="danger" outline icon>
+              <p-button @click.native="deleteUser(user.username)" type="danger" outline icon v-if="user.username != current_user.username">
                 <i class="fa fa-trash"></i>
               </p-button>
             </div>
@@ -50,7 +50,10 @@ export default {
       title: "Users",
       users: [],
       default_user_img: require("@/assets/img/faces/face-1.jpg")
-    };
+    }
+  },
+  props: {
+    current_user: Object
   },
   methods: {
     getStatusClass(role) {

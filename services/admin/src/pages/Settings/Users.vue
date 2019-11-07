@@ -1,6 +1,6 @@
 <template>
     <div>
-        <users-list></users-list>
+        <users-list :current_user="current_user"></users-list>
     </div>
 </template>
 
@@ -10,6 +10,9 @@ import UsersList from "./UsersList.vue";
 export default {
     components: {
         UsersList
+    },
+    props: {
+        current_user: Object
     }
     
 }

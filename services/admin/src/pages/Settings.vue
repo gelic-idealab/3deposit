@@ -1,6 +1,6 @@
 <template>
     <div>
-        {{ current_user }}
+        {{ current_user.role }}
     </div>
 </template>
 

@@ -35,6 +35,20 @@ def create_app():
 
     logging.info(f'Starting {service_name}...')
 
+    @app.route('/', methods=['GET'])
+    def get_stats():
+        client = create_client(request)
+        database = client[DATABASE_NAME]
+        collection = database[COLLECTION_NAME]
+        docs = collection.find(projection={'_id': False})
+        doc_list = []
+
+        for doc in docs:
+            doc_list.append(doc)
+
+        return jsonify({"stats": doc_list})
+
+
     @app.route('/log', methods=['GET'])
     def log_handler():
         try:

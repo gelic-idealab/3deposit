@@ -701,3 +701,19 @@ async def service_logs(request):
         except Exception as err:
             logging.error(f'service_logs err: {str(err)}')
             return web.json_response({'err': str(err)})
+
+
+async def mongo(request):
+    username = await authorized_userid(request)
+    if not username:
+        raise web.HTTPUnauthorized()
+
+    if request.method == 'GET':
+        try:
+            async with new_request(method='GET', url='http://mongo-service:5000/') as resp:
+                resp_json = await resp.json()
+                return web.json_response(resp_json)
+
+        except Exception as err:
+            return web.json_response({'err': str(err)})
+

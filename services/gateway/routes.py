@@ -19,7 +19,8 @@ from views import (
     metadata,
     metadata_keys,
     gallery,
-    service_logs
+    service_logs,
+    mongo
 )
 
 
@@ -75,5 +76,8 @@ def setup_routes(app):
 
     # gallery routes
     app.router.add_get('/api/gallery', gallery)
+
+    # mongo routs
+    app.router.add_get('/api/mongo', mongo)
 
 

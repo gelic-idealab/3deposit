@@ -22,7 +22,7 @@
     <!--Charts-->
     <div class="row">
 
-      <div class="col-12" v-if="usersChart.data.series.length > 0">
+      <div class="col-md-6" v-if="usersChart.data.series.length > 0">
         <chart-card title="Users behavior"
                     sub-title="Distribution by media type per day"
                     :chart-data="usersChart.data"
@@ -36,7 +36,7 @@
         </chart-card>
       </div>
 
-      <div class="col-md-6 col-12" v-if="depositsPieChart.data.series.length > 0">
+      <div class="col-md-6" v-if="depositsPieChart.data.series.length > 0">
         <chart-card title="Deposits"
                     sub-title="Distribution by Media Type"
                     :chart-data="depositsPieChart.data"
@@ -49,7 +49,7 @@
         </chart-card>
       </div>
 
-      <div class="col-md-6 col-12">
+      <!-- <div class="col-md-6 col-12">
         <chart-card title="2015 Sales"
                     sub-title="All products including Taxes"
                     :chart-data="activityChart.data"
@@ -62,7 +62,7 @@
             <i class="fa fa-circle text-warning"></i> BMW 5 Series
           </div>
         </chart-card>
-      </div>
+      </div> -->
 
     </div>
 

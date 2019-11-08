@@ -81,7 +81,7 @@ services:
         - /var/run/docker.sock:/var/run/docker.sock
         - ./traefik.toml:/traefik.toml
         # map host cert to container
-        - /etc/pki/tls/:/etc/traefik/tls/
+        # - /etc/pki/tls/:/etc/traefik/tls/
       networks:
         - proxy
       restart: always

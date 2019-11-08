@@ -1,6 +1,6 @@
 <template>
   <div align="center">
-      <b-form-file
+      <b-form-file v-if="file === 0"
         class="mb-3"
         v-model="file"
         id="add-file"
@@ -85,13 +85,17 @@ import Resumable from 'resumablejs'
 export default {
   data(){
     return {
+      blobSlice: null,
       file: 0,
+      fileReader: null,
+      spark: null,
       hashing: false,
       hashed: false,
       paused: false,
       uploadPercentage: 0,
       chunkSize: 10*1024*1024, // 10MB
       maxFileSize: 1000*10*1024*1024, // 10GB
+      chunks: 0,
       currentChunk: 1,
       checksums: [],
       r: {}
@@ -108,89 +112,90 @@ export default {
       console.log('uploading...')
     },
     cancelUpload() {
-      this.r.cancel();
       this.file = 0;
       this.checksums = [];
+      this.currentChunk = 1;
+      this.chunks = 0;
       this.uploadPercentage = 0;
       this.hashed = false;
       this.hashing = false;
+      this.r.cancel();
       axios.delete('../api/form/upload', {
         params: {
           deposit_id: this.id
           }
+      })
+      .then( () => {
+        this.initR();
       });
+    },
+    loadNext() {
+      var start = (this.currentChunk-1) * this.chunkSize,
+          end = ((start + this.chunkSize) >= this.file.size) ? this.file.size : start + this.chunkSize;
+      console.log('start', start, 'end', end)
+      this.fileReader.readAsArrayBuffer(this.blobSlice.call(this.file, start, end));  
     },
     hashFile() {
       if (this.file) {
         var self = this;
-        var blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice,
-          file = self.file,
-          hashing = self.hashing = true,
-          hashed = self.hashed,
-          chunkSize = self.chunkSize,
-          chunks = self.chunks = Math.ceil(this.file.size / this.chunkSize),
-          currentChunk = self.currentChunk,
-          checksums = self.checksums,
-          spark = new SparkMD5.ArrayBuffer(),
-          fileReader = new FileReader();
+        self.fileReader = new FileReader();
+        self.spark = new SparkMD5.ArrayBuffer();
+        self.hashing = true;
+        self.chunks = Math.ceil(self.file.size / self.chunkSize);
 
-        fileReader.onload = function (e) {
-          spark.append(e.target.result);                   // Append array buffer
-          var hash = spark.end();
-          checksums.push(hash);
-          spark.reset();
-          console.info('computed hash for chunk', currentChunk, 'of', chunks, hash);
-          currentChunk++;
+        self.fileReader.onload = function (e) {
+          console.log(self)
+          self.spark.append(self.fileReader.result); // Append array buffer
+          var hash = self.spark.end();
+          self.checksums.push(hash);
+          self.spark.reset();
+          console.info('computed hash for chunk', self.currentChunk, 'of', self.chunks, hash);
+          self.currentChunk++;
 
-          if (currentChunk <= chunks) {
+          if (self.currentChunk <= self.chunks) {
             console.log('loading next chunk')
-            loadNext();
+            self.loadNext();
           } else {
             self.hashed = true;
             console.log('finished hashing');
           }
         };
 
-        fileReader.onerror = function () {
+        this.fileReader.onerror = function () {
           console.warn('oops, something went wrong.');
         };
-
-        function loadNext() {
-          var start = (currentChunk-1) * chunkSize,
-              end = ((start + chunkSize) >= file.size) ? file.size : start + chunkSize;
-          
-          console.log('start', start, 'end', end)
-
-          fileReader.readAsArrayBuffer(blobSlice.call(file, start, end));
-        }
-        loadNext();
+        this.loadNext();
       }
     },
     handleFileAdd() {
       console.log('file added, hashing...')
       this.hashFile();
-    }
-  },
-  mounted() {
-    let comp = this;
-    let r = new Resumable({ 
-            target:'../api/form/upload',
-            fileType: ['zip'],
-            chunkSize: comp.chunkSize,
-            maxFileSize: comp.maxFileSize,
-            // xhrTimeout: 10000,
-            testChunks: false,
-            forceChunkSize: true,
-            query: {
-              deposit_id: this.id,
-              checksums: comp.checksums
-            }
-            });
+    },
+    initR() {
+      let comp = this;
+      let r = new Resumable({ 
+        target:'../api/form/upload',
+        fileType: ['zip'],
+        chunkSize: comp.chunkSize,
+        maxFileSize: comp.maxFileSize,
+        // xhrTimeout: 10000,
+        testChunks: false,
+        forceChunkSize: true,
+        query: {
+          deposit_id: this.id,
+          checksums: comp.checksums
+        }
+      });
     r.assignBrowse(document.getElementById('add-file'));
     r.on('progress', function () {
       comp.uploadPercentage = r.progress()*100
     });
     comp.r = r;
+    }
+  },
+  mounted() {
+    this.blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice;
+    this.initR();
   },
   props: {
     id: String

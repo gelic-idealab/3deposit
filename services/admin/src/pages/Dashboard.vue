@@ -38,15 +38,15 @@
         </chart-card>
       </div>
 
-      <div class="col-md-6 col-12">
+      <div class="col-md-6 col-12" v-if="depositsPieChart.data.series.length > 0">
         <chart-card title="Deposits"
                     sub-title="Distribution by Media Type"
-                    :chart-data="preferencesChart.data"
+                    :chart-data="depositsPieChart.data"
                     chart-type="Pie">
           <span slot="footer" >
             <i class="ti-timer"></i> Updated now</span>
-          <div slot="legend" v-for="(label, index) in preferencesChart.data.labels" :key="label">
-            <i class="fa fa-circle" :class="`text-${preferencesChart.data.colors[index]}`"></i> {{label}}
+          <div slot="legend" v-for="(label, index) in depositsPieChart.data.labels" :key="label">
+            <i class="fa fa-circle" :class="`text-${depositsPieChart.data.colors[index]}`"></i> {{label}}
           </div>
         </chart-card>
       </div>
@@ -102,7 +102,6 @@ export default {
           media_types.set(mt,1)
         }
       }
-      console.log(media_types)
       var color = ['#EF5350', '#00BCD4', '#FFC107']
       var counter = 0;
       var keys = [];
@@ -216,20 +215,12 @@ export default {
           height: "245px"
         }
       },
-      preferencesChart: {
+      depositsPieChart: {
         data: {
           labels: [],
           series: [],
           colors: []
         },
-        // {
-        //   labels:
-        //   value:
-        //   color:
-        // }
-        // labels: ["62%", "32%", "6%"],
-        //  series: [62, 32, 6]
-
         options: {}
       },
       mongo_data: {}
@@ -244,12 +235,11 @@ export default {
     });
     axios.get('../api/mongo')
     .then(response => {
-      console.log(this)
       this.mongo_data = response.data.stats
-      var result_list = this.fetchCountByMediaTypes(response.data.stats)
-      this.preferencesChart.data.labels = result_list[0]
-      this.preferencesChart.data.series = result_list[1]
-      this.preferencesChart.data.colors = ['info', 'warning', 'danger']
+      var result_list = this.fetchCountByMediaTypes(this.mongo_data)
+      this.depositsPieChart.data.labels = result_list[0]
+      this.depositsPieChart.data.series = result_list[1]
+      this.depositsPieChart.data.colors = ['info', 'warning', 'danger']
     });
   }
 };

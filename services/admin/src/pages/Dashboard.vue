@@ -10,7 +10,7 @@
           </div>
           <div class="numbers" slot="content">
             <p>{{stats.title}}</p>
-            <p>{{stats.value}}</p>
+            {{stats.value}}
           </div>
           <div class="stats" slot="footer">
             <i :class="stats.footerIcon"></i> {{stats.footerText}}
@@ -39,13 +39,13 @@
       </div>
 
       <div class="col-md-6 col-12">
-        <chart-card title="Email Statistics"
+        <chart-card title="Deposits"
                     sub-title="Distribution by Media Type"
                     :chart-data="preferencesChart.data"
                     chart-type="Pie">
           <span slot="footer" >
             <i class="ti-timer"></i> Updated now</span>
-          <div slot="legend" v-for="(label, index) in preferencesChart.data.labels">
+          <div slot="legend" v-for="(label, index) in preferencesChart.data.labels" :key="label">
             <i class="fa fa-circle" :class="`text-${preferencesChart.data.colors[index]}`"></i> {{label}}
           </div>
         </chart-card>

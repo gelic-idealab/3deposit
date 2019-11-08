@@ -22,7 +22,7 @@
     <!--Charts-->
     <div class="row">
 
-      <div class="col-12">
+      <div class="col-12" v-if="usersChart.data.series.length > 0">
         <chart-card title="Users behavior"
                     sub-title="Distribution by media type per day"
                     :chart-data="usersChart.data"
@@ -109,10 +109,14 @@ export default {
       return [keys, values]
     },
     fetchCountByMediaTypesGroupByDay(list_of_deposits) {
-      var count_by_date = new Map()
+      var count_by_date = new Map();
+      var legends = [];
       for (var i = 0; i < list_of_deposits.length; i++) {
         var mt = list_of_deposits[i]['deposit_metadata']['media_type']
         var cd = list_of_deposits[i]['deposit_metadata']['create_date']
+        if(!legends.includes(mt)) {
+          legends.push(mt);
+        }
         if (count_by_date.has(cd)) {
           var media_types = count_by_date.get(cd)
           if(media_types.has(mt)) {
@@ -130,23 +134,34 @@ export default {
       }
       var keys = [];
       var values = [];
-      var legends = [];
+      count_by_date = new Map([...count_by_date.entries()].sort());
       for(const [key, value] of count_by_date.entries()) {
         keys.push(key);
-        var media_types = value
-        for(const [key2, value2] of media_types.entries()) {
-          if (!(legends.includes(key2))) {
-            legends.push(key2)
+        for(var i=0; i<legends.length; i++) {
+          var value_to_be_pushed = 0;
+          if(value.has(legends[i])) {
+            value_to_be_pushed = value.get(legends[i]);
           }
-          var index = legends.indexOf(key2)
-          if(index>=values.length) {
-            values.push([value2])
+          if(i>=values.length) {
+            values.push([value_to_be_pushed])
           }
           else {
-            values[index].push(value2)
+            values[i].push(value_to_be_pushed)
           }
         }
+
+
+        // for(const [key2, value2] of media_types.entries()) {
+        //   var index = legends.indexOf(key2)
+        //   if(index>=values.length) {
+        //     values.push([value2])
+        //   }
+        //   else {
+        //     values[index].push(value2)
+        //   }
+        // }
       }
+      console.log(keys, values, legends)
       return [keys, values, legends]
     }
 
@@ -192,21 +207,9 @@ export default {
       ],
       usersChart: {
         data: {
-          // labels: [
-          //   "9:00AM",
-          //   "12:00AM",
-          //   "3:00PM",
-          //   "6:00PM",
-          //   "9:00PM",
-          //   "12:00PM",
-          //   "3:00AM",
-          //   "6:00AM"
-          // ],
-          // series: [
-          //   [287, 385, 490, 562, 594, 626, 698, 895, 952],
-          //   [67, 152, 193, 240, 387, 435, 535, 642, 744],
-          //   [23, 113, 67, 108, 190, 239, 307, 410, 410]
-          // ]
+          labels: [],
+          series: [],
+          colors: []
         },
         options: {
           low: 0,
@@ -220,7 +223,9 @@ export default {
             divisor: 3
           }),
           showLine: true,
-          showPoint: false
+          showPoint: false,
+          scaleMinSpace: 1,
+          onlyInteger: true
         }
       },
       activityChart: {

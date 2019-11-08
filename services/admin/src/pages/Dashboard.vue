@@ -22,18 +22,16 @@
     <!--Charts-->
     <div class="row">
 
-      <div class="col-12">
+      <div class="col-12" v-if="usersChart.data.series.length > 0">
         <chart-card title="Users behavior"
-                    sub-title="24 Hours performance"
+                    sub-title="Distribution by media type per day"
                     :chart-data="usersChart.data"
                     :chart-options="usersChart.options">
           <span slot="footer">
-            <i class="ti-reload"></i> Updated 3 minutes ago
+            <i class="ti-reload"></i> Updated now
           </span>
-          <div slot="legend">
-            <i class="fa fa-circle text-info"></i> Open
-            <i class="fa fa-circle text-danger"></i> Click
-            <i class="fa fa-circle text-warning"></i> Click Second Time
+          <div slot="legend" v-for="(legend, index) in usersChart.data.legends">
+            <i class="fa fa-circle" :class="`text-${usersChart.data.colors[index]}`"></i> {{legend}}
           </div>
         </chart-card>
       </div>
@@ -102,8 +100,6 @@ export default {
           media_types.set(mt,1)
         }
       }
-      var color = ['#EF5350', '#00BCD4', '#FFC107']
-      var counter = 0;
       var keys = [];
       var values = [];
       for(const [key, value] of media_types.entries()) {
@@ -111,6 +107,62 @@ export default {
         values.push(value);
       }
       return [keys, values]
+    },
+    fetchCountByMediaTypesGroupByDay(list_of_deposits) {
+      var count_by_date = new Map();
+      var legends = [];
+      for (var i = 0; i < list_of_deposits.length; i++) {
+        var mt = list_of_deposits[i]['deposit_metadata']['media_type']
+        var cd = list_of_deposits[i]['deposit_metadata']['create_date']
+        if(!legends.includes(mt)) {
+          legends.push(mt);
+        }
+        if (count_by_date.has(cd)) {
+          var media_types = count_by_date.get(cd)
+          if(media_types.has(mt)) {
+            media_types.set(mt, media_types.get(mt)+1)
+          } else {
+            media_types.set(mt, 1)
+          }
+
+          count_by_date.set(cd, media_types)
+        } else {
+          var media_types = new Map()
+          media_types.set(mt, 1)
+          count_by_date.set(cd, media_types);
+        }
+      }
+      var keys = [];
+      var values = [];
+      count_by_date = new Map([...count_by_date.entries()].sort());
+      for(const [key, value] of count_by_date.entries()) {
+        keys.push(key);
+        for(var i=0; i<legends.length; i++) {
+          var value_to_be_pushed = 0;
+          if(value.has(legends[i])) {
+            value_to_be_pushed = value.get(legends[i]);
+          }
+          if(i>=values.length) {
+            values.push([value_to_be_pushed])
+          }
+          else {
+            values[i].push(value_to_be_pushed)
+          }
+        }
+
+
+        // for(const [key2, value2] of media_types.entries()) {
+        //   var index = legends.indexOf(key2)
+        //   if(index>=values.length) {
+        //     values.push([value2])
+        //   }
+        //   else {
+        //     values[index].push(value2)
+        //   }
+        // }
+      }
+      console.log(keys, values, legends)
+      return [keys, values, legends]
     }
 
   },
@@ -155,25 +207,13 @@ export default {
       ],
       usersChart: {
         data: {
-          // labels: [
-          //   "9:00AM",
-          //   "12:00AM",
-          //   "3:00PM",
-          //   "6:00PM",
-          //   "9:00PM",
-          //   "12:00PM",
-          //   "3:00AM",
-          //   "6:00AM"
-          // ],
-          // series: [
-          //   [287, 385, 490, 562, 594, 626, 698, 895, 952],
-          //   [67, 152, 193, 240, 387, 435, 535, 642, 744],
-          //   [23, 113, 67, 108, 190, 239, 307, 410, 410]
-          // ]
+          labels: [],
+          series: [],
+          colors: []
         },
         options: {
           low: 0,
-          high: 1000,
+          high: 10,
           showArea: true,
           height: "245px",
           axisX: {
@@ -183,7 +223,9 @@ export default {
             divisor: 3
           }),
           showLine: true,
-          showPoint: false
+          showPoint: false,
+          scaleMinSpace: 1,
+          onlyInteger: true
         }
       },
       activityChart: {
@@ -240,6 +282,13 @@ export default {
       this.depositsPieChart.data.labels = result_list[0]
       this.depositsPieChart.data.series = result_list[1]
       this.depositsPieChart.data.colors = ['info', 'warning', 'danger']
+
+      var result_list_2 = this.fetchCountByMediaTypesGroupByDay(this.mongo_data)
+
+      this.usersChart.data.labels = result_list_2[0]
+      this.usersChart.data.series = result_list_2[1]
+      this.usersChart.data.legends = result_list_2[2]
+      this.usersChart.data.colors = ['info', 'warning', 'danger']
     });
   }
 };

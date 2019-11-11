@@ -113,7 +113,10 @@ export default {
       var legends = [];
       for (var i = 0; i < list_of_deposits.length; i++) {
         var mt = list_of_deposits[i]['deposit_metadata']['media_type']
-        var cd = list_of_deposits[i]['deposit_metadata']['create_date']
+        var cd = list_of_deposits[i]['deposit_metadata']['deposit_date']
+        // console.log(list_of_deposits[i]['deposit_metadata']['deposit_date']);
+        var ddate = new Date(Number(cd)*1000)
+        cd = ((ddate.getMonth() > 8) ? (ddate.getMonth() + 1) : ('0' + (ddate.getMonth() + 1))) + '/' + ((ddate.getDate() > 9) ? ddate.getDate() : ('0' + ddate.getDate())) + '/' + ddate.getFullYear()
         if(!legends.includes(mt)) {
           legends.push(mt);
         }

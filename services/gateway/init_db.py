@@ -8,8 +8,6 @@ from sqlalchemy import create_engine, MetaData
 from db import forms, deposits, users, services, actions
 from security import generate_password_hash
 
-time.sleep(5)
-
 
 ### Create user_engine from keys.env values
 user_username = os.environ.get('POSTGRES_USER')
@@ -114,7 +112,8 @@ def create_default_services(engine):
 
 
 def main():
-    # setup_db()
+    time.sleep(5) # wait for postgres to finish booting before running setup routines
+
     create_tables(engine=user_engine) 
     create_admin(engine=user_engine)
     create_default_actions(engine=user_engine)

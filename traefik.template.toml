@@ -13,6 +13,7 @@ defaultEntryPoints = ["http", "https"]
       [[entryPoints.https.tls.certificates]]
       certFile = "<CHANGE ME!>"
       keyFile = "<CHANGE ME!>"
+      # add this cert location to the docker-compose file, under reverse-proxy: volumes. 
 
 [docker]
 endpoint = "unix:///var/run/docker.sock"

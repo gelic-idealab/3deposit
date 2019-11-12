@@ -10,7 +10,7 @@
           </div>
           <div class="numbers" slot="content">
             <p>{{stats.title}}</p>
-            {{stats.value}}
+            <p>{{stats.value}}</p>
           </div>
           <div class="stats" slot="footer">
             <i :class="stats.footerIcon"></i> {{stats.footerText}}
@@ -152,17 +152,6 @@ export default {
             values[i].push(value_to_be_pushed)
           }
         }
-
-
-        // for(const [key2, value2] of media_types.entries()) {
-        //   var index = legends.indexOf(key2)
-        //   if(index>=values.length) {
-        //     values.push([value2])
-        //   }
-        //   else {
-        //     values[index].push(value2)
-        //   }
-        // }
       }
       console.log(keys, values, legends)
       return [keys, values, legends]
@@ -223,7 +212,7 @@ export default {
             showGrid: false
           },
           lineSmooth: Chartist.Interpolation.simple({
-            divisor: 3
+            divisor: 10
           }),
           showLine: true,
           showPoint: false,

@@ -6,3 +6,4 @@ keys.py
 keys.env
 *.log
 node_modules/
+traefik.toml

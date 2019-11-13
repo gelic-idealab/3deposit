@@ -1,14 +1,15 @@
 import os
-from pymediainfo import MediaInfo as mi
+# from pymediainfo import MediaInfo as mi
 import subprocess
 import pprint
 import json
 import requests
-# import logging
+import logging
 import zipfile
 import time
-import trimesh
+# import trimesh
 import numpy as np
+import yaml
 
 
 def main():
@@ -92,8 +93,6 @@ def unzip_and_extract_vr_metadata(vr_zip_file, unzip_path, extracted_files_list)
         # for fn in filename_list:
         #     zip_ref.extract(fn, path=unzip_path)
 
-    # supported_3d_mesh_types = ['gltf','glb','obj','stl'] # add more
-
     all_file_metadata = {}
 
     # Get number of files in each base directory folder
@@ -136,8 +135,9 @@ def unzip_and_extract_vr_metadata(vr_zip_file, unzip_path, extracted_files_list)
     # exit()
 
     if app_package_metadata is not None:
-        all_file_metadata.update( {"VR application package_metadata" : app_package_metadata} )
+        all_file_metadata.update( {"VR application package metadata" : app_package_metadata} )
 
+    # vr_asset_metadata = {}
 
     for fn in filename_list:
         # logging.debug(fn)
@@ -146,12 +146,17 @@ def unzip_and_extract_vr_metadata(vr_zip_file, unzip_path, extracted_files_list)
         extracted_files_list.append(fn_path)
 
         # Clear previous properties
-        # gltf_metadata = None
-        # mesh_metadata = None
+        vr_asset_metadata = None
         file_metadata = None
-        # animated = False
 
         file_metadata = get_vr_file_metadata(fn_path)
+        print(file_metadata)
+
+        if not os.path.isdir(fn_path):
+            if file_metadata['filename'].endswith('.asset'):
+                vr_asset_metadata = get_vr_asset_settings(fn_path)
+                # vr_asset_metadata.update( {fn_path : asset_settings} )
+                # exit()
 
         # if file_metadata["ext"] is not None:
         #     if file_metadata["ext"].lower() == "gltf" or file_metadata["ext"].lower() == "glb":
@@ -170,11 +175,8 @@ def unzip_and_extract_vr_metadata(vr_zip_file, unzip_path, extracted_files_list)
         if file_metadata is not None:
             metadata_dict.update( {"General properties" : file_metadata} )
 
-        # if gltf_metadata is not None:
-        #     metadata_dict.update( {"GLTF metadata" : gltf_metadata} )
-
-        # if mesh_metadata is not None:
-        #     metadata_dict.update( {"Mesh metadata" : mesh_metadata} )
+        if vr_asset_metadata is not None:
+            metadata_dict.update( {"Asset metadata" : vr_asset_metadata} )
 
         all_file_metadata.update( {fn_path : metadata_dict} )
 
@@ -237,102 +239,69 @@ def get_vr_file_metadata(app_file):
         except Exception as emsg:
             # logging.error("EXCEPTION:", str(emsg))
             print("Problem getting file path, name, and extension.")
+            print("EXCEPTION:", err)
             file_info_dict.update({"file_tree_path":None})
             file_info_dict.update({"filename":None})
             file_info_dict.update({"ext":None})
 
         return file_info_dict
 
-    except Exception as emsg:
+    except Exception as err:
+        print("EXCEPTION:",err)
         # logging.error("EXCEPTION:", str(emsg))
         return None
 
 
-def get_vr_metadata(vr_file, file_info_dict, is_animimated):
+def get_vr_asset_settings(asset_file): #, file_info_dict):
 
     """
-    Function to extract the VR-related metadata from a VR package.
+    Function to extract the metadata from an asset file (e.g., 'ProjectSettings.asset') of a VR package.
 
-	*** CURRENTLY JUST A COPY OF FUNCTION FROM 3D MODEL METADATA EXTRACT SCRIPT ***
-	*** NOT ACTUALLY USEFUL RIGHT NOW ***
+    Files in current testing case are in the format of YAML 1.1, and need to be handled using the method below.
+
+    Uses the 'yaml' Python library.
 
     """
 
+    # For some reason, in order to read the Project Settings file properly with the yaml library, the header has to be
+    # removed (at least in this case here). This seems to be a consistent bug in the yaml python library that normally
+    # is resolved by using the "Loader=yaml.Loader" argument, but apparently still not in this case.
+    #
+    # So, for now, just create a temporary file without the header. (Which is necessary becasuse trying to read in just
+    # beyond the header from the original file as a stream also creates an error.)
     try:
-        m = trimesh.load(vr_file)
-    except Exception as emsg:
-        print("EXCEPTION:", str(emsg))
+        with open(asset_file, 'r') as f:
+            new_yaml=[]
+            for line in f:
+                if line.startswith('%') or line.startswith('-'):
+                    continue
+                else:
+                    new_yaml.append(line)
+        with open('temp_yaml.txt', 'w') as tmp:
+            for l in new_yaml:
+                tmp.write(l)
+    except Exception as err:
+        print("EXCEPTION:", err)
+
+    # Load the project settings into asset_settings_dict
+    try:
+        asset_settings_stream = open('temp_yaml.txt','r')
+        asset_settings_dict = yaml.load(asset_settings_stream, Loader=yaml.Loader)
+        asset_settings_stream.close()
+        pprint.pprint(asset_settings_dict)
+    except Exception as err:
+        print("EXCEPTION:",err)
         return None
 
-    mesh_data_dict = {}
-
-    def get_mesh_obj_attrs(mesh, anim):
-        attr_dict = {}
-
-        # Get all mesh metadata for STILL objects only (animated files will overload system)
-        if not anim:    # For animations, this gets stuck when getting the "bounding_box_oriented" attribute
-            for a in dir(mesh):
-                if not a.startswith('_'):  # and a in mesh_attr_list:
-                    try:
-                        if not callable(getattr(mesh, a)):
-                            json.dumps( {a : getattr(mesh, a)} )   # Check to see if it can be serialized (e.g., not a numpy array or unfamiliar object)
-                            attr_dict.update( {a : getattr(mesh, a)} )
-                    except Exception:
-                        try:
-                            if type(getattr(mesh, a)) == np.ndarray: # If it's a numpy array, but a small one, keep it (e.g., 'centroid')
-                                if getattr(mesh, a).size <= 20:
-                                    attr_dict.update( { a : str(getattr(mesh, a)) } )
-
-                            if a == 'triangles':
-                                attr_dict.update( { "num_triangles" : len(getattr(mesh, a)) } )
-
-                            if a == 'vertices':
-                                attr_dict.update( { "num_vertices" : len(getattr(mesh, a)) } )
-
-                            else:
-                                continue
-                        except Exception:
-                            continue
-
-        elif anim:
-            # List of reasonably-sized attributes to gather from animated GLTF models (as certain other attributes will cause the process to stall if you try to get them (e.g., all "bounding_" attrs))
-            anim_attrs = ['bounds', 'camera', 'camera_transform', 'centroid', 'extents', 'is_empty', 'is_valid', 'metadata', 'scale', 'triangles', 'triangles_node', 'units']
-            for a in anim_attrs:
-                try:
-                    json.dumps( {a : getattr(mesh, a)} )   # Check to see if it can be serialized (e.g., not a numpy array or unfamiliar object)
-                    attr_dict.update( {a : getattr(mesh, a)} )
-                except Exception:
-                    try:
-                        if type(getattr(mesh, a)) == np.ndarray: # If it's a numpy array, but a small one, keep it (e.g., 'centroid')
-                            if getattr(mesh, a).size <= 20:
-                                attr_dict.update( { a : str(getattr(mesh, a)) } )
-
-                        if a == 'triangles':
-                            attr_dict.update( { "num_triangles" : len(getattr(mesh, a)) } )
-
-                        else:
-                            continue
-
-                    except Exception:
-                        continue
-
-        return attr_dict
-
+    # Last, remove the temporary file if it exists
     try:
-        mesh_data_dict.update( get_mesh_obj_attrs(m, is_animimated) )
-    except Exception:
-        pass
+        if os.path.isfile('temp_yaml.txt'):
+            os.remove('temp_yaml.txt')
+    except Exception as err:
+        print("EXCEPTION:",err)
 
-    if file_info_dict["ext"].lower() in ["gltf", "glb"] and not is_animimated:
-        # Make a dump of the current mesh objects and analyze those (Only for non-animated models!)
-        mesh_dump = m.dump()
-        for (index, obj) in enumerate(mesh_dump):
-            try:
-                mesh_data_dict.update( { "mesh object "+str(index) : get_mesh_obj_attrs(obj, is_animimated) } )
-            except Exception:
-                continue
 
-    return mesh_data_dict
+    return asset_settings_dict
 
 
 if __name__ == "__main__":

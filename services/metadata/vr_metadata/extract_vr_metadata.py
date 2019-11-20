@@ -7,31 +7,17 @@ import requests
 import logging
 import zipfile
 import time
-# import trimesh
+import trimesh
 import numpy as np
 import yaml
+from metadata_service_copy import get_3d_model_mesh_metadata
 
 
 def main():
     """
     ## NOTES:
 		- Use this as a sample app to get metadata for: https://github.com/Grainger-Engineering-Library/webvr-unity-src
-
-		- Get at least very general info about repo: number of files, size of repo, etc., what engine was used to build it, metadata on assets, unreal, target hardware this is for, a "score" for the complexity or the app (based on maybe number of vertices), what hardware would be able to run it
-			- For the build directory--not that interested in metadata for these files, but may want to at least get what was used to build it, and stats on filetypes (e.g., mainly .js files?), and how long the source code is, etc...very broad encompassing sorts of metadata
-			- Depending on what the app is for, we will know what folders to look for
-
-		- For VR apps, maybe consider getting the following info:
-			- number of subdirectories
-			- number of types of files
-			- type of headset supported (e.g., Oculus Go), so you can filter by support
-
 		- A-frame is an example of an app
-
-		- Project settings
-			- files containing presets that the user setup in their editor
-			- may just make the contents of each file the entire metadata itself
-
 		- "premis" field, or 'pbcore'
 
 		- U. Oklahoma publishing about VR app metadata standards
@@ -41,10 +27,20 @@ def main():
 		- Edward's schemas:
 			- https://github.com/Grainger-Engineering-Library/3deposit/tree/master/docs/metadata_templates
 
-
     ## TODO:
+        - Update/expand list of supported VR headsets known for each platform (e.g., Oculus Go)
+        - What engine was used to build it (e.g., unreal, )
+        - Target hardware the app is for (what hardware would be able to run it?)
+        - *Depending on what the app is for, we will know what folders to look for
+        - A "score" for the complexity or the app (based on maybe number of vertices)
+        - Stats on filetypes (e.g., mainly .js files?),
+        - How long the source code is, etc.
 
     ## DONE:
+        - Grap top-level directory data
+        - Fix format of Dates in file info metadata on all of files --> These are actually in OK format, but pprint displays them oddly when spaces are present in a string...
+        - Check through /webvr-unity-src-master/Assets folder to find .obj files and run 3dmodel metadata extract script on those as well
+        - Grab Headset info from project settings
 
     """
 
@@ -95,13 +91,12 @@ def unzip_and_extract_vr_metadata(vr_zip_file, unzip_path, extracted_files_list)
 
     all_file_metadata = {}
 
-    # Get number of files in each base directory folder
-    app_package_metadata = {}
-    app_package_metadata.update( {"Total file/directory count" : len(filename_list)} )
+    supported_3d_mesh_types = ['gltf','glb','obj','stl'] # add more
 
-    main_sub_directories = {}
+    # First, gather overall application file-tree information
+    top_level_directories = {}
     f_count, d_count, sum_size = 0, 0, 0
-
+    app_package_metadata = {"Total file/directory count" : len(filename_list)}
     for fn in filename_list:
         if os.path.isfile(fn):
             f_count +=1
@@ -109,66 +104,64 @@ def unzip_and_extract_vr_metadata(vr_zip_file, unzip_path, extracted_files_list)
             d_count +=1
         sum_size += os.path.getsize(fn)
 
-
+        # Get number of files in each base directory folder
         if os.path.isdir(fn) and 2 < len(fn.split('/')) < 4:
-            print("DIRECTORY",fn)
-            main_sub_directories.update( {fn:{}} )
+            top_level_directories.update( {fn:{}} )
             num_sub_files = 0
             subdir_sum_size = 0
-            for f in os.walk(fn):
-                num_sub_files += len(f[2])
-                for fi in f[2]:
-                    fi_path = os.path.join(f[0],fi)
+            for fx in os.walk(fn):
+                num_sub_files += len(fx[2])
+                for fi in fx[2]:
+                    fi_path = os.path.join(fx[0],fi)
                     subdir_sum_size += os.path.getsize(fi_path)
-            print("NUMBER FILES:", num_sub_files)
-            print("SUB-DIRECTORY SIZE:", subdir_sum_size)
-            main_sub_directories[fn].update( {"File count":num_sub_files} )
-            main_sub_directories[fn].update( {"Directory size (bytes)":subdir_sum_size} )
-
+            top_level_directories[fn].update( {"File count":num_sub_files} )
+            top_level_directories[fn].update( {"Directory size (bytes)":subdir_sum_size} )
 
     app_package_metadata.update( {"File count" : f_count} )
     app_package_metadata.update( {"Directory count" : d_count} )
     app_package_metadata.update( {"App size (bytes)" : sum_size} )
-    app_package_metadata.update( {"Main sub-directories" : main_sub_directories} )
-
-    pprint.pprint(app_package_metadata)
-    # exit()
+    app_package_metadata.update( {"Top-level directories" : top_level_directories} )
 
     if app_package_metadata is not None:
         all_file_metadata.update( {"VR application package metadata" : app_package_metadata} )
 
-    # vr_asset_metadata = {}
 
+    # Second, gather file-specific metadata
     for fn in filename_list:
         # logging.debug(fn)
+        print(fn)
         fn_path = os.path.join(unzip_path, fn)
         # logging.debug(fn_path)
         extracted_files_list.append(fn_path)
 
         # Clear previous properties
-        vr_asset_metadata = None
         file_metadata = None
+        vr_asset_metadata = None
+        mesh_metadata = None
+        compatibility_info = None
 
         file_metadata = get_vr_file_metadata(fn_path)
-        print(file_metadata)
 
         if not os.path.isdir(fn_path):
             if file_metadata['filename'].endswith('.asset'):
                 vr_asset_metadata = get_vr_asset_settings(fn_path)
-                # vr_asset_metadata.update( {fn_path : asset_settings} )
-                # exit()
 
-        # if file_metadata["ext"] is not None:
-        #     if file_metadata["ext"].lower() == "gltf" or file_metadata["ext"].lower() == "glb":
-        #         gltf_metadata = get_3d_model_gltf_metadata(fn_path, file_metadata)
-        #
-        #         if gltf_metadata is not None:
-        #             if gltf_metadata['animated']:
-        #                 animated = True
-        #
-        #     # Check if extension is in supported type list (OR, could simply TRY for all file to see if it can be loaded)
-        #     if file_metadata["ext"] in supported_3d_mesh_types:
-        #         mesh_metadata = get_3d_model_mesh_metadata(fn_path, file_metadata, animated)
+                if vr_asset_metadata is not None:
+                    # Look for VR headset metdata
+                    if 'PlayerSettings' in vr_asset_metadata.keys():
+                        if 'm_BuildTargetVRSettings' in vr_asset_metadata['PlayerSettings'].keys():
+                            if 'm_Devices' in vr_asset_metadata['PlayerSettings']['m_BuildTargetVRSettings'][0].keys():
+                                vr_devices = vr_asset_metadata['PlayerSettings']['m_BuildTargetVRSettings'][0]['m_Devices']
+                                if not isinstance(vr_devices, list):
+                                    vr_devices = [vr_devices]
+                                compatibility_info = get_compatibility_info(vr_devices)
+                                if compatibility_info is not None:
+                                    all_file_metadata["VR application compatibility"] = compatibility_info
+
+        # Check if 3d obj files in Assets directory
+        if '/Assets/' in fn_path and not os.path.isdir(fn_path):
+            if file_metadata["ext"].lower() in supported_3d_mesh_types:
+                mesh_metadata = get_3d_model_mesh_metadata(fn_path, file_metadata, is_animimated=False)
 
         metadata_dict = {}
 
@@ -177,6 +170,9 @@ def unzip_and_extract_vr_metadata(vr_zip_file, unzip_path, extracted_files_list)
 
         if vr_asset_metadata is not None:
             metadata_dict.update( {"Asset metadata" : vr_asset_metadata} )
+
+        if mesh_metadata is not None:
+            metadata_dict.update( {"Mesh metadata" : mesh_metadata} )
 
         all_file_metadata.update( {fn_path : metadata_dict} )
 
@@ -187,6 +183,7 @@ def unzip_and_extract_vr_metadata(vr_zip_file, unzip_path, extracted_files_list)
             for subzip_file in subzip_metadata:
                 # logging.debug('subzip iteration')
                 all_file_metadata.update( {subzip_file : subzip_metadata[subzip_file]} )
+
 
     # logging.debug(f'all_file_metadata: {all_file_metadata}')
     return all_file_metadata
@@ -259,16 +256,17 @@ def get_vr_asset_settings(asset_file): #, file_info_dict):
 
     Files in current testing case are in the format of YAML 1.1, and need to be handled using the method below.
 
-    Uses the 'yaml' Python library.
-
+    This function makes use of the 'yaml' Python library (installed via pip as 'pyyaml').
+    A few notes on the current limitations of this library:
+        1.  For some reason, this library has trouble reading all the '.asset' YAML files due to the header lines, and so
+            can only work if these lines are removed. This seems to be a common reported bug that normally is resolved by
+            using the "Loader=yaml.Loader" argument, but apparently this does not work for the '.asset' files here.
+            So, for now, just create a temporary file without the header. (Which is necessary becasuse trying to read in just
+            beyond the header from the original file as a stream also creates an error.)
+        2.  The library can only read in files using UTF-8 encoding, but not latin-1 encoding, which is the case for some
+            '.asset' YAML files here.
     """
 
-    # For some reason, in order to read the Project Settings file properly with the yaml library, the header has to be
-    # removed (at least in this case here). This seems to be a consistent bug in the yaml python library that normally
-    # is resolved by using the "Loader=yaml.Loader" argument, but apparently still not in this case.
-    #
-    # So, for now, just create a temporary file without the header. (Which is necessary becasuse trying to read in just
-    # beyond the header from the original file as a stream also creates an error.)
     try:
         with open(asset_file, 'r') as f:
             new_yaml=[]
@@ -280,18 +278,15 @@ def get_vr_asset_settings(asset_file): #, file_info_dict):
         with open('temp_yaml.txt', 'w') as tmp:
             for l in new_yaml:
                 tmp.write(l)
-    except Exception as err:
-        print("EXCEPTION:", err)
 
-    # Load the project settings into asset_settings_dict
-    try:
+        # Load the project settings into asset_settings_dict
         asset_settings_stream = open('temp_yaml.txt','r')
         asset_settings_dict = yaml.load(asset_settings_stream, Loader=yaml.Loader)
         asset_settings_stream.close()
-        pprint.pprint(asset_settings_dict)
+
     except Exception as err:
-        print("EXCEPTION:",err)
-        return None
+        print("EXCEPTION:", err)
+        asset_settings_dict = None
 
     # Last, remove the temporary file if it exists
     try:
@@ -300,8 +295,42 @@ def get_vr_asset_settings(asset_file): #, file_info_dict):
     except Exception as err:
         print("EXCEPTION:",err)
 
-
     return asset_settings_dict
+
+
+def get_compatibility_info(vr_device_list):
+    """
+    Function for getting/determining device compatibility information for the VR application
+    (e.g., platforms, headsets, engines).
+
+    Information from: https://en.wikipedia.org/wiki/Comparison_of_virtual_reality_headsets
+    """
+
+    known_engine_support = {
+        'OpenVR':['Unity', 'Unreal Engine', 'CryEngine', 'Godot'],
+        'Oculus':['Unity', 'Unreal Engine', 'CryEngine', 'Godot']
+        }
+
+    known_headset_support = {
+        'OpenVR':['Razer OSVR HDK 1.4', 'Razer OSVR HDK 2'],
+        'Oculus':['Oculus Rift', 'Oculus Rift S']
+        }
+
+    compatibility_dict = {'Platforms':vr_device_list}
+
+    for dev in vr_device_list:
+        compatibility_dict.update({dev:{}})
+        try:
+            compatibility_dict[dev].update({ 'Engines':known_engine_support[dev] })
+        except Exception:
+            pass
+
+        try:
+            compatibility_dict[dev].update({ 'Headsets':known_headset_support[dev] })
+        except Exception:
+            pass
+
+    return compatibility_dict
 
 
 if __name__ == "__main__":

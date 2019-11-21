@@ -3,7 +3,7 @@
 
     <!--Stats cards-->
     <div class="row">
-      <div class="col" v-for="stats in statsCards" :key="stats.title">
+      <div class="col-4" v-for="stats in statsCards" :key="stats.title">
         <stats-card>
           <div class="icon-big text-center" :class="`icon-${stats.type}`" slot="header">
             <i :class="stats.icon"></i>
@@ -187,6 +187,30 @@ export default {
           value: '',
           footerText: "Updated now",
           footerIcon: "ti-reload"
+        },
+         {
+          type: "warning",
+          icon: "ti-control-play",
+          title: "360 Video",
+          value: '',
+          footerText: "Updated now",
+          footerIcon: "ti-reload"
+        },
+        {
+          type: "success",
+          icon: "ti-video-camera",
+          title: "VR Tour",
+          value: '',
+          footerText: "Updated now",
+          footerIcon: "ti-reload"
+        },
+        {
+          type: "danger",
+          icon: "ti-harddrives",
+          title: "3D Model",
+          value: '',
+          footerText: "Updated now",
+          footerIcon: "ti-reload"
         }
         // {
         //   type: "info",
@@ -274,6 +298,10 @@ export default {
       this.depositsPieChart.data.labels = result_list[0]
       this.depositsPieChart.data.series = result_list[1]
       this.depositsPieChart.data.colors = ['info', 'warning', 'danger']
+
+      this.statsCards[3].value = result_list[1][0];
+      this.statsCards[4].value = result_list[1][1];
+      this.statsCards[5].value = result_list[1][2];
 
       var result_list_2 = this.fetchCountByMediaTypesGroupByDay(this.mongo_data)
 

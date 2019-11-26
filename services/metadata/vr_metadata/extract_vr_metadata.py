@@ -10,6 +10,7 @@ import time
 import trimesh
 import numpy as np
 import yaml
+import copy
 from metadata_service_copy import get_3d_model_mesh_metadata
 
 
@@ -304,6 +305,21 @@ def get_compatibility_info(vr_device_list):
     (e.g., platforms, headsets, engines).
 
     Information from: https://en.wikipedia.org/wiki/Comparison_of_virtual_reality_headsets
+    (* PLEASE CORRECT ME IF INFORMATION IN TABEL BELOW IS WRONG *)
+
+    SDKs 				PLATFORM		HEADSETS
+
+    OpenVR				SteamVR			HTC Vive, HTC Vive Pro, HTC Vive Cosmos, Razer OSVR HDK 1.4, Razer OSVR HDK 2,
+    									Pimax 4K, Pimax 8K, Pimax 5K Plus, Deepoon VR E3, Dell Visor, Asus HC102, Acer AH101,
+    									Windows Mixed Reality (WMR) headsets, HP WMR headset, Lenovo Explorer, Samsung Odyssey, Samsung Odyssey+,
+    									StarVR One,  HP Reverb, Varjo VR-1, Valve headsets, Valve Index, Varjo VR-2, GFL Developer Kit
+
+    Oculus PC SDK		Oculus PC 		Oculus Rift and Oculus Rift S
+
+    Oculus Mobile SDK	Oculus VR		Oculus Standalone headsets, Samsung Gear VR, Oculus Go, Oculus Quest
+
+    OSVR								Razer OSVR HDK 1.4, Razer OSVR HDK 2
+
     """
 
     known_engine_support = {
@@ -312,13 +328,17 @@ def get_compatibility_info(vr_device_list):
         }
 
     known_headset_support = {
-        'OpenVR':['Razer OSVR HDK 1.4', 'Razer OSVR HDK 2'],
-        'Oculus':['Oculus Rift', 'Oculus Rift S']
+        'OpenVR':['HTC Vive', 'HTC Vive Pro', 'HTC Vive Cosmos', 'Razer OSVR HDK 1.4', 'Razer OSVR HDK 2', 'Pimax 4K',  'Pimax 8K', 'Pimax 5K Plus', 'Deepoon VR E3', 'Dell Visor', 'Asus HC102', 'Acer AH101', 'Windows Mixed Reality (WMR) headsets', 'HP WMR headset', 'Lenovo Explorer', 'Samsung Odyssey', 'Samsung Odyssey+', 'StarVR One', 'HP Reverb', 'Varjo VR-1', 'Valve headsets', 'Valve Index', 'Varjo VR-2', 'GFL Developer Kit'],
+        'Oculus': {'Oculus PC' : ['Oculus Rift', 'Oculus Rift S'], 'Oculus Mobile' : ['Oculus Standalone headsets', 'Oculus Go', 'Oculus Quest', 'Samsung Gear VR']},
+        'OSVR':['Razer OSVR HDK 1.4', 'Razer OSVR HDK 2']
         }
 
-    compatibility_dict = {'Platforms':vr_device_list}
+
+    compatibility_dict = {'Platforms':copy.deepcopy(vr_device_list)}
 
     for dev in vr_device_list:
+        if dev == 'OpenVR':
+            compatibility_dict['Platforms'].append('SteamVR') # Add SteamVR compatibility as well if developed OpenVR devices (right?)
         compatibility_dict.update({dev:{}})
         try:
             compatibility_dict[dev].update({ 'Engines':known_engine_support[dev] })

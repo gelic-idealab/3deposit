@@ -198,7 +198,7 @@ export default {
         },
         {
           type: "success",
-          icon: "ti-video-camera",
+          icon: "fa-vr-cardboard",
           title: "VR Tour",
           value: '',
           footerText: "Updated now",

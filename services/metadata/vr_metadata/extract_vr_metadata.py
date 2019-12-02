@@ -29,25 +29,31 @@ def main():
 			- https://github.com/Grainger-Engineering-Library/3deposit/tree/master/docs/metadata_templates
 
     ## TODO:
-        - Update/expand list of supported VR headsets known for each platform (e.g., Oculus Go)
-        - What engine was used to build it (e.g., unreal, )
-        - Target hardware the app is for (what hardware would be able to run it?)
+        - Update DocStrings
+        - Merge script functions into metadata-service script
+        - What engine was used to build it (e.g., unreal, unity, ...)
+        - Based on engine used to build it
+            --> Target hardware the app is for (what hardware would be able to run it?)
         - *Depending on what the app is for, we will know what folders to look for
         - A "score" for the complexity or the app (based on maybe number of vertices)
         - Stats on filetypes (e.g., mainly .js files?),
         - How long the source code is, etc.
+        - Add WebVR detail gathering (e.g., handling of A-Frame applications)
 
     ## DONE:
+        - What engine was used to build it (So far, can only [possibly] detect: Unity or Unreal)
         - Grap top-level directory data
         - Fix format of Dates in file info metadata on all of files --> These are actually in OK format, but pprint displays them oddly when spaces are present in a string...
         - Check through /webvr-unity-src-master/Assets folder to find .obj files and run 3dmodel metadata extract script on those as well
         - Grab Headset info from project settings
+        - Update/expand list of supported VR headsets known for each platform (e.g., Oculus Go)
 
     """
 
     extracted_files_to_delete_later = []
 
     zipped_vr_file = './webvr-unity-src-master.zip'   # Path to zipped model file from which to gather metadata
+    # zipped_vr_file = './UE4FirstPersonVRTemplate-0.4.5.zip'   # Path to zipped model file from which to gather metadata
     # base_path = '/'.join(zipped_vr_file.split('/')[0:-1]) # set as base directory, or '' if already in working base direcotry
     base_path = ''
 
@@ -106,7 +112,7 @@ def unzip_and_extract_vr_metadata(vr_zip_file, unzip_path, extracted_files_list)
         sum_size += os.path.getsize(fn)
 
         # Get number of files in each base directory folder
-        if os.path.isdir(fn) and 2 < len(fn.split('/')) < 4:
+        if os.path.isdir(fn) and 2 < len(fn.split('/')) < 5:
             top_level_directories.update( {fn:{}} )
             num_sub_files = 0
             subdir_sum_size = 0
@@ -122,6 +128,11 @@ def unzip_and_extract_vr_metadata(vr_zip_file, unzip_path, extracted_files_list)
     app_package_metadata.update( {"Directory count" : d_count} )
     app_package_metadata.update( {"App size (bytes)" : sum_size} )
     app_package_metadata.update( {"Top-level directories" : top_level_directories} )
+
+    engine_used_to_generate_app, supported_platforms = determine_engine_used(app_package_metadata)
+    if engine_used_to_generate_app is not None:
+        app_package_metadata.update( {"Engine used to generate VR application" : engine_used_to_generate_app} )
+        app_package_metadata.update( {"Potentially supported platforms (based on engine used)" : supported_platforms} )
 
     if app_package_metadata is not None:
         all_file_metadata.update( {"VR application package metadata" : app_package_metadata} )
@@ -144,10 +155,10 @@ def unzip_and_extract_vr_metadata(vr_zip_file, unzip_path, extracted_files_list)
         file_metadata = get_vr_file_metadata(fn_path)
 
         if not os.path.isdir(fn_path):
-            if file_metadata['filename'].endswith('.asset'):
+            if file_metadata['filename'].endswith('.asset'): # Unfortunately, all '.uasset' files in Unreal example are unreadable (binary)
                 vr_asset_metadata = get_vr_asset_settings(fn_path)
 
-                if vr_asset_metadata is not None:
+                if vr_asset_metadata is not None and "VR application compatibility" not in all_file_metadata.keys():
                     # Look for VR headset metdata
                     if 'PlayerSettings' in vr_asset_metadata.keys():
                         if 'm_BuildTargetVRSettings' in vr_asset_metadata['PlayerSettings'].keys():
@@ -205,12 +216,12 @@ def get_vr_file_metadata(app_file):
         # Example output:  os.stat_result(st_mode=33204, st_ino=5522179, st_dev=64513, st_nlink=1, st_uid=1000, st_gid=1000, st_size=28869, st_atime=1570141042, st_mtime=1562097398, st_ctime=1570141042)
 
         file_info_dict = {
-            "mode" : mode,
-            "ino" : ino,
-            "dev" : dev,
-            "nlink" : nlink,
-            "uid" : uid,
-            "gid" : gid,
+            # "mode" : mode,
+            # "ino" : ino,
+            # "dev" : dev,
+            # "nlink" : nlink,
+            # "uid" : uid,
+            # "gid" : gid,
             "size" : size,  # in bytes
             "atime" : time.ctime(atime),    # time of last access
             "mtime" : time.ctime(mtime),    # time of last modified
@@ -297,6 +308,42 @@ def get_vr_asset_settings(asset_file): #, file_info_dict):
         print("EXCEPTION:",err)
 
     return asset_settings_dict
+
+
+def determine_engine_used(app_pkg_metadata):
+    """
+    Function for determining VR engine with which VR app was created, based on directory tree structure and files.
+
+    For Unreal, check for a few of the "Common Directories":
+         https://docs.unrealengine.com/en-US/Engine/Basics/DirectoryStructure/index.html
+
+    """
+
+    try:
+        top_lvl_dir_list = [d for k in app_pkg_metadata['Top-level directories'].keys() for d in str(k).split('/')]
+        top_lvl_dir_list = list(set(top_lvl_dir_list))
+        # print(top_lvl_dir_list)
+
+        if all( [folder in top_lvl_dir_list for folder in ['Config','Content','Saved']] ):
+            engine_used = "Unreal Engine"
+            known_platform_support = ['SteamVR', 'Oculus PC', 'Oculus Mobile', 'Windows Mixed Reality', 'Open Source Virtual Reality (OSVR)']
+
+        elif all( [folder in top_lvl_dir_list for folder in ['Assets','Library','ProjectSettings']] ):
+            engine_used = "Unity"
+            known_platform_support = ['SteamVR', 'Oculus PC', 'Oculus Mobile', 'Windows Mixed Reality', 'Open Source Virtual Reality (OSVR)']
+
+        else:
+            # Currently have only determined general ways of assuming app-generation engine
+            engine_used = "Unknown"
+            known_platform_support = "Unknown"
+
+    except:
+        return None, None
+
+    # exit()
+
+    return engine_used, known_platform_support
+
 
 
 def get_compatibility_info(vr_device_list):

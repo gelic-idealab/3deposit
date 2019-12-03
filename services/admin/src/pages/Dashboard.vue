@@ -3,7 +3,7 @@
 
     <!--Stats cards-->
     <div class="row">
-      <div class="col-4" v-for="stats in statsCards" :key="stats.title">
+      <div class="col-sm" v-for="stats in statsCards" :key="stats.title">
         <stats-card>
           <div class="icon-big text-center" :class="`icon-${stats.type}`" slot="header">
             <i :class="stats.icon"></i>
@@ -30,7 +30,7 @@
           <span slot="footer">
             <i class="ti-reload"></i> Updated now
           </span>
-          <div slot="legend" v-for="(legend, index) in usersChart.data.legends">
+          <div slot="legend" v-for="(legend, index) in usersChart.data.legends" :key="legend">
             <i class="fa fa-circle" :class="`text-${usersChart.data.colors[index]}`"></i> {{legend}}
           </div>
         </chart-card>
@@ -165,7 +165,7 @@ export default {
     return {
        statsCards: [
         {
-          type: "warning",
+          type: "primary",
           icon: "ti-server",
           title: "Used Size",
           value: '',
@@ -173,23 +173,31 @@ export default {
           footerIcon: "ti-reload"
         },
         {
-          type: "success",
-          icon: "ti-wallet",
+          type: "primary",
+          icon: "ti-archive",
           title: "Deposits",
           value: '',
           footerText: "Updated now",
           footerIcon: "ti-reload"
         },
         {
-          type: "danger",
+          type: "primary",
           icon: "ti-pulse",
           title: "Largest File",
           value: '',
           footerText: "Updated now",
           footerIcon: "ti-reload"
         },
-         {
-          type: "warning",
+        {
+          type: "info",
+          icon: "ti-package",
+          title: "3D Model",
+          value: '',
+          footerText: "Updated now",
+          footerIcon: "ti-reload"
+        },
+        {
+          type: "danger",
           icon: "ti-control-play",
           title: "360 Video",
           value: '',
@@ -197,29 +205,14 @@ export default {
           footerIcon: "ti-reload"
         },
         {
-          type: "success",
-          icon: "fa-vr-cardboard",
-          title: "VR Tour",
+          type: "warning",
+          icon: "ti-eye",
+          title: "VR",
           value: '',
           footerText: "Updated now",
           footerIcon: "ti-reload"
         },
-        {
-          type: "danger",
-          icon: "ti-harddrives",
-          title: "3D Model",
-          value: '',
-          footerText: "Updated now",
-          footerIcon: "ti-reload"
-        }
-        // {
-        //   type: "info",
-        //   icon: "ti-twitter-alt",
-        //   title: "Followers",
-        //   value: "+45",
-        //   footerText: "Updated now",
-        //   footerIcon: "ti-reload"
-        // }
+
       ],
       usersChart: {
         data: {

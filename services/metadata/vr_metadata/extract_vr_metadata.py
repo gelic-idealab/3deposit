@@ -129,10 +129,18 @@ def unzip_and_extract_vr_metadata(vr_zip_file, unzip_path, extracted_files_list)
     app_package_metadata.update( {"App size (bytes)" : sum_size} )
     app_package_metadata.update( {"Top-level directories" : top_level_directories} )
 
-    engine_used_to_generate_app, supported_platforms = determine_engine_used(app_package_metadata)
+    engine_used_to_generate_app, potential_supported_platforms, potential_supported_sdks = determine_engine_used(app_package_metadata)
     if engine_used_to_generate_app is not None:
         app_package_metadata.update( {"Engine used to generate VR application" : engine_used_to_generate_app} )
-        app_package_metadata.update( {"Potentially supported platforms (based on engine used)" : supported_platforms} )
+        app_package_metadata.update( {"Potentially supported platforms (based on engine used)" : potential_supported_platforms} )
+        app_package_metadata.update( {"Potentially supported SDKs (based on engine used)" : potential_supported_sdks} )
+
+        ## Get VR Headset support for Unreal Engine
+        if engine_used_to_generate_app == 'Unreal Engine':
+            # compatibility_info = get_compatibility_info(potential_supported_sdks)
+            compatibility_info = get_compatibility_info(potential_supported_sdks)   # FOR THIS, WILL WANT TO USE USER FORM INPUT OF SDKS ENABLED FOR APP (INSTEAD OF "POTENTIAL SDKS")
+            if compatibility_info is not None:
+                all_file_metadata["VR application compatibility"] = compatibility_info
 
     if app_package_metadata is not None:
         all_file_metadata.update( {"VR application package metadata" : app_package_metadata} )
@@ -319,6 +327,13 @@ def determine_engine_used(app_pkg_metadata):
 
     """
 
+    known_engine_SDK_support = {
+        'Unity':['OpenVR', 'Oculus PC', 'Oculus Mobile', 'Windows Mixed Reality', 'OSVR'],
+        'Unreal Engine':['OpenVR', 'Oculus PC', 'Oculus Mobile', 'Windows Mixed Reality', 'OSVR'],
+        'CryEngine':['OpenVR', 'Oculus PC', 'OSVR'],
+        'Godot':['OpenVR', 'Oculus PC', 'OSVR']
+        }
+
     try:
         top_lvl_dir_list = [d for k in app_pkg_metadata['Top-level directories'].keys() for d in str(k).split('/')]
         top_lvl_dir_list = list(set(top_lvl_dir_list))
@@ -327,26 +342,29 @@ def determine_engine_used(app_pkg_metadata):
         if all( [folder in top_lvl_dir_list for folder in ['Config','Content','Saved']] ):
             engine_used = "Unreal Engine"
             known_platform_support = ['SteamVR', 'Oculus PC', 'Oculus Mobile', 'Windows Mixed Reality', 'Open Source Virtual Reality (OSVR)']
+            known_sdk_support = known_engine_SDK_support[engine_used]
 
         elif all( [folder in top_lvl_dir_list for folder in ['Assets','Library','ProjectSettings']] ):
             engine_used = "Unity"
             known_platform_support = ['SteamVR', 'Oculus PC', 'Oculus Mobile', 'Windows Mixed Reality', 'Open Source Virtual Reality (OSVR)']
+            known_sdk_support = known_engine_SDK_support[engine_used]
 
         else:
             # Currently have only determined general ways of assuming app-generation engine
-            engine_used = "Unknown"
-            known_platform_support = "Unknown"
+            engine_used = None
+            known_platform_support = None
+            known_sdk_support = None
 
     except:
-        return None, None
+        engine_used = None
+        known_platform_support = None
+        known_sdk_support = None
 
-    # exit()
-
-    return engine_used, known_platform_support
+    return engine_used, known_platform_support, known_sdk_support
 
 
 
-def get_compatibility_info(vr_device_list):
+def get_compatibility_info(sdk_device_list):
     """
     Function for getting/determining device compatibility information for the VR application
     (e.g., platforms, headsets, engines).
@@ -363,39 +381,60 @@ def get_compatibility_info(vr_device_list):
 
     Oculus PC SDK		Oculus PC 		Oculus Rift and Oculus Rift S
 
-    Oculus Mobile SDK	Oculus VR		Oculus Standalone headsets, Samsung Gear VR, Oculus Go, Oculus Quest
+    Oculus Mobile SDK	Oculus Mobile	Oculus Standalone headsets, Samsung Gear VR, Oculus Go, Oculus Quest
 
     OSVR								Razer OSVR HDK 1.4, Razer OSVR HDK 2
 
+    :param sdk_device_list: **I think for this you can just pass in 'known_platform_support',
+                             so can run this function separately in the case of Unreal Engine
+
     """
 
-    known_engine_support = {
-        'OpenVR':['Unity', 'Unreal Engine', 'CryEngine', 'Godot'],
-        'Oculus':['Unity', 'Unreal Engine', 'CryEngine', 'Godot']
+
+    known_SDK_platform_support = {
+        'OpenVR':'SteamVR',
+        'Oculus':'Oculus',
+        'Oculus PC':'Oculus PC',
+        'Oculus Mobile':'Oculus Mobile',
+        'OSVR':'OSVR'
         }
 
-    known_headset_support = {
+
+    known_SDK_headset_support = {
         'OpenVR':['HTC Vive', 'HTC Vive Pro', 'HTC Vive Cosmos', 'Razer OSVR HDK 1.4', 'Razer OSVR HDK 2', 'Pimax 4K',  'Pimax 8K', 'Pimax 5K Plus', 'Deepoon VR E3', 'Dell Visor', 'Asus HC102', 'Acer AH101', 'Windows Mixed Reality (WMR) headsets', 'HP WMR headset', 'Lenovo Explorer', 'Samsung Odyssey', 'Samsung Odyssey+', 'StarVR One', 'HP Reverb', 'Varjo VR-1', 'Valve headsets', 'Valve Index', 'Varjo VR-2', 'GFL Developer Kit'],
         'Oculus': {'Oculus PC' : ['Oculus Rift', 'Oculus Rift S'], 'Oculus Mobile' : ['Oculus Standalone headsets', 'Oculus Go', 'Oculus Quest', 'Samsung Gear VR']},
-        'OSVR':['Razer OSVR HDK 1.4', 'Razer OSVR HDK 2']
+         # Not sure if OSVR will appear as "OSVR", "OSVRUnity", or "OSVR-Unity", as haven't added OSVR SDK to Unity registry yet to test.
+        'OSVR':['Razer OSVR HDK 1.4', 'Razer OSVR HDK 2'],
+        'OSVRUniy':['Razer OSVR HDK 1.4', 'Razer OSVR HDK 2'],
+        'OSVR-Uniy':['Razer OSVR HDK 1.4', 'Razer OSVR HDK 2']
         }
 
+    # compatibility_dict = {'Platforms':copy.deepcopy(sdk_device_list)}
+    compatibility_dict = {'SDKs':copy.deepcopy(sdk_device_list)} # This should be SDKs, not platforms. For Unity, can be either Oculus, OpenVR, or OSVR.
 
-    compatibility_dict = {'Platforms':copy.deepcopy(vr_device_list)}
+    # For now, we can ask in the user form what Engine was used (Unity or Unreal, or something else), and if not Unity, then ask what SDKs were selected for support.
+    # Based on that information, we can then present what headsets would be compatible, since we would know the Engine and SDK (which for unity we will do automatically),
+    # together which inform us which headsets would be supported.
 
-    for dev in vr_device_list:
-        if dev == 'OpenVR':
-            compatibility_dict['Platforms'].append('SteamVR') # Add SteamVR compatibility as well if developed OpenVR devices (right?)
-        compatibility_dict.update({dev:{}})
-        try:
-            compatibility_dict[dev].update({ 'Engines':known_engine_support[dev] })
-        except Exception:
-            pass
+    for sdk in sdk_device_list:
+        if sdk == 'Oculus PC' or sdk == 'Oculus Mobile':
+            sdk_fill = 'Oculus'
+        else:
+            sdk_fill = sdk
+        # if sdk_fill == 'OpenVR':
+        #     compatibility_dict['Platforms'].append('SteamVR') # Add SteamVR compatibility as well if developed OpenVR devices (right?)
 
-        try:
-            compatibility_dict[dev].update({ 'Headsets':known_headset_support[dev] })
-        except Exception:
-            pass
+        if sdk_fill in known_SDK_platform_support.keys() or sdk_fill in known_SDK_headset_support.keys():
+            compatibility_dict.update({sdk_fill:{}})
+            try:
+                compatibility_dict[sdk_fill].update({ 'Platforms':known_SDK_platform_support[sdk_fill] })
+            except Exception:
+                pass
+
+            try:
+                compatibility_dict[sdk_fill].update({ 'Headsets':known_SDK_headset_support[sdk_fill] })
+            except Exception:
+                pass
 
     return compatibility_dict
 

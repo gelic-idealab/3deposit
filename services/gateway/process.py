@@ -127,6 +127,7 @@ async def start_deposit_processing_task(data):
                 return True
 
             else:
+                logging.error('err: no deposit id')
                 return False
         else:
             logging.error(msg=f'error assembling chunks')

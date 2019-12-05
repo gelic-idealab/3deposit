@@ -398,7 +398,7 @@ async def deposit_submit(request):
             if deposit_processed:
                 return web.json_response({'success': True})
             else:
-                return web.Response(status=418, headers=headers)
+                return web.Response(status=500, headers=headers)
         except Exception as err:
             return web.json_response({'err': str(err)}, headers=headers)
     else:

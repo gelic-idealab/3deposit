@@ -238,18 +238,22 @@ def create_app():
                 # Remove requested object from specified bucket
                 rem_object = minioClient.remove_object(bucket_name, deposit_id)
 
-            except (NoSuchBucket, InvalidBucketError, ResponseError, TypeError) as err:  # Handle bucket_name related errors
-                return jsonify({"err": "Bucket does not exist.",
-                                "log": str(err)})
-            except NoSuchKey as err:  # Handle deposit_id related error
-                return jsonify({"err": "Please enter valid deposit_id.",
-                                "log": str(err)})
-            except (AccessDenied, InvalidAccessKeyId, SignatureDoesNotMatch) as err:  # Handle authentication related errors
-                return jsonify({"err": "Invalid Authentication.",
-                                "log": str(err)})
-            except JSONDecodeError as err:  # Handle formatting related errors
-                return jsonify({"err": "Incorrect formatting of data",
-                                "log": str(err)})
+            # except (NoSuchBucket, InvalidBucketError, ResponseError, TypeError) as err:  # Handle bucket_name related errors
+            #     return jsonify({"err": "Bucket does not exist.",
+            #                     "log": str(err)})
+            # except NoSuchKey as err:  # Handle deposit_id related error
+            #     return jsonify({"err": "Please enter valid deposit_id.",
+            #                     "log": str(err)})
+            # except (AccessDenied, InvalidAccessKeyId, SignatureDoesNotMatch) as err:  # Handle authentication related errors
+            #     return jsonify({"err": "Invalid Authentication.",
+            #                     "log": str(err)})
+            # except JSONDecodeError as err:  # Handle formatting related errors
+            #     return jsonify({"err": "Incorrect formatting of data",
+            #                     "log": str(err)})
+
+            except Exception as err:
+                logging.error(f'DELETE err: {str(err)}')
+                return jsonify({'err': str(err)})
 
             return jsonify({"deposit_id": deposit_id})
 

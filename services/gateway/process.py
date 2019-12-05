@@ -58,14 +58,13 @@ async def start_reassembling_chunks(did):
 async def start_deposit_processing_task(data):
     try:
         deposit_id = data.get('id')
-
-        logging.info(msg='start_deposit_processing_task'+str(data))
-        assemble_chunks = create_task(start_reassembling_chunks(deposit_id))
-        chunks_assembled = await assemble_chunks
-        if chunks_assembled:
-            engine = await get_service_engine()
-            media_type = data.get('media_type')
-            if deposit_id:
+        if deposit_id:
+            logging.info(msg='start_deposit_processing_task'+str(data))
+            assemble_chunks = create_task(start_reassembling_chunks(deposit_id))
+            chunks_assembled = await assemble_chunks
+            if chunks_assembled:
+                engine = await get_service_engine()
+                media_type = data.get('media_type')
                 async with engine.acquire() as conn:
                     # insert deposit_id
                     await db.add_deposit_by_id(conn, deposit_id)
@@ -102,6 +101,7 @@ async def start_deposit_processing_task(data):
 
                     # add new fields to mongo doc
                     data = {
+                        'etag': etag,
                         'location': publish_resp.get('location'),
                         'resource_id': publish_resp.get('resource_id')
                     }
@@ -126,11 +126,8 @@ async def start_deposit_processing_task(data):
 
                 return True
 
-            else:
-                logging.error('err: no deposit id')
-                return False
         else:
-            logging.error(msg=f'error assembling chunks')
+            logging.error('err: no deposit id')
             return False
 
     except Exception as err:

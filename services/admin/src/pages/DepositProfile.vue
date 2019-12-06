@@ -1,5 +1,32 @@
 <template>
     <div>
+
+        <div v-if="confirmDelete">
+            <transition name="modal">
+            <div class="modal-mask">
+            <div class="modal-wrapper">
+                <div class="modal-container text-center">
+
+                <div class="modal-header text-center">
+                    <slot name="header">
+                    Confirm Delete?
+                    </slot>
+                </div>
+
+                <!-- <div class="modal-body">
+                    <p class="my-4">Are you sure you want to delete {{ id }}?</p>
+                </div> -->
+
+                <div class="modal-footer">
+                    <p-button type="danger" v-on:click.native="deleteDeposit">Yes</p-button>
+                    <p-button type="primary" v-on:click.native="confirmDeletefunc">Cancel</p-button>
+                </div>
+                </div>
+            </div>
+            </div>
+            </transition>
+        </div>
+
         <div class="row">
             <div class ="col">
              
@@ -30,7 +57,7 @@
                                     <i class="ti ti-close mr-1"></i>
                                     Unpublish
                                 </p-button>
-                                <p-button type="danger" outline v-on:click.native="deleteDeposit" class="btn" style="width: 20%">
+                                <p-button type="danger" outline v-on:click.native="confirmDeletefunc" class="btn" style="width: 20%">
                                     <i class="ti ti-trash mr-1"></i>
                                     Delete
                                 </p-button>
@@ -78,7 +105,8 @@ export default {
                 deposit_date: ''
             },
             publish_metadata: {},
-            id: ''
+            id: '',
+            confirmDelete: false
         }
     },
     components: {
@@ -132,6 +160,9 @@ export default {
                 link.click();
             });
         },
+        confirmDeletefunc() {
+            this.confirmDelete = !this.confirmDelete;
+        },
         deleteDeposit() {
             axios({
                 url: "../../api/store/objects",
@@ -140,6 +171,7 @@ export default {
             })
             .then((response) => {
                 console.log(response.data)
+                this.confirmDeletefunc();
             });
         }
     }
@@ -148,5 +180,64 @@ export default {
 
 
 <style>
+.modal-mask {
+  position: fixed;
+  z-index: 9998;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, .5);
+  display: table;
+  transition: opacity .3s ease;
+}
 
+.modal-wrapper {
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.modal-container {
+  width: 300px;
+  margin: 0px auto;
+  padding: 20px 30px;
+  background-color: #fff;
+  border-radius: 2px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
+  transition: all .3s ease;
+  font-family: Helvetica, Arial, sans-serif;
+}
+
+.modal-header h3 {
+  margin-top: 0;
+  color: #42b983;
+}
+
+.modal-body {
+  margin: 20px 0;
+}
+
+
+/*
+ * The following styles are auto-applied to elements with
+ * transition="modal" when their visibility is toggled
+ * by Vue.js.
+ *
+ * You can easily play with the modal transition by editing
+ * these styles.
+ */
+
+.modal-enter {
+  opacity: 0;
+}
+
+.modal-leave-active {
+  opacity: 0;
+}
+
+.modal-enter .modal-container,
+.modal-leave-active .modal-container {
+  -webkit-transform: scale(1.1);
+  transform: scale(1.1);
+}
 </style>

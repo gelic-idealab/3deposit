@@ -119,7 +119,7 @@ def create_app():
                 result = collection.update_one(update_query, {'$set': update_values})
 
                 if result.modified_count == 0:
-                    return jsonify({"err": f'Unable to update document with deposit ID {deposit_id}'})
+                    return jsonify({"err": f'PATCH attempted, no change to document for {deposit_id}'})
                 else:
                     return jsonify({"log": f'Updated deposit ID {deposit_id} with values {str(update_values)}'})
 

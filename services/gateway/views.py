@@ -454,6 +454,7 @@ async def store_buckets(request):
 
 
 async def store_objects(request):
+    logging.debug(f'store_objects called with request: {request}')
     username = await authorized_userid(request)
     async with request.app['db'].acquire() as conn:
         if not username:

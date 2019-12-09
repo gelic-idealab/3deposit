@@ -221,15 +221,14 @@ def get_vr_file_metadata(app_file):
 
     try:
         (mode, ino, dev, nlink, uid, gid, size, atime, mtime, ctime) = os.stat(app_file)
-        # Example output:  os.stat_result(st_mode=33204, st_ino=5522179, st_dev=64513, st_nlink=1, st_uid=1000, st_gid=1000, st_size=28869, st_atime=1570141042, st_mtime=1562097398, st_ctime=1570141042)
 
         file_info_dict = {
-            # "mode" : mode,
-            # "ino" : ino,
-            # "dev" : dev,
-            # "nlink" : nlink,
-            # "uid" : uid,
-            # "gid" : gid,
+            "mode" : mode,
+            "ino" : ino,
+            "dev" : dev,
+            "nlink" : nlink,
+            "uid" : uid,
+            "gid" : gid,
             "size" : size,  # in bytes
             "atime" : time.ctime(atime),    # time of last access
             "mtime" : time.ctime(mtime),    # time of last modified
@@ -269,7 +268,7 @@ def get_vr_file_metadata(app_file):
         return None
 
 
-def get_vr_asset_settings(asset_file): #, file_info_dict):
+def get_vr_asset_settings(asset_file):
 
     """
     Function to extract the metadata from an asset file (e.g., 'ProjectSettings.asset') of a VR package.
@@ -285,6 +284,11 @@ def get_vr_asset_settings(asset_file): #, file_info_dict):
             beyond the header from the original file as a stream also creates an error.)
         2.  The library can only read in files using UTF-8 encoding, but not latin-1 encoding, which is the case for some
             '.asset' YAML files here.
+
+    :param asset_file: Path and filename of asset file for which to try getting metadata (i.e., the contents of the file)
+
+    :return asset_settings_dict: Dictionary of contents saved from asset file.
+
     """
 
     try:
@@ -324,6 +328,12 @@ def determine_engine_used(app_pkg_metadata):
 
     For Unreal, check for a few of the "Common Directories":
          https://docs.unrealengine.com/en-US/Engine/Basics/DirectoryStructure/index.html
+
+    :param app_pkg_metadata: Dictionary containig the application-wide metdata for the top-level directories of the application.
+
+    :return engine_used: Name of engine used to build application, as a string.
+    :return known_platform_support: List of platforms known to be supported by the engine used.
+    :return known_sdk_support: List of SDKs known to be supported by the engine used.
 
     """
 
@@ -385,8 +395,10 @@ def get_compatibility_info(sdk_device_list):
 
     OSVR								Razer OSVR HDK 1.4, Razer OSVR HDK 2
 
-    :param sdk_device_list: **I think for this you can just pass in 'known_platform_support',
-                             so can run this function separately in the case of Unreal Engine
+
+    :param sdk_device_list: List of konwn SDKs supported for the particular VR application.
+
+    :return compatibility_dict: Dictionary of VR devices/headsets known to be compatible with the VR application.
 
     """
 

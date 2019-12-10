@@ -15,11 +15,11 @@ import GalleryEmbed from "@/pages/GalleryEmbed.vue";
 import Settings from "@/pages/Settings.vue";
 import Users from "@/pages/Settings/Users.vue";
 import ServiceProfile from "@/pages/ServiceProfile.vue";
-
+import UploadForm from "@/pages/UploadForm.vue";
 
 const routes = [
   {
-    path: "/",
+    path: "/admin",
     component: DashboardLayout,
     redirect: 'dashboard',
     children: [
@@ -79,6 +79,11 @@ const routes = [
         component: Settings
       }
     ]
+  },
+  {
+    path: "/upload/:id", 
+    name: "uploadForm", 
+    component: UploadForm
   },
   {
     path: "/public/gallery",

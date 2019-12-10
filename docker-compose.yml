@@ -2,19 +2,19 @@ version: '3'
 
 services:
 
-  form:
-    build: ./services/form/
-    networks:
-      - proxy
-    container_name: form
-    labels:
-      - "traefik.enable=true"
-      - "traefik.frontend.rule=PathPrefix:/"
-      - "traefik.backend=form"
-      - "traefik.port=80"
-      - "traefik.docker.network=proxy"
-      - "traefik.frontend.passHostHeader=true"
-    restart: always
+  # form:
+  #   build: ./services/form/
+  #   networks:
+  #     - proxy
+  #   container_name: form
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.frontend.rule=PathPrefix:/"
+  #     - "traefik.backend=form"
+  #     - "traefik.port=80"
+  #     - "traefik.docker.network=proxy"
+  #     - "traefik.frontend.passHostHeader=true"
+  #   restart: always
 
   postgres:
     container_name: postgres
@@ -39,9 +39,7 @@ services:
       - "traefik.backend=admin"
       - "traefik.port=80"
       - "traefik.docker.network=proxy"
-      - "traefik.frontend.redirect.regex=^(.*)/admin$$"
-      - "traefik.frontend.redirect.replacement=$$1/admin/"
-      - "traefik.frontend.rule=PathPrefix:/admin;ReplacePathRegex: ^/admin/(.*) /$$1"
+      - "traefik.frontend.rule=PathPrefix:/"
       - "traefik.frontend.passHostHeader=true"
     restart: always
 

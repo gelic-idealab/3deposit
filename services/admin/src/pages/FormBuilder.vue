@@ -14,7 +14,7 @@
         
         <!-- Form ID<input class="ml-3 mr-3 mb-3" type="text" v-model="deposit_form.form_id">
         <p-button @click.native.prevent="getForm">Load Form</p-button> -->
-        
+
         <br>
 
         <div v-show="saveSuccess" class="alert alert-success">
@@ -36,7 +36,7 @@ export default {
     data() {
         return {
             deposit_form: {
-                form_id: '',
+                form_id: null,
                 content: {}
             },
             saveSuccess: false
@@ -50,13 +50,12 @@ export default {
     },
     methods: {
         getForm() {
-            axios.get('../api/form', {params: {form_id: this.deposit_form.form_id}})
+            axios.get('../api/form', {params: {form_id: this.deposit_form.form_id || 'default'}})
             .then(response => {
                 if (response.data.form) {
+                    this.deposit_form.form_id = response.data.form.id;
                     this.deposit_form.content = response.data.form.content;
                     console.log(response.data.form.id, 'loaded')
-                } else {
-                    console.log(this.deposit_form.id, 'does not exist')
                 }
             })
         },

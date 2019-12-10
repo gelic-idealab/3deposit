@@ -288,12 +288,18 @@ Handlers for deposit form frontend
 async def deposit_form(request):
     if request.method == 'GET':
         form_id = request.query.get('form_id')
-        async with request.app['db'].acquire() as conn:
-            form = await db.get_form_by_id(conn, id=form_id)
-        if form:
-            return web.json_response({'form': form})
+        if form_id:
+            async with request.app['db'].acquire() as conn:
+                form = await db.get_form_by_id(conn, id=form_id)
+            if form:
+                return web.json_response({'form': form})
+            else:
+                return web.json_response({'err': f'No form with id {form_id}'})
         else:
-            return web.json_response({'err': f'No form with id {form_id}'})
+            async with request.app['db'].acquire() as conn:
+                forms = await db.get_forms(conn)
+                return web.json_response({'forms': forms})
+
 
     if request.method == 'POST':
         username = await authorized_userid(request)
@@ -305,7 +311,7 @@ async def deposit_form(request):
                 raise web.HTTPUnauthorized()
         try:
             req = await request.json()
-            form_id = req.get('form_id')
+            form_id = req.get('id')
             content = req.get('content')
             if form_id and content:
                 try:

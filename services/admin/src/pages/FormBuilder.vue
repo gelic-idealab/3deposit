@@ -1,12 +1,26 @@
 <template>
     <div>
-        <input class="mr-3" type="text" v-model="deposit_form.form_id">Form ID
-        <p-button @click.native.prevent="getForm">Load Form</p-button>
+        <b-form inline>
+            <b-input
+                id="inline-form-input-name"
+                class="mb-2 mr-sm-2 mb-sm-0"
+                label="Form ID"
+                placeholder="Form ID"
+                v-model="deposit_form.form_id"
+            ></b-input>
+            <b-button variant="primary" @click="getForm">Load</b-button>
+        </b-form>
+
+        
+        <!-- Form ID<input class="ml-3 mr-3 mb-3" type="text" v-model="deposit_form.form_id">
+        <p-button @click.native.prevent="getForm">Load Form</p-button> -->
+        
         <br>
+
         <div v-show="saveSuccess" class="alert alert-success">
             <button @click="saveSuccess = false" type="button" aria-hidden="true" class="close">×</button>
             <span>
-                <b> Oh yeah - </b> form saved successfully</span>
+                <b>{{deposit_form.form_id}}</b> saved successfully</span>
         </div>
 
         <vue-json-editor v-model="deposit_form.content" :show-btns="true" @json-save="saveForm"></vue-json-editor>
@@ -40,9 +54,9 @@ export default {
             .then(response => {
                 if (response.data.form) {
                     this.deposit_form.content = response.data.form.content;
-                    console.log(response.data.form.form_id, 'loaded')
+                    console.log(response.data.form.id, 'loaded')
                 } else {
-                    console.log('form does not exist')
+                    console.log(this.deposit_form.id, 'does not exist')
                 }
             })
         },

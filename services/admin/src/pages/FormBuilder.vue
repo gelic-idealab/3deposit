@@ -6,7 +6,7 @@
                 class="mb-2 mr-sm-2 mb-sm-0"
                 label="Form ID"
                 placeholder="Form ID"
-                v-model="deposit_form.form_id"
+                v-model="deposit_form.content.id"
             ></b-input>
             <b-button variant="primary" @click="getForm">Load</b-button>
         </b-form>
@@ -17,13 +17,11 @@
 
         <br>
 
-        <div v-show="saveSuccess" class="alert alert-success">
-            <button @click="saveSuccess = false" type="button" aria-hidden="true" class="close">×</button>
-            <span>
-                <b>{{deposit_form.form_id}}</b> saved successfully</span>
-        </div>
+        <b-alert v-model="unsaved" variant="warning">
+            <span>Form <b>{{deposit_form.form_id}}</b> has unsaved changes</span>
+        </b-alert>
 
-        <vue-json-editor v-model="deposit_form.content" :show-btns="true" @json-save="saveForm"></vue-json-editor>
+        <vue-json-editor v-model="deposit_form.content" :show-btns="true" @json-save="saveForm" @input="formChanged"></vue-json-editor>
 
     </div>
 </template>
@@ -36,26 +34,26 @@ export default {
     data() {
         return {
             deposit_form: {
-                form_id: null,
-                content: {}
+                content: {
+                    id: null
+                }
             },
-            saveSuccess: false
+            unsaved: false
         }
     },
     components: {
         vueJsonEditor
     },
     mounted() {
-
+        this.getForm();
     },
     methods: {
         getForm() {
-            axios.get('../api/form', {params: {form_id: this.deposit_form.form_id || 'default'}})
+            axios.get('../api/form', {params: {form_id: this.deposit_form.content.id || 'default'}})
             .then(response => {
                 if (response.data.form) {
-                    this.deposit_form.form_id = response.data.form.id;
                     this.deposit_form.content = response.data.form.content;
-                    console.log(response.data.form.id, 'loaded')
+                    console.log(response.data.form.content.id, 'loaded')
                 }
             })
         },
@@ -63,9 +61,19 @@ export default {
             axios.post('../api/form', this.deposit_form)
             .then(response => {
                 if (response.status == 200) {
-                    this.saveSuccess = true;
+                    this.unsaved = false;
+                    this.$notify({
+                        message: 'Form saved',
+                        horizontalAlign: 'right',
+                        verticalAlign: 'top',
+                        type: 'success',
+                        closeOnClick: true
+                    });
                 }            
             })
+        },
+        formChanged() {
+            this.unsaved = true;
         }
     }
 };

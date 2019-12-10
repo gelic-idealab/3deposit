@@ -21,60 +21,60 @@ const routes = [
   {
     path: "/admin",
     component: DashboardLayout,
-    redirect: 'dashboard',
+    redirect: '/admin/dashboard',
     children: [
       {
-        path: "/dashboard",
+        path: "dashboard",
         name: "dashboard",
         component: Dashboard
       },
       {
-        path: "/profile",
+        path: "profile",
         name: "profile",
         component: UserProfile
       },
       {
-        path: "/actions",
+        path: "actions",
         name: "actions",
         component: Actions
       },
       {
-        path: "/users",
+        path: "users",
         name: "users",
         component: Users
       },
       {
-        path: "/services",
+        path: "services",
         name: "services",
         component: Services
       },
       {
-        path: "/services/:id", 
+        path: "services/:id", 
         name: "service-profile", 
         component: ServiceProfile
       },
       {
-        path: "/deposits",
+        path: "deposits",
         name: "deposits",
         component: Deposits
       },
       {
-        path: "/forms",
+        path: "forms",
         name: "form-builder",
         component: FormBuilder
       },
       {
-        path: "/gallery-builder",
+        path: "gallery-builder",
         name: "gallery-builder",
         component: GalleryBuilder
       },
       {
-        path: "/deposits/:id", 
+        path: "deposits/:id", 
         name: "deposit-profile", 
         component: DepositProfile
       },
       {
-        path: "/settings",
+        path: "settings",
         name: "settings",
         component: Settings
       }

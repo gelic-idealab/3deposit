@@ -44,7 +44,7 @@ async def index(request):
 async def login(request):
     username = await authorized_userid(request)
     if username:
-        return web.HTTPFound('/admin/')
+        return web.HTTPFound('/#/admin/')
 
     if request.method == 'POST':
         form = await request.post()
@@ -55,7 +55,7 @@ async def login(request):
             if error:
                 return {'error': error}
             else:
-                response = web.HTTPFound('/admin/')
+                response = web.HTTPFound('/#/admin/')
 
                 user = await db.get_user_by_name(conn, form['username'])
                 await remember(request, response, user['username'])

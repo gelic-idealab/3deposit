@@ -81,12 +81,12 @@ const routes = [
     ]
   },
   {
-    path: "/upload/:id", 
+    path: "/upload/:id?", 
     name: "uploadForm", 
     component: UploadForm
   },
   {
-    path: "/public/gallery",
+    path: "/public/gallery", //TODO: use /public/gallery/:id? to retrieve prefiltered gallery
     name: "public-gallery",
     component: GalleryEmbed 
   },

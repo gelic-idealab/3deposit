@@ -132,7 +132,7 @@ export default {
         },
         resetNewForm() {
             this.new_form.id = null;
-            this.new_form.content = null;
+            this.new_form.content = {};
             this.new_form.template_id = null;
         },
         createNew() {
@@ -142,6 +142,8 @@ export default {
                 if (response.data.form) {
                     this.new_form.content = response.data.form.content;
                     console.log('creating template from', response.data.form.id)
+                } else {
+
                 }
             })
             .then( () => {

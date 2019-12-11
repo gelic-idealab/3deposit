@@ -313,7 +313,7 @@ async def deposit_form(request):
             req = await request.json()
             form_id = req.get('id')
             content = req.get('content')
-            if form_id and content:
+            if form_id:
                 try:
                     async with request.app['db'].acquire() as conn:
                         form = await db.update_form_by_id(conn, form_id, content)
@@ -321,7 +321,7 @@ async def deposit_form(request):
                 except Exception as e:
                     return web.json_response({'err': str(e)})
             else:
-                return web.json_response({'err': f'Missing params for req: {str(req)}'})
+                return web.json_response({'err': f'No form id'}, status=400)
         except Exception as e:
             return web.json_response({'err': 'Error handling request: ' + str(e)})
 

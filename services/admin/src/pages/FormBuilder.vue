@@ -76,7 +76,7 @@ export default {
             new_form: {
                 id: null,
                 content: null,
-                template_id: null
+                template_id: 'default'
             },
             unsaved: false,
             showCreateModal: false

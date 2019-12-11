@@ -113,7 +113,7 @@ async def update_deposit_by_id(conn, deposit_id, **kwargs):
 async def get_deposits(conn):
     result = await conn.execute(
         deposits
-        .select().order_by(desc(deposits.c.deposit_date))
+        .select().order_by(deposits.c.deposit_date.desc())
     )
 
     deposit_list = await result.fetchall()

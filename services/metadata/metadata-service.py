@@ -49,7 +49,6 @@ def handler():
 
         try:
             # unpack request data
-            logging.debug(f'received POST request with data: {str(data)}')
             data = json.loads(request.form.get('data'))
             did = data.get('deposit_id')
             media_type = data.get('media_type')
@@ -73,7 +72,7 @@ def handler():
                     base_model_file_path = ''
 
                     all_model_metadata = unzip_and_extract_model_metadata(zipped_model_file, base_model_file_path, extracted_files_to_delete_later)
-                    logging.debug(f'all_model_metadata: {all_model_metadata}')
+                    # logging.debug(f'all_model_metadata: {all_model_metadata}')
 
                     all_keys = list(all_model_metadata.keys())
                     for k in all_keys:
@@ -81,7 +80,7 @@ def handler():
                             k_new = k.replace('.', '_')
                             all_model_metadata[k_new] = all_model_metadata.pop(k)
 
-                    logging.debug(f'all_model_metadata replaced: {all_model_metadata}')
+                    # logging.debug(f'all_model_metadata replaced: {all_model_metadata}')
 
                     return jsonify({"deposit_id": did, "technical_metadata": all_model_metadata})
 
@@ -113,25 +112,30 @@ def handler():
 
 
                 elif media_type == 'vr':
-                    zipped_vr_file = fzip   # Path to zipped vr app from which to gather metadata
-                    base_vr_path = ''
+                    try:
+                        zipped_vr_file = fzip   # Path to zipped vr app from which to gather metadata
+                        base_vr_path = ''
 
-                    all_vr_metadata = unzip_and_extract_vr_metadata(zipped_vr_file, base_vr_path, extracted_files_to_delete_later, vr_engine=vrEngine, supported_sdks=supportedSdks)
-                    logging.debug(f'all_vr_metadata: {all_vr_metadata}')
+                        all_vr_metadata = unzip_and_extract_vr_metadata(zipped_vr_file, base_vr_path, extracted_files_to_delete_later, vr_engine=vrEngine, supported_sdks=supportedSdks)
+                        # logging.debug(f'all_vr_metadata: {all_vr_metadata}')
+                        logging.debug(f'all_vr_metadata generated: {bool(all_vr_metadata)}')
 
-                    all_keys = list(all_vr_metadata.keys())
-                    for k in all_keys:
-                        if '.' in k:
-                            k_new = k.replace('.', '_')
-                            all_vr_metadata[k_new] = all_vr_metadata.pop(k)
+                        all_keys = list(all_vr_metadata.keys())
+                        for k in all_keys:
+                            if '.' in k:
+                                k_new = k.replace('.', '_')
+                                all_vr_metadata[k_new] = all_vr_metadata.pop(k)
 
-                    logging.debug(f'all_vr_metadata replaced: {all_vr_metadata}')
-
-                    return jsonify({"deposit_id": did, 'technical_metadata': all_vr_metadata})
+                        # logging.debug(f'all_vr_metadata replaced: {all_vr_metadata}')
+                        response = jsonify({"deposit_id": did, 'technical_metadata': all_vr_metadata})
+                        return response
+                        
+                    except Exception as emsg:
+                        logging.error(f'vr process exception: {str(emsg)}')
 
 
         except Exception as emsg:
-            logging.error(str(emsg))
+            logging.error(str(emsg), exc_info=True)
             return jsonify({'emsg': str(emsg)})
 
         finally:
@@ -249,9 +253,9 @@ def unzip_and_extract_model_metadata(model_zip_file, unzip_path, extracted_files
     all_file_metadata = {}
 
     for fn in filename_list:
-        logging.debug(fn)
+        # logging.debug(fn)
         fn_path = os.path.join(unzip_path, fn)
-        logging.debug(fn_path)
+        # logging.debug(fn_path)
         extracted_files_list.append(fn_path)
 
         # Clear previous properties
@@ -295,7 +299,7 @@ def unzip_and_extract_model_metadata(model_zip_file, unzip_path, extracted_files
                 logging.debug('subzip iteration')
                 all_file_metadata.update( {subzip_file : subzip_metadata[subzip_file]} )
 
-    logging.debug(f'all_file_metadata: {all_file_metadata}')
+    # logging.debug(f'all_file_metadata: {all_file_metadata}')
     return all_file_metadata
 
 
@@ -343,7 +347,7 @@ def get_general_file_metadata(in_file):
                     file_info_dict.update({"ext":None})
 
         except Exception as emsg:
-            logging.error("EXCEPTION:", str(emsg))
+            logging.error("EXCEPTION: "+str(emsg))
             # print("Problem getting file path, name, and extension.")
             file_info_dict.update({"file_tree_path":None})
             file_info_dict.update({"filename":None})
@@ -352,7 +356,7 @@ def get_general_file_metadata(in_file):
         return file_info_dict
 
     except Exception as emsg:
-        logging.error("EXCEPTION:", str(emsg))
+        logging.error("EXCEPTION: "+str(emsg))
         return None
 
 
@@ -388,7 +392,7 @@ def get_3d_model_gltf_metadata(gltf_file, file_info_dict):
             return gltf_data_dict
 
         except Exception as emsg:
-            logging.error("EXCEPTION:", str(emsg))
+            logging.error("EXCEPTION: "+str(emsg))
             return None
 
     elif file_info_dict["ext"].lower() == "glb": # Get header info
@@ -409,7 +413,7 @@ def get_3d_model_gltf_metadata(gltf_file, file_info_dict):
             return gltf_data_dict
 
         except Exception as emsg:
-            logging.error("EXCEPTION:", str(emsg))
+            logging.error("EXCEPTION: "+str(emsg))
             return None
 
 
@@ -469,7 +473,7 @@ def get_3d_model_mesh_metadata(mesh_file, file_info_dict, is_animimated):
     try:
         m = trimesh.load(mesh_file)
     except Exception as emsg:
-        logging.error("EXCEPTION:", str(emsg))
+        logging.error("EXCEPTION: "+str(emsg))
         return None
 
     mesh_data_dict = {}
@@ -582,17 +586,18 @@ def unzip_and_extract_vr_metadata(vr_zip_file, unzip_path, extracted_files_list,
         sum_size += os.path.getsize(fn)
 
         # Get number of files in each base directory folder
-        if os.path.isdir(fn) and 2 < len(fn.split('/')) < 5:
-            top_level_directories.update( {fn:{}} )
-            num_sub_files = 0
-            subdir_sum_size = 0
-            for fx in os.walk(fn):
-                num_sub_files += len(fx[2])
-                for fi in fx[2]:
-                    fi_path = os.path.join(fx[0],fi)
-                    subdir_sum_size += os.path.getsize(fi_path)
-            top_level_directories[fn].update( {"File count":num_sub_files} )
-            top_level_directories[fn].update( {"Directory size (bytes)":subdir_sum_size} )
+        if os.path.isdir(fn):
+            if 2 < len(fn.split('/')) < 5:
+                top_level_directories.update( {fn:{}} )
+                num_sub_files = 0
+                subdir_sum_size = 0
+                for fx in os.walk(fn):
+                    num_sub_files += len(fx[2])
+                    for fi in fx[2]:
+                        fi_path = os.path.join(fx[0],fi)
+                        subdir_sum_size += os.path.getsize(fi_path)
+                top_level_directories[fn].update( {"File count":num_sub_files} )
+                top_level_directories[fn].update( {"Directory size (bytes)":subdir_sum_size} )
 
     app_package_metadata.update( {"File count" : f_count} )
     app_package_metadata.update( {"Directory count" : d_count} )
@@ -617,19 +622,19 @@ def unzip_and_extract_vr_metadata(vr_zip_file, unzip_path, extracted_files_list,
                 try:
                     all_file_metadata["VR application compatibility"] = compatibility_info
                 except Exception as emsg:
-                   logging.error("EXCEPTION:", str(emsg))
+                   logging.error("EXCEPTION: "+str(emsg))
     
     except Exception as emsg:
-        logging.error("EXCEPTION:", str(emsg))
+        logging.error("EXCEPTION: "+str(emsg))
     
     if app_package_metadata is not None:
         all_file_metadata.update( {"VR application package metadata" : app_package_metadata} )
 
     # Second, gather file-specific metadata
     for fn in filename_list:
-        logging.debug(fn)
+        # logging.debug(fn)
         fn_path = os.path.join(unzip_path, fn)
-        logging.debug(fn_path)
+        # logging.debug(fn_path)
         extracted_files_list.append(fn_path)
 
         # Clear previous properties
@@ -677,13 +682,13 @@ def unzip_and_extract_vr_metadata(vr_zip_file, unzip_path, extracted_files_list,
         # Now check if the file was a zipped file, and if so, recursively gather subzipped file metadata
         if file_metadata["ext"] == "zip":
             zipfile_root = '/'.join(file_metadata['file_tree_path'].split('/')[0:-1])
-            subzip_metadata = unzip_and_extract_vr_metadata(fn_path, zipfile_root, extracted_files_list)
+            subzip_metadata = unzip_and_extract_vr_metadata(fn_path, zipfile_root, extracted_files_list, vr_engine, supported_sdks)
             for subzip_file in subzip_metadata:
                 logging.debug('subzip iteration')
                 all_file_metadata.update( {subzip_file : subzip_metadata[subzip_file]} )
 
 
-    logging.debug(f'all_file_metadata: {all_file_metadata}')
+    # logging.debug(f'all_file_metadata: {all_file_metadata}')
 
     return all_file_metadata
 
@@ -709,6 +714,7 @@ def get_vr_asset_settings(asset_file):
 
     :return asset_settings_dict: Dictionary of contents saved from asset file.
     """
+    asset_settings_dict = None
 
     try:
         with open(asset_file, 'r') as f:
@@ -728,7 +734,7 @@ def get_vr_asset_settings(asset_file):
         asset_settings_stream.close()
 
     except Exception as emsg:
-        logging.error("EXCEPTION:", str(emsg))
+        logging.error("EXCEPTION:"+str(emsg))
         asset_settings_dict = None
 
     # Last, remove the temporary file if it exists
@@ -736,7 +742,7 @@ def get_vr_asset_settings(asset_file):
         if os.path.isfile('temp_yaml.txt'):
             os.remove('temp_yaml.txt')
     except Exception as emsg:
-        logging.error("EXCEPTION:", str(emsg))
+        logging.error("EXCEPTION:"+str(emsg))
 
     return asset_settings_dict
 
@@ -785,7 +791,7 @@ def determine_engine_used(app_pkg_metadata):
             known_sdk_support = None
 
     except Exception as emsg:
-        logging.error("EXCEPTION:", str(emsg))
+        logging.error("EXCEPTION: "+str(emsg))
         engine_used = None
         known_platform_support = None
         known_sdk_support = None
@@ -865,7 +871,7 @@ def get_compatibility_info(sdk_device_list):
                     pass
 
     except Exception as emsg:
-        logging.error("EXCEPTION:", str(emsg))
+        logging.error("EXCEPTION: "+str(emsg))
 
     return compatibility_dict
 

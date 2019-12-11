@@ -218,7 +218,10 @@ async def trigger_metadata(data):
     with open(TMP_FILE_LOCATION + did, 'rb') as f:
         fd.add_field('file', f, filename=did, content_type='application/octet-stream')
         async with new_request(method='POST', url='http://metadata-service:5000/', data=fd) as resp:
-            resp_json = await resp.json()
+            if resp.content_type == 'application/json':
+                resp_json = await resp.json()
+            else:
+                resp_json = await resp.text()
             logging.debug(f'trigger_metadata, metadata-service returned: {str(resp_json)}')
             technical_metadata = resp_json.get('technical_metadata')
 

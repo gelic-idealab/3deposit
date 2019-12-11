@@ -2,15 +2,15 @@
   <div class="wrapper">
     <side-bar>
       <template slot="links">
-        <sidebar-link to="/dashboard" name="Dashboard" icon="ti-dashboard"/>
-        <sidebar-link to="/profile" name="User Profile" icon="ti-id-badge"/>
-        <sidebar-link to="/deposits" name="Deposits" icon="ti-package"/>
-        <sidebar-link to="/gallery-builder" name="Gallery" icon="ti-gallery"/>
-        <sidebar-link v-show="current_user.role === 'admin'" to="/actions" name="Actions" icon="ti-control-play"/>
-        <sidebar-link v-show="current_user.role === 'admin'" to="/forms" name="Forms" icon="ti-pencil-alt"/>
-        <sidebar-link v-show="current_user.role === 'admin'" to="/services" name="Services" icon="ti-panel"/>
-        <sidebar-link v-show="current_user.role === 'admin'" to="/users" name="Users" icon="fa fa-users"/>
-        <sidebar-link v-show="current_user.role === 'admin'" to="/settings" name="Settings" icon="ti-settings"/>
+        <sidebar-link to="/admin/dashboard" name="Dashboard" icon="ti-dashboard"/>
+        <sidebar-link to="/admin/profile" name="User Profile" icon="ti-id-badge"/>
+        <sidebar-link to="/admin/deposits" name="Deposits" icon="ti-package"/>
+        <sidebar-link to="/admin/gallery-builder" name="Gallery" icon="ti-gallery"/>
+        <sidebar-link v-show="current_user.role === 'admin'" to="/admin/actions" name="Actions" icon="ti-control-play"/>
+        <sidebar-link v-show="current_user.role === 'admin'" to="/admin/forms" name="Forms" icon="ti-pencil-alt"/>
+        <sidebar-link v-show="current_user.role === 'admin'" to="/admin/services" name="Services" icon="ti-panel"/>
+        <sidebar-link v-show="current_user.role === 'admin'" to="/admin/users" name="Users" icon="fa fa-users"/>
+        <sidebar-link v-show="current_user.role === 'admin'" to="/admin/settings" name="Settings" icon="ti-settings"/>
       </template>
       <mobile-menu>
         <li class="nav-item">

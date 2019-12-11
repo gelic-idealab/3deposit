@@ -44,7 +44,7 @@ async def index(request):
 async def login(request):
     username = await authorized_userid(request)
     if username:
-        return web.HTTPFound('/admin/')
+        return web.HTTPFound('/#/admin/')
 
     if request.method == 'POST':
         form = await request.post()
@@ -55,7 +55,7 @@ async def login(request):
             if error:
                 return {'error': error}
             else:
-                response = web.HTTPFound('/admin/')
+                response = web.HTTPFound('/#/admin/')
 
                 user = await db.get_user_by_name(conn, form['username'])
                 await remember(request, response, user['username'])
@@ -287,13 +287,19 @@ Handlers for deposit form frontend
 
 async def deposit_form(request):
     if request.method == 'GET':
-        form_id = request.query.get('form_id')
-        async with request.app['db'].acquire() as conn:
-            form = await db.get_form_by_id(conn, id=form_id)
-        if form:
-            return web.json_response({'form': form})
+        id = request.query.get('id')
+        if id:
+            async with request.app['db'].acquire() as conn:
+                form = await db.get_form_by_id(conn, id=id)
+            if form:
+                return web.json_response({'form': form})
+            else:
+                return web.json_response({'err': f'No form with id {id}'})
         else:
-            return web.json_response({'err': f'No form with id {form_id}'})
+            async with request.app['db'].acquire() as conn:
+                forms = await db.get_forms(conn)
+                return web.json_response({'forms': forms})
+
 
     if request.method == 'POST':
         username = await authorized_userid(request)
@@ -305,9 +311,9 @@ async def deposit_form(request):
                 raise web.HTTPUnauthorized()
         try:
             req = await request.json()
-            form_id = req.get('form_id')
+            form_id = req.get('id')
             content = req.get('content')
-            if form_id and content:
+            if form_id:
                 try:
                     async with request.app['db'].acquire() as conn:
                         form = await db.update_form_by_id(conn, form_id, content)
@@ -315,7 +321,7 @@ async def deposit_form(request):
                 except Exception as e:
                     return web.json_response({'err': str(e)})
             else:
-                return web.json_response({'err': f'Missing params for req: {str(req)}'})
+                return web.json_response({'err': f'No form id'}, status=400)
         except Exception as e:
             return web.json_response({'err': 'Error handling request: ' + str(e)})
 

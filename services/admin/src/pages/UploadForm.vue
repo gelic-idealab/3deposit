@@ -1,8 +1,7 @@
 <template>
-  <div id="app">
+  <div id="uploadForm">
     <div class="container">
       <Banner v-bind:banner="form.banner"/>
-      <!-- <FileProgress v-bind:id="id"/> -->
       <Upload v-bind:id="id"/>
       <Fields v-bind:fields="form.fields" :id="id"/>
       <Footer />
@@ -11,11 +10,10 @@
 </template>
 
 <script>
-import Banner from './components/Banner.vue'
-import Fields from './components/Fields.vue'
-// import FileProgress from './components/FileProgress.vue'
-import Upload from './components/Upload.vue'
-import Footer from './components/Footer.vue'
+import Banner from '../components/Banner.vue'
+import Fields from '../components/Fields.vue'
+import Upload from '../components/Upload.vue'
+import Footer from '../components/Footer.vue'
 
 import axios from 'axios'
 import uuidv4 from 'uuid'
@@ -29,7 +27,6 @@ export default {
   components: {
     Banner,
     Fields,
-    // FileProgress,
     Footer,
     Upload
   },
@@ -42,10 +39,10 @@ export default {
   },
   mounted () {
     axios
-      .get('../api/form', {params: {form_id: 'deposit_form'}})
+      .get('../api/form', {params: {id: this.$route.params.id || 'default'}})
       .then(response => (this.form = response.data.form.content));
     // eslint-disable-next-line
-    console.log(this.id);
+    console.log('deposit_id:', this.id);
   },
 }
 </script>
@@ -53,7 +50,7 @@ export default {
 
 
 <style>
-#app {
+#uploadForm {
   /*font-family: 'Avenir', Helvetica, Arial, sans-serif;*/
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

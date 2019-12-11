@@ -170,7 +170,10 @@ export default {
 };
 </script>
 <style>
-.ace_line_group {
+  .ace-jsoneditor, textarea.jsoneditor-text {
+    min-height: 350px;
+  }
+  .ace_line_group {
     text-align: left;
   }
   .json-editor-container {

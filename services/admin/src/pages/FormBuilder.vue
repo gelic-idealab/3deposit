@@ -11,9 +11,8 @@
                     v-on:change="getForm"
                 ></b-form-select>
             </b-input-group>
+            <b-button size="sm" class="mb-2" v-on:click="toggleShowModal">Create New</b-button>
         </b-form>
-
-        <b-button v-on:click="toggleShowModal">Create New</b-button>
 
         <b-alert v-model="unsaved" variant="warning">
             <span>Form <b>{{deposit_form.form_id}}</b> has unsaved changes</span>
@@ -28,9 +27,7 @@
                 <div class="modal-container text-center">
 
                 <div class="modal-header text-center">
-                    <slot name="header">
-                    Create New Form
-                    </slot>
+                    <slot name="header" class="text-center">Create New Form</slot>
                 </div>
 
                 <div class="modal-body">
@@ -44,7 +41,7 @@
                             :options="forms"
                             v-model="new_form.template_id"
                         ></b-form-select>
-                        <b-button type="submit" variant="primary">Create</b-button>
+                        <b-button class="mr-2" type="submit" variant="primary">Create</b-button>
                         <b-button v-on:click="toggleShowModal">Cancel</b-button>
                     </b-form>
                 </div>
@@ -112,7 +109,7 @@ export default {
             axios.post('../api/form', this.deposit_form)
             .then(response => {
                 if (response.status == 200) {
-                    console.log(response);
+                    console.log(response.data);
                     this.unsaved = false;
                     this.$notify({
                         message: 'Form saved',
@@ -173,4 +170,43 @@ export default {
 };
 </script>
 <style>
+.ace_line_group {
+    text-align: left;
+  }
+  .json-editor-container {
+    display: flex;
+    width: 100%;
+  }
+  .json-editor-container .tree-mode {
+    width: 75%;
+  }
+  .json-editor-container .code-mode {
+    flex-grow: 1;
+  }
+  .jsoneditor-btns{
+    text-align: center;
+    margin-top:10px;
+  }
+  .jsoneditor-vue .jsoneditor-outer{
+    min-height:350px;
+  }
+  .jsoneditor-vue div.jsoneditor-tree{
+    min-height: 350px;
+  }
+  .json-save-btn{
+    background-color: #66615b;
+    border: none;
+    color:#fff;
+    padding:5px 10px;
+    border-radius: 5px;
+  }
+  .json-save-btn:focus{
+    outline: none;
+  }
+  .json-save-btn[disabled]{
+    background-color: #66615b;
+  }
+  code {
+    background-color: #f5f5f5;
+  }
 </style>

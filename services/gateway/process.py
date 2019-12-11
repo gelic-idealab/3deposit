@@ -56,6 +56,7 @@ async def start_reassembling_chunks(did):
         
 
 async def start_deposit_processing_task(data):
+    logging.debug(f'start_deposit_processing_task with data: {str(data)}')
     try:
         deposit_id = data.get('id')
         if deposit_id:
@@ -218,6 +219,7 @@ async def trigger_metadata(data):
         fd.add_field('file', f, filename=did, content_type='application/octet-stream')
         async with new_request(method='POST', url='http://metadata-service:5000/', data=fd) as resp:
             resp_json = await resp.json()
+            logging.debug(f'trigger_metadata, metadata-service returned: {str(resp_json)}')
             technical_metadata = resp_json.get('technical_metadata')
 
         if technical_metadata:

@@ -12,6 +12,7 @@ requests = "*"
 gunicorn = "*"
 trimesh = "*"
 pillow = "*"
+pyyaml = "*"
 
 [requires]
 python_version = "3.7"

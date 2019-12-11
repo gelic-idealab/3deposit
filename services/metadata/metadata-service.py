@@ -49,11 +49,14 @@ def handler():
 
         try:
             # unpack request data
+            logging.debug(f'received POST request with data: {str(data)}')
             data = json.loads(request.form.get('data'))
             did = data.get('deposit_id')
             media_type = data.get('media_type')
 
-            # deposit_form_metadata = data.get('metadata')
+            form_data = data.get('deposit_metadata')
+            vrEngine = form_data.get('vrEngine')
+            supportedSdks = form_data.get('supportedSdks')
 
             logging.info(f"POST request for deposit_id: {did}, data: {data}")
 
@@ -113,7 +116,7 @@ def handler():
                     zipped_vr_file = fzip   # Path to zipped vr app from which to gather metadata
                     base_vr_path = ''
 
-                    all_vr_metadata = unzip_and_extract_vr_metadata(zipped_vr_file, base_vr_path, extracted_files_to_delete_later)
+                    all_vr_metadata = unzip_and_extract_vr_metadata(zipped_vr_file, base_vr_path, extracted_files_to_delete_later, vr_engine=vrEngine, supported_sdks=supportedSdks)
                     logging.debug(f'all_vr_metadata: {all_vr_metadata}')
 
                     all_keys = list(all_vr_metadata.keys())
@@ -541,7 +544,7 @@ def get_3d_model_mesh_metadata(mesh_file, file_info_dict, is_animimated):
 
 
 
-def unzip_and_extract_vr_metadata(vr_zip_file, unzip_path, extracted_files_list):
+def unzip_and_extract_vr_metadata(vr_zip_file, unzip_path, extracted_files_list, vr_engine, supported_sdks):
     """
     Function to unzip a 3D model file and extract all of the metadata for each of the unzipped files
     (including further zip files within the original zip file).
@@ -554,6 +557,7 @@ def unzip_and_extract_vr_metadata(vr_zip_file, unzip_path, extracted_files_list)
                                associated with each file, including model-specific metadata if the file
                                is of a model type (e.g., gltf, glb, obj, stl).
     """
+    
 
     logging.info(f'Exctracting file: {vr_zip_file}')
     with zipfile.ZipFile(vr_zip_file, 'r') as zip_ref:
@@ -596,21 +600,30 @@ def unzip_and_extract_vr_metadata(vr_zip_file, unzip_path, extracted_files_list)
     app_package_metadata.update( {"Top-level directories" : top_level_directories} )
 
     engine_used_to_generate_app, potential_supported_platforms, potential_supported_sdks = determine_engine_used(app_package_metadata)
-    if engine_used_to_generate_app is not None:
+    if engine_used_to_generate_app == vr_engine:
+        pass
+    else:
+        logging.info("Input VR engine does not match detected engine.:"+str(engine_used_to_generate_app)+"!="+str(vr_engine))
+        engine_used_to_generate_app = vr_engine
+    try:
         app_package_metadata.update( {"Engine used to generate VR application" : engine_used_to_generate_app} )
         app_package_metadata.update( {"Potentially supported platforms (based on engine used)" : potential_supported_platforms} )
         app_package_metadata.update( {"Potentially supported SDKs (based on engine used)" : potential_supported_sdks} )
-
+    
         ## Get VR Headset support for Unreal Engine
-        if engine_used_to_generate_app == 'Unreal Engine':
-             # FOR THIS, WILL WANT TO USE USER FORM INPUT OF SDKS ENABLED FOR APP (INSTEAD OF "POTENTIAL_SDKS")
-            compatibility_info = get_compatibility_info(potential_supported_sdks)
+        if engine_used_to_generate_app != 'Unity':
+            compatibility_info = get_compatibility_info(supported_sdks)
             if compatibility_info is not None:
-                all_file_metadata["VR application compatibility"] = compatibility_info
-
+                try:
+                    all_file_metadata["VR application compatibility"] = compatibility_info
+                except Exception as emsg:
+                   logging.error("EXCEPTION:", str(emsg))
+    
+    except Exception as emsg:
+        logging.error("EXCEPTION:", str(emsg))
+    
     if app_package_metadata is not None:
         all_file_metadata.update( {"VR application package metadata" : app_package_metadata} )
-
 
     # Second, gather file-specific metadata
     for fn in filename_list:

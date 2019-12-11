@@ -39,7 +39,7 @@ export default {
   },
   mounted () {
     axios
-      .get('../api/form', {params: {form_id: this.$route.params.id || 'default'}})
+      .get('../api/form', {params: {id: this.$route.params.id || 'default'}})
       .then(response => (this.form = response.data.form.content));
     // eslint-disable-next-line
     console.log('deposit_id:', this.id);

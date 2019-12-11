@@ -13,11 +13,50 @@
             </b-input-group>
         </b-form>
 
+        <b-button v-on:click="toggleShowModal">Create New</b-button>
+
         <b-alert v-model="unsaved" variant="warning">
             <span>Form <b>{{deposit_form.form_id}}</b> has unsaved changes</span>
         </b-alert>
 
         <vue-json-editor v-model="deposit_form.content" :show-btns="true" @json-save="saveForm" @input="formChanged"></vue-json-editor>
+
+        <div v-if="showCreateModal">
+            <transition name="modal">
+            <div class="modal-mask">
+            <div class="modal-wrapper">
+                <div class="modal-container text-center">
+
+                <div class="modal-header text-center">
+                    <slot name="header">
+                    Create New Form
+                    </slot>
+                </div>
+
+                <div class="modal-body">
+                    <b-form @submit="createNew">
+                        <b-input class="mb-3" v-model="new_form.id" required></b-input>
+                        <p>Create from template</p>
+                        <b-form-select
+                            id="templateId"
+                            class="mb-3 mr-sm-2"
+                            label="Form Template"
+                            :options="forms"
+                            v-model="new_form.template_id"
+                        ></b-form-select>
+                        <b-button type="submit" variant="primary">Create</b-button>
+                        <b-button v-on:click="toggleShowModal">Cancel</b-button>
+                    </b-form>
+                </div>
+
+                <div class="modal-footer">
+                    
+                </div>
+                </div>
+            </div>
+            </div>
+            </transition>
+        </div>
 
     </div>
 </template>
@@ -34,7 +73,13 @@ export default {
                 id: null,
                 content: {}
             },
-            unsaved: false
+            new_form: {
+                id: null,
+                content: null,
+                template_id: null
+            },
+            unsaved: false,
+            showCreateModal: false
         }
     },
     components: {
@@ -55,7 +100,7 @@ export default {
             });
         },
         getForm() {
-            axios.get('../api/form', {params: {form_id: this.deposit_form.id || 'default'}})
+            axios.get('../api/form', {params: {id: this.deposit_form.id || 'default'}})
             .then(response => {
                 if (response.data.form) {
                     this.deposit_form = response.data.form;
@@ -81,6 +126,46 @@ export default {
         },
         formChanged() {
             this.unsaved = true;
+        },
+        toggleShowModal() {
+            this.showCreateModal = !this.showCreateModal;
+        },
+        resetNewForm() {
+            this.new_form.id = null;
+            this.new_form.content = null;
+            this.new_form.template_id = null;
+        },
+        createNew() {
+            this.toggleShowModal();
+            axios.get('../api/form', {params: {id: this.new_form.template_id || 'default'}})
+            .then(response => {
+                if (response.data.form) {
+                    this.new_form.content = response.data.form.content;
+                    console.log('creating template from', response.data.form.id)
+                }
+            })
+            .then( () => {
+                axios.post('../api/form', this.new_form)
+                .then(response => {
+                    if (response.status == 200) {
+                        this.$notify({
+                            message: 'New form created',
+                            horizontalAlign: 'right',
+                            verticalAlign: 'top',
+                            type: 'success',
+                            closeOnClick: true
+                        });
+                    }  
+                })
+                .then( () => {
+                    this.getForms();
+                })
+                .then( () => {
+                    this.deposit_form.id = this.new_form.id;
+                    this.deposit_form.content = this.new_form.content
+                    this.resetNewForm();
+                })
+            })          
         }
     }
 };

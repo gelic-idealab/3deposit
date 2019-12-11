@@ -113,7 +113,7 @@ async def update_deposit_by_id(conn, deposit_id, **kwargs):
 async def get_deposits(conn):
     result = await conn.execute(
         deposits
-        .select().order_by(deposits.c.id)
+        .select().order_by(desc(deposits.c.deposit_date))
     )
 
     deposit_list = await result.fetchall()
@@ -198,7 +198,7 @@ async def delete_user(conn, username):
 async def get_forms(conn):
     result = await conn.execute(
         forms
-        .select()
+        .select().order_by(forms.c.id)
     )
     forms_result = await result.fetchall()
     return [form.id for form in forms_result]

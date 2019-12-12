@@ -1,8 +1,8 @@
 {
   "banner": {
-    "title": "Default Deposit & Publish 3D content",
-    "description": "Use this form to upload your 3d models, 360 videos, and VR source code & projects",
-    "instructions": "Your files will be deposited into a Library repository and published to a third-party website."
+    "title": "Default Title - Change this in Admin/Forms",
+    "description": "Default description goes here! The fields in the default form are necessary to properly process deposits.",
+    "instructions": "This is where you should put instructions which are specific to this form. "
   },
   "fields": [
     {

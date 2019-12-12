@@ -167,7 +167,7 @@ async def services(request):
         except Exception as err:
             return web.json_response({'err': str(err)})
     else:
-        return web.Response()
+        return web.Response(status=405)
 
 
 async def services_configs(request):
@@ -205,7 +205,7 @@ async def services_configs(request):
             return web.json_response({'err': str(err)}, headers=headers)
 
     else:
-        return web.Response(headers=headers)
+        return web.Response(status=405, headers=headers)
 
 
 async def services_actions(request):
@@ -276,7 +276,9 @@ async def services_actions(request):
             return web.json_response({'err': str(err)})
 
     else:
-        return web.Response(headers={
+        return web.Response(
+            status=405,
+            headers={
             'Access-Control-Allow-Headers': 'content-type'
         })
 
@@ -389,7 +391,7 @@ async def deposit_upload(request):
             return web.json_response({'err': str(err)}, status=500)
 
     else:
-        return web.Response(status=200)
+        return web.Response(status=405)
 
 async def deposit_submit(request):
     headers = {
@@ -408,7 +410,7 @@ async def deposit_submit(request):
         except Exception as err:
             return web.json_response({'err': str(err)}, headers=headers)
     else:
-        return web.Response(status=200, headers=headers)
+        return web.Response(status=405, headers=headers)
 
 
 """
@@ -746,3 +748,5 @@ async def tokens(request):
 
         except Exception as err:
             return web.json_response({'err': str(err)})
+    else:
+        return web.Response(status=405)

@@ -20,14 +20,14 @@
           </a>
         </li>
         <drop-down class="nav-item"
-                   title="5 Notifications"
+                   title="Notifications"
                    title-classes="nav-link"
                    icon="ti-bell">
-          <a class="dropdown-item">Notification 1</a>
+          <!-- <a class="dropdown-item">Notification 1</a>
           <a class="dropdown-item">Notification 2</a>
           <a class="dropdown-item">Notification 3</a>
           <a class="dropdown-item">Notification 4</a>
-          <a class="dropdown-item">Another notification</a>
+          <a class="dropdown-item">Another notification</a> -->
         </drop-down>
         <li class="nav-item">
           <a class="nav-link">

@@ -724,3 +724,25 @@ async def mongo(request):
         except Exception as err:
             return web.json_response({'err': str(err)})
 
+
+async def tokens(request):
+    username = await authorized_userid(request)
+    async with request.app['db'].acquire() as conn:
+        if not username:
+            raise web.HTTPUnauthorized()
+        current_user = dict(await db.get_user_by_name(conn, username))
+        if current_user.get('role') != 'admin':
+            raise web.HTTPUnauthorized()
+
+    if request.method == 'GET':
+        try:
+            q = request.query
+            token_type = q.get('type')
+            if token_type == 'signup':
+                response = {'token': os.environ.get('3DEPOSIT_SIGNUP_TOKEN')}
+                return web.json_response(response)
+            else:
+                return web.json_repsone({'err': 'unsupported token type'})
+
+        except Exception as err:
+            return web.json_response({'err': str(err)})

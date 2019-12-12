@@ -49,7 +49,7 @@ export default {
     return {
       title: "Users",
       users: [],
-      default_user_img: require("@/assets/img/faces/face-1.jpg")
+      default_user_img: require("@/assets/img/faces/face-0.jpg")
     }
   },
   props: {

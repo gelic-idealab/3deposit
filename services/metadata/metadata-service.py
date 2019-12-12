@@ -21,6 +21,7 @@ handles POST requests with media payload, responds with metadata.
 '''
 
 app = Flask(__name__)
+app.config['JSON_SORT_KEYS'] = False
 
 filename_360_video = ''
 
@@ -125,9 +126,13 @@ def handler():
                             if '.' in k:
                                 k_new = k.replace('.', '_')
                                 all_vr_metadata[k_new] = all_vr_metadata.pop(k)
-
-                        # logging.debug(f'all_vr_metadata replaced: {all_vr_metadata}')
-                        response = jsonify({"deposit_id": did, 'technical_metadata': all_vr_metadata})
+                        
+                                                
+                        # TODO: fix: '<' not supported between instances of 'str' and 'int' from jsonify(...all_vr_metadata)
+                        # working now with sort turned off in jsonify, MongoDB complains: 'OverflowError: MongoDB can only handle up to 8-byte ints'
+                        # hmmmm.... maybe condense, skip files more than 8 levels deep, omit some general info from general file data 
+                        # HACK using str(all_vr_metadata) to get process to return to gateway
+                        response = jsonify({"deposit_id": did, 'technical_metadata': str(all_vr_metadata)})
                         return response
                         
                     except Exception as emsg:

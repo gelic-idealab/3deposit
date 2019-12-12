@@ -111,6 +111,13 @@ def create_default_services(engine):
             conn.execute(services.insert().values(name=obj.get('name'), endpoint=obj.get('endpoint'), config=obj.get('config')))
 
 
+def create_default_form(engine):
+    env = os.environ
+    with engine.connect() as conn:
+        with open('./templates/default_form.json') as f:
+            form_json = json.load(f)
+            conn.execute(forms.insert().values(id='default', content=form_json))
+
 def main():
     time.sleep(5) # wait for postgres to finish booting before running setup routines
 
@@ -118,6 +125,7 @@ def main():
     create_admin(engine=user_engine)
     create_default_actions(engine=user_engine)
     create_default_services(engine=user_engine)
+    create_default_form(engine=user_engine)
 
 
 if __name__ == '__main__':

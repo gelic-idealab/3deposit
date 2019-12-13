@@ -6,7 +6,7 @@
     <div class="row">
       <div class="col-12">
         <card :title="tables.deposits.title" :subTitle="tables.deposits.subTitle">
-          <div slot="raw-content" class="table-responsive">
+          <!-- <div slot="raw-content" class="table-responsive">
             <paper-table :data="tables.deposits.data" 
                          :columns="tables.deposits.columns"
                          linkField="deposit_id"
@@ -14,7 +14,13 @@
             >
 
             </paper-table>
-          </div>
+          </div> -->
+
+          <data-tables :data="tables.deposits.data">
+            <!-- <el-table-column prop="deposit_id" label="ID" sortable="custom"></el-table-column>
+            <el-table-column prop="deposit_date" label="Date" sortable="custom"></el-table-column>
+            <el-table-column prop="media_type" label="Type" sortable="custom"></el-table-column> -->
+          </data-tables>
         </card>
       </div>
     </div>  
@@ -22,17 +28,19 @@
 </template>
 <script>
 import { PaperTable } from "@/components";
+import { DataTables } from 'vue-data-tables';
 import axios from 'axios';
 
 export default {
   components: {
-    PaperTable
+    PaperTable,
+    DataTables
   },
   mounted() {
     axios
     .get('../api/deposits')
     .then(response => {
-      this.tables.deposits.data = response.data;
+      this.data = response.data;
     },
     error => {
       if (error.response.status === 401) {
@@ -41,6 +49,11 @@ export default {
     })
     .then(() => (this.tables.deposits.columns = Object.keys(this.tables.deposits.data[0])));
 
+  },
+  watch: {
+    data(data) {
+      this.tables.deposits.data = data;
+    }
   },
   data() {
     return {
@@ -51,13 +64,8 @@ export default {
           columns: [],
           data: []
         }
-      }
-      // get table1() {
-      //   return this._table1;
-      // },
-      // set table1(value) {
-      //   this._table1=value;
-      // },
+      },
+      data: []
     };
   }
 };

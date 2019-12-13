@@ -66,7 +66,7 @@
                 ></b-form-select>
                 <b-button class="mr-2" type="submit" variant="primary">Save</b-button>
                 <b-button v-on:click="toggleModal">Cancel</b-button>
-                <b-button variant="danger" v-on:click="deleteUser(userBeingEdited.username)">Delete</b-button>
+                <b-button class="sm mt-5" variant="danger" v-on:click="deleteUser(userBeingEdited.username)">Delete</b-button>
             </b-form>
         </div>
 

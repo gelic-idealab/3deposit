@@ -174,6 +174,15 @@ async def get_user_by_name(conn, username):
     return user_record
 
 
+async def update_user(conn, user):
+    result = await conn.execute(
+        users
+        .update()
+        .where(users.c.username == user.get('username'))
+        .values(role=user.get('role'), email=user.get('email'))
+    )
+    return True
+
 async def create_user(conn, username, password, email, role='user'):
     password_hash = generate_password_hash(password)
     result = await conn.execute(

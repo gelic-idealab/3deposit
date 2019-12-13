@@ -134,6 +134,16 @@ async def users(request):
 
         return web.json_response({'users': users})
     
+    if request.method == 'PATCH':
+        req = await request.json()
+        user = req.get('user')
+        username = user.get('username')
+        logging.debug(f'attempting to update {user}')
+        async with request.app['db'].acquire() as conn:
+            updated = await db.update_user(conn, user)
+        return web.json_response({'updated': updated, 'username': username})
+            
+    
     if request.method == 'DELETE':
         data = await request.json()
         user_to_delete = data.get('username')

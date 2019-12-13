@@ -11,7 +11,7 @@
       <div class="logo">
         <a href="/" class="simple-text">
             <div class="logo-img">
-                <img src="@/assets/img/logo.png" alt="">
+                <img src="@/assets/img/logo_cube.png" alt="">
             </div>
           {{title}}
         </a>
@@ -43,7 +43,7 @@ export default {
   props: {
     title: {
       type: String,
-      default: "3DEPOSIT"
+      default: "3deposit"
     },
     backgroundColor: {
       type: String,

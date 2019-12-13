@@ -134,6 +134,16 @@ async def users(request):
 
         return web.json_response({'users': users})
     
+    if request.method == 'PATCH':
+        req = await request.json()
+        user = req.get('user')
+        username = user.get('username')
+        logging.debug(f'attempting to update {user}')
+        async with request.app['db'].acquire() as conn:
+            updated = await db.update_user(conn, user)
+        return web.json_response({'updated': updated, 'username': username})
+            
+    
     if request.method == 'DELETE':
         data = await request.json()
         user_to_delete = data.get('username')
@@ -167,7 +177,7 @@ async def services(request):
         except Exception as err:
             return web.json_response({'err': str(err)})
     else:
-        return web.Response()
+        return web.Response(status=405)
 
 
 async def services_configs(request):
@@ -205,7 +215,7 @@ async def services_configs(request):
             return web.json_response({'err': str(err)}, headers=headers)
 
     else:
-        return web.Response(headers=headers)
+        return web.Response(status=405, headers=headers)
 
 
 async def services_actions(request):
@@ -276,7 +286,9 @@ async def services_actions(request):
             return web.json_response({'err': str(err)})
 
     else:
-        return web.Response(headers={
+        return web.Response(
+            status=405,
+            headers={
             'Access-Control-Allow-Headers': 'content-type'
         })
 
@@ -389,7 +401,7 @@ async def deposit_upload(request):
             return web.json_response({'err': str(err)}, status=500)
 
     else:
-        return web.Response(status=200)
+        return web.Response(status=405)
 
 async def deposit_submit(request):
     headers = {
@@ -408,7 +420,7 @@ async def deposit_submit(request):
         except Exception as err:
             return web.json_response({'err': str(err)}, headers=headers)
     else:
-        return web.Response(status=200, headers=headers)
+        return web.Response(status=405, headers=headers)
 
 
 """
@@ -724,3 +736,27 @@ async def mongo(request):
         except Exception as err:
             return web.json_response({'err': str(err)})
 
+
+async def tokens(request):
+    username = await authorized_userid(request)
+    async with request.app['db'].acquire() as conn:
+        if not username:
+            raise web.HTTPUnauthorized()
+        current_user = dict(await db.get_user_by_name(conn, username))
+        if current_user.get('role') != 'admin':
+            raise web.HTTPUnauthorized()
+
+    if request.method == 'GET':
+        try:
+            q = request.query
+            token_type = q.get('type')
+            if token_type == 'signup':
+                response = {'token': os.environ.get('3DEPOSIT_SIGNUP_TOKEN')}
+                return web.json_response(response)
+            else:
+                return web.json_repsone({'err': 'unsupported token type'})
+
+        except Exception as err:
+            return web.json_response({'err': str(err)})
+    else:
+        return web.Response(status=405)

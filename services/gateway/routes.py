@@ -6,6 +6,7 @@ from views import (
     success,
     current_user,
     users,
+    tokens,
     deposit_form,
     deposit_upload,
     deposit_submit,
@@ -41,6 +42,7 @@ def setup_routes(app):
     app.router.add_get('/api/user', current_user, name='user')
     app.router.add_view('/api/users', users, name='users')
     app.router.add_view('/api/signup', signup, name='signup')
+    app.router.add_view('/api/tokens', tokens, name='tokens')
 
     # service routes
     app.router.add_view('/api/services', services)

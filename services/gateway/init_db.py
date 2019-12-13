@@ -112,7 +112,6 @@ def create_default_services(engine):
 
 
 def create_default_form(engine):
-    env = os.environ
     with engine.connect() as conn:
         with open('./templates/default_form.json') as f:
             form_json = json.load(f)

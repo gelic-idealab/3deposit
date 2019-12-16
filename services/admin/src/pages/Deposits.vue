@@ -6,25 +6,25 @@
     <div class="row">
       <div class="col-12">
         <card :title="tables.deposits.title" :subTitle="tables.deposits.subTitle">
-          <!-- <div slot="raw-content" class="table-responsive">
-            <paper-table :data="tables.deposits.data" 
+          <div slot="raw-content" class="table-responsive">
+            <paper-table :data="tables.deposits.data"
                          :columns="tables.deposits.columns"
                          linkField="deposit_id"
                          pathName="deposit-profile"
             >
 
             </paper-table>
-          </div> -->
-
-          <data-tables :data="tables.deposits.data">
-            <!-- <el-table-column prop="deposit_id" label="ID" sortable="custom"></el-table-column>
-            <el-table-column prop="deposit_date" label="Date" sortable="custom"></el-table-column>
-            <el-table-column prop="media_type" label="Type" sortable="custom"></el-table-column> -->
-          </data-tables>
+          </div>
+          <div slot="raw-content" class="table-responsive">
+            <data-tables :data="this.tables.deposits.data" :pagination-props="{ pageSizes: [5, 10, 15] }" :table-props="tables.deposits.tableProps">
+               <el-table-column v-for="title in tables.deposits.columns" :label="title" :key="title">
+              </el-table-column>
+            </data-tables>-
+          </div>
         </card>
       </div>
-    </div>  
-  </div>   
+    </div>
+  </div>
 </template>
 <script>
 import { PaperTable } from "@/components";
@@ -47,12 +47,13 @@ export default {
         window.location.href = '../api/login';
         }
     })
-    .then(() => (this.tables.deposits.columns = Object.keys(this.tables.deposits.data[0])));
+    //.then(() => (this.tables.deposits.columns = Object.keys(this.data[0])));
 
   },
   watch: {
     data(data) {
       this.tables.deposits.data = data;
+      this.tables.deposits.columns = Object.keys(this.data[0])
     }
   },
   data() {
@@ -62,7 +63,11 @@ export default {
           title: "Deposits",
           subTitle: "All deposits so far",
           columns: [],
-          data: []
+          data: [],
+          tableProps: {
+            border: true,
+            stripe: true
+        }
         }
       },
       data: []

@@ -4,10 +4,11 @@ import router from "./router/index";
 import PaperDashboard from "./plugins/paperDashboard";
 import "vue-notifyjs/themes/default.css";
 import BootstrapVue from 'bootstrap-vue';
-import VueDataTables from 'vue-data-tables'
+import ElementUI from 'element-ui';
 
-Vue.use(VueDataTables)
+
 Vue.use(BootstrapVue)
+Vue.use(ElementUI)
 Vue.use(PaperDashboard);
 Vue.config.devtools = true;
 

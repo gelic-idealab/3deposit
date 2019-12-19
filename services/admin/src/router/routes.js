@@ -19,6 +19,10 @@ import UploadForm from "@/pages/UploadForm.vue";
 
 const routes = [
   {
+    path: "/",
+    redirect: '/admin',
+  },
+  {
     path: "/admin",
     component: DashboardLayout,
     redirect: '/admin/dashboard',

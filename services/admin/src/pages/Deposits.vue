@@ -78,7 +78,6 @@ export default {
   },
   methods: {
     openDepositProfile(id) {
-      console.log('router push', id)
       this.$router.push({ name: 'deposit-profile', params: { id: id }})
     }
   }

@@ -180,7 +180,7 @@ export default {
         },
         generateEmbed() {
             let location = window.location.href;
-            location = location.replace("gallery-builder", "public/gallery?filters=");
+            location = location.replace("admin/gallery-builder", "public/gallery?filters=");
             let qs = JSON.stringify(this.all_filters);
             this.embed = location.concat(encodeURIComponent(qs));
             console.log(this.embed);

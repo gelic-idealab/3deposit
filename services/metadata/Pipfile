@@ -13,6 +13,7 @@ gunicorn = "*"
 trimesh = "*"
 pillow = "*"
 pyyaml = "*"
+networkx = "*"
 
 [requires]
 python_version = "3.7"
